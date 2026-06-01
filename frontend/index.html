@@ -353,7 +353,28 @@ body{
 
 /* ─── ИНСТРУКЦИЯ ПОДКЛЮЧЕНИЯ ───────────────────────────────────────────────── */
 .connect-guide{margin-top:20px;padding-top:20px;border-top:1px solid var(--bd)}
-.connect-guide-title{font-size:13.5px;font-weight:700;color:var(--t1);letter-spacing:-.15px;margin-bottom:14px}
+
+/* Кликабельный заголовок аккордеона */
+.connect-guide-header{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;padding:2px 0;min-height:32px;
+}
+.connect-guide-header-title{
+  font-size:13.5px;font-weight:700;color:var(--t1);letter-spacing:-.15px;
+  transition:color var(--tf);
+}
+.connect-guide-header:hover .connect-guide-header-title{color:var(--a-tx)}
+.connect-guide-chevron{
+  color:var(--t2);flex-shrink:0;
+  transition:transform .26s cubic-bezier(.4,0,.2,1),color var(--tf);
+}
+.connect-guide-chevron.open{transform:rotate(180deg);color:var(--a-tx)}
+
+/* Тело аккордеона — height-анимация */
+.connect-body{height:0;overflow:hidden;transition:height .28s cubic-bezier(.4,0,.2,1)}
+.connect-body-inner{padding-top:14px}
+
 .connect-steps{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
 .connect-step{display:flex;gap:12px;align-items:flex-start}
 .step-num{
@@ -385,7 +406,8 @@ body{
   border:1px solid rgba(245,158,11,.30);border-radius:var(--r1);
   font-size:13px;font-weight:700;color:#fbbf24;letter-spacing:.01em;
 }
-.warn-hint{margin-top:8px;font-size:11.5px;color:var(--t3);line-height:1.5}
+/* Подпись — тот же уровень читаемости, что и основной текст warning */
+.warn-hint{margin-top:8px;font-size:12.5px;color:var(--t2);line-height:1.55}
 
 /* ═══ АДАПТИВНОСТЬ ═══════════════════════════════════════════════════════════ */
 
@@ -632,48 +654,60 @@ body{
         </div>
       </div>
 
-      <!-- Инструкция подключения -->
+      <!-- Инструкция подключения — аккордеон, по умолчанию свёрнут -->
       <div class="connect-guide">
-        <div class="connect-guide-title">Как подключиться</div>
-
-        <div class="connect-steps">
-          <div class="connect-step">
-            <div class="step-num">1</div>
-            <div>
-              <div class="step-title">Установите приложение</div>
-              <div class="step-desc">Скачайте и установите <strong>Amnesia VPN</strong> для вашей платформы, используя ссылки выше.</div>
-            </div>
-          </div>
-          <div class="connect-step">
-            <div class="step-num">2</div>
-            <div>
-              <div class="step-title">Импортируйте конфигурацию</div>
-              <div class="step-desc">
-                Откройте приложение и нажмите <strong>«Import configuration file»</strong>.<br>
-                Выберите файл <code>.conf</code>, скачанный в этой панели управления.
-              </div>
-            </div>
-          </div>
+        <div class="connect-guide-header" id="connect-guide-toggle">
+          <span class="connect-guide-header-title">Как подключиться</span>
+          <svg class="connect-guide-chevron" width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
         </div>
 
-        <!-- Warning: обфускация -->
-        <div class="connect-warn">
-          <div class="connect-warn-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-            Если подключение не работает
-          </div>
-          <div class="connect-warn-body">
-            Некоторые сети и провайдеры могут блокировать WireGuard.
-            При импорте конфигурации <strong>обязательно включите</strong> опцию:
-            <div class="obfuscation-label">
-              ☑&nbsp; Enable obfuscation (WireGuard)
+        <div class="connect-body" id="connect-body">
+          <div class="connect-body-inner">
+
+            <div class="connect-steps">
+              <div class="connect-step">
+                <div class="step-num">1</div>
+                <div>
+                  <div class="step-title">Установите приложение</div>
+                  <div class="step-desc">Скачайте и установите <strong>Amnesia VPN</strong> для вашей платформы, используя ссылки выше.</div>
+                </div>
+              </div>
+              <div class="connect-step">
+                <div class="step-num">2</div>
+                <div>
+                  <div class="step-title">Импортируйте конфигурацию</div>
+                  <div class="step-desc">
+                    Откройте приложение и выберите <strong>«Файл с настройками подключения»</strong>.<br>
+                    Выберите файл <code>.conf</code>, скачанный в этой панели управления.
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="warn-hint">
-              Это галочка в интерфейсе Amnesia VPN, которую нужно активировать прямо во время импорта файла конфигурации.
+
+            <!-- Warning: аутфускация -->
+            <div class="connect-warn">
+              <div class="connect-warn-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                Если подключение не работает
+              </div>
+              <div class="connect-warn-body">
+                Некоторые сети и провайдеры могут блокировать WireGuard.
+                При импорте конфигурации <strong>обязательно включите</strong> опцию:
+                <div class="obfuscation-label">
+                  ☑&nbsp; Включить аутфускацию WireGuard
+                </div>
+                <div class="warn-hint">
+                  Это галочка в интерфейсе Amnesia VPN, которую нужно активировать прямо во время импорта файла конфигурации.
+                </div>
+              </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -1154,6 +1188,29 @@ $("#device-confirm-btn").addEventListener("click",_submitDevice);
 $("#device-name-input").addEventListener("keydown",e=>{ if(e.key==="Enter") _submitDevice(); });
 $("#device-modal-bg").addEventListener("click",_closeDeviceModal);
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ _closeUserModal(); _closeDeviceModal(); } });
+
+/* ── Аккордеон "Как подключиться" ────────────────────────────────────────── */
+(function(){
+  const toggle = document.getElementById("connect-guide-toggle");
+  const body   = document.getElementById("connect-body");
+  if(!toggle||!body) return;
+  let open = false;
+  toggle.addEventListener("click",()=>{
+    const chevron = toggle.querySelector(".connect-guide-chevron");
+    if(open){
+      body.style.height = body.scrollHeight+"px";
+      requestAnimationFrame(()=>{ body.style.height="0"; });
+      chevron&&chevron.classList.remove("open");
+    }else{
+      body.style.height = body.scrollHeight+"px";
+      body.addEventListener("transitionend",()=>{
+        if(open) body.style.height="auto";
+      },{once:true});
+      chevron&&chevron.classList.add("open");
+    }
+    open=!open;
+  });
+})();
 
 /* ── Старт ────────────────────────────────────────────────────────────────── */
 if(_token) _showDashboard().catch(()=>_logout());
