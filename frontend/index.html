@@ -2,69 +2,70 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>VPN Control Panel</title>
 <style>
 /* ─── DESIGN TOKENS ────────────────────────────────────────────────────────── */
 :root {
-  /* Surface layers — elevation through color value, not shadows */
-  --s0:  #07101f;   /* page background */
-  --s1:  #0b1628;   /* card surface     */
-  --s2:  #0f1d33;   /* inset / rows     */
-  --s3:  #132240;   /* hover on s2      */
-  --s4:  #162847;   /* modal surface    */
+  --s0:  #07101f;
+  --s1:  #0b1628;
+  --s2:  #0f1d33;
+  --s3:  #132240;
+  --s4:  #162847;
 
-  /* Borders */
   --bd:  rgba(255,255,255,.07);
   --bd2: rgba(255,255,255,.12);
   --bd3: rgba(255,255,255,.20);
 
-  /* Accent */
   --a:     #5271e8;
   --a-hv:  #4060d4;
   --a-bg:  rgba(82,113,232,.11);
   --a-ri:  rgba(82,113,232,.28);
   --a-tx:  #7b9af4;
 
-  /* Success */
   --gn:    #1fc96a;
   --gn-bg: rgba(31,201,106,.09);
   --gn-ri: rgba(31,201,106,.25);
 
-  /* Danger */
   --rd:    #e55e5e;
   --rd-hv: #d44f4f;
   --rd-bg: rgba(229,94,94,.10);
   --rd-ri: rgba(229,94,94,.26);
 
-  /* Typography */
-  --t1: #cfd9ee;   /* primary   */
-  --t2: #5c738f;   /* secondary */
-  --t3: #293d54;   /* muted     */
+  --t1: #cfd9ee;
+  --t2: #5c738f;
+  --t3: #293d54;
 
-  /* Geometry */
   --r1: 6px;
   --r2: 9px;
   --r3: 12px;
   --r4: 16px;
   --r5: 20px;
 
-  /* Timing */
   --tf: 160ms cubic-bezier(.2,0,.13,1);
   --tm: 240ms cubic-bezier(.2,0,.13,1);
+
+  /* Safe area for notch/home-bar aware padding */
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
 }
 
 /* ─── RESET & BASE ─────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+html { -webkit-text-size-adjust: 100%; }
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
   background: var(--s0);
   min-height: 100vh;
+  min-height: 100dvh;
   color: var(--t1);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 .hidden { display: none !important; }
@@ -72,15 +73,6 @@ body {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
-
-/* ─── TYPOGRAPHY ───────────────────────────────────────────────────────────── */
-.label-xs {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--t2);
-}
 
 /* ─── BUTTON SYSTEM ────────────────────────────────────────────────────────── */
 .btn {
@@ -100,11 +92,13 @@ body {
   white-space: nowrap;
   background: none;
   color: inherit;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   transition: background var(--tf), border-color var(--tf),
               color var(--tf), box-shadow var(--tf), transform var(--tf);
-  user-select: none;
 }
-.btn:active:not(:disabled) { transform: scale(.96); }
+.btn:active:not(:disabled) { transform: scale(.95); }
 .btn:disabled { opacity: .4; cursor: not-allowed; transform: none !important; }
 
 .btn-primary {
@@ -118,7 +112,7 @@ body {
   box-shadow: 0 2px 14px rgba(82,113,232,.38);
   transform: translateY(-1px);
 }
-.btn-primary:active:not(:disabled) { transform: translateY(0) scale(.96); }
+.btn-primary:active:not(:disabled) { transform: translateY(0) scale(.95); }
 
 .btn-secondary {
   background: var(--s2);
@@ -166,10 +160,12 @@ body {
 /* ─── LOGIN ────────────────────────────────────────────────────────────────── */
 #login-view {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
+  padding-bottom: calc(24px + var(--safe-b));
 }
 
 .login-wrap {
@@ -179,19 +175,18 @@ body {
 }
 
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 .login-brand {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
-
 .login-icon-wrap {
-  width: 52px;
-  height: 52px;
-  margin: 0 auto 16px;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 14px;
   background: var(--a-bg);
   border: 1px solid var(--a-ri);
   border-radius: var(--r3);
@@ -200,13 +195,12 @@ body {
   justify-content: center;
   color: var(--a-tx);
 }
-
 .login-brand h1 {
   font-size: 19px;
   font-weight: 700;
   letter-spacing: -.4px;
   color: var(--t1);
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 .login-brand p { font-size: 13px; color: var(--t2); }
 
@@ -214,8 +208,8 @@ body {
   background: var(--s1);
   border: 1px solid var(--bd);
   border-radius: var(--r4);
-  padding: 28px;
-  box-shadow: 0 24px 64px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.04) inset;
+  padding: 26px;
+  box-shadow: 0 20px 56px rgba(0,0,0,.48), 0 1px 0 rgba(255,255,255,.04) inset;
 }
 
 .field { margin-bottom: 16px; }
@@ -230,13 +224,15 @@ body {
 }
 .field input {
   width: 100%;
-  padding: 10px 13px;
+  padding: 11px 13px;
   background: var(--s2);
   border: 1px solid var(--bd);
   border-radius: var(--r2);
-  font-size: 14px;
+  font-size: 16px; /* 16px prevents iOS auto-zoom */
   color: var(--t1);
   outline: none;
+  -webkit-appearance: none;
+  appearance: none;
   transition: border-color var(--tf), box-shadow var(--tf), background var(--tf);
 }
 .field input::placeholder { color: var(--t3); }
@@ -256,9 +252,10 @@ body {
 #login-btn {
   width: 100%;
   margin-top: 8px;
-  padding: 10px;
+  padding: 12px;
   font-size: 14px;
   font-weight: 600;
+  min-height: 46px;
 }
 
 /* ─── HEADER ───────────────────────────────────────────────────────────────── */
@@ -267,7 +264,7 @@ body {
   top: 0;
   z-index: 50;
   height: 54px;
-  background: rgba(7,16,31,.88);
+  background: rgba(7,16,31,.9);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--bd);
@@ -275,7 +272,9 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  gap: 16px;
+  padding-left: calc(24px + var(--safe-l));
+  padding-right: calc(24px + var(--safe-r));
+  gap: 12px;
 }
 
 .logo {
@@ -283,8 +282,8 @@ body {
   align-items: center;
   gap: 9px;
   flex-shrink: 0;
+  min-width: 0;
 }
-
 .logo-mark {
   width: 30px;
   height: 30px;
@@ -297,12 +296,14 @@ body {
   color: var(--a-tx);
   flex-shrink: 0;
 }
-
 .logo-title {
   font-size: 14.5px;
   font-weight: 650;
   color: var(--t1);
   letter-spacing: -.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-badge {
@@ -316,9 +317,9 @@ body {
   background: var(--gn-bg);
   border: 1px solid var(--gn-ri);
   border-radius: 20px;
-  letter-spacing: .01em;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
-
 .badge-dot {
   width: 6px;
   height: 6px;
@@ -329,23 +330,30 @@ body {
 }
 @keyframes dot-pulse {
   0%,100% { opacity: 1; }
-  50%      { opacity: .55; }
+  50%      { opacity: .5; }
 }
 
-.header-controls { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
 
-/* ─── MAIN LAYOUT ──────────────────────────────────────────────────────────── */
+/* ─── MAIN ─────────────────────────────────────────────────────────────────── */
 .main {
   max-width: 860px;
   margin: 0 auto;
-  padding: 36px 20px 72px;
+  padding: clamp(20px,4vw,36px) clamp(14px,3vw,20px) clamp(56px,8vw,72px);
+  padding-left: max(clamp(14px,3vw,20px), var(--safe-l));
+  padding-right: max(clamp(14px,3vw,20px), var(--safe-r));
 }
 
 .section-head {
-  margin-bottom: 20px;
+  margin-bottom: clamp(16px,3vw,22px);
 }
 .section-head h2 {
-  font-size: 20px;
+  font-size: clamp(17px,3.5vw,20px);
   font-weight: 700;
   letter-spacing: -.45px;
   color: var(--t1);
@@ -375,12 +383,22 @@ body {
   padding: 14px 18px;
   cursor: pointer;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  gap: 10px;
+  min-height: 56px; /* touch target */
   transition: background var(--tf);
-  gap: 12px;
 }
 .user-header:hover { background: rgba(255,255,255,.022); }
+.user-header:active { background: rgba(255,255,255,.035); }
 
-.user-info { display: flex; align-items: center; gap: 13px; min-width: 0; }
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  flex: 1;
+}
 
 .avatar {
   width: 38px;
@@ -393,13 +411,26 @@ body {
   font-size: 15px;
   flex-shrink: 0;
   letter-spacing: -.3px;
-  /* color/bg/border set inline from JS _avatarStyle() */
 }
 
-.user-name { font-weight: 600; font-size: 14px; color: var(--t1); letter-spacing: -.15px; }
+.user-text { min-width: 0; }
+.user-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--t1);
+  letter-spacing: -.15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .user-meta { font-size: 12px; color: var(--t2); margin-top: 2px; }
 
-.header-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
 
 .chevron {
   color: var(--t3);
@@ -436,7 +467,7 @@ body {
   background: var(--s2);
   border: 1px solid var(--bd);
   border-radius: var(--r2);
-  gap: 12px;
+  gap: 10px;
   transition: background var(--tf), border-color var(--tf);
 }
 .device-item:hover {
@@ -444,8 +475,13 @@ body {
   border-color: var(--bd2);
 }
 
-.device-left { display: flex; align-items: center; gap: 11px; min-width: 0; }
-
+.device-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
 .device-icon {
   width: 32px;
   height: 32px;
@@ -458,7 +494,6 @@ body {
   justify-content: center;
   flex-shrink: 0;
 }
-
 .device-name {
   font-size: 13.5px;
   font-weight: 500;
@@ -474,18 +509,21 @@ body {
   margin-top: 2px;
   letter-spacing: .01em;
 }
-
-.device-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.device-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
 
 /* ─── EMPTY STATES ─────────────────────────────────────────────────────────── */
 .empty-page {
-  padding: 64px 20px;
+  padding: clamp(40px,8vw,64px) 20px;
   text-align: center;
 }
-
 .empty-icon {
-  width: 56px;
-  height: 56px;
+  width: 54px;
+  height: 54px;
   margin: 0 auto 16px;
   background: var(--s2);
   border: 1px solid var(--bd);
@@ -495,7 +533,6 @@ body {
   justify-content: center;
   color: var(--t3);
 }
-
 .empty-page h3 {
   font-size: 15px;
   font-weight: 600;
@@ -508,7 +545,7 @@ body {
 
 .empty-devices {
   text-align: center;
-  padding: 20px 0 8px;
+  padding: 18px 0 6px;
   font-size: 13px;
   color: var(--t3);
 }
@@ -549,7 +586,6 @@ body {
   justify-content: center;
   padding: 20px;
 }
-
 .modal-backdrop {
   position: absolute;
   inset: 0;
@@ -557,13 +593,12 @@ body {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
-
 .modal-box {
   position: relative;
   background: var(--s4);
   border: 1px solid var(--bd2);
   border-radius: var(--r4);
-  box-shadow: 0 32px 80px rgba(0,0,0,.65), 0 1px 0 rgba(255,255,255,.05) inset;
+  box-shadow: 0 28px 72px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.05) inset;
   padding: 28px;
   width: 100%;
   max-width: 392px;
@@ -597,15 +632,14 @@ body {
 /* ─── TOASTS ───────────────────────────────────────────────────────────────── */
 .toast-container {
   position: fixed;
-  bottom: 28px;
-  right: 24px;
+  bottom: calc(24px + var(--safe-b));
+  right: 20px;
   z-index: 200;
   display: flex;
   flex-direction: column;
   gap: 7px;
   pointer-events: none;
 }
-
 .toast {
   display: flex;
   align-items: center;
@@ -656,7 +690,6 @@ body {
 .download-card-header p { font-size: 12.5px; color: var(--t2); margin-top: 3px; }
 
 .download-platforms { display: flex; flex-direction: column; gap: 7px; }
-
 .download-platform {
   display: flex;
   align-items: center;
@@ -693,17 +726,258 @@ body {
 }
 .dl-github-link:hover { color: var(--a-tx); }
 
-/* ─── RESPONSIVE ───────────────────────────────────────────────────────────── */
-@media (max-width: 620px) {
-  .header { padding: 0 14px; }
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE SYSTEM
+   ─────────────────────────────────────────────────────────────────────────
+   320–480px   mobile (phones)
+   481–768px   large mobile / small tablet
+   769–1024px  tablet
+   1025px+     desktop (base styles)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── MOBILE ≤ 480px ───────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+
+  /* Header */
+  .header {
+    height: 50px;
+    padding: 0 14px;
+    padding-left: calc(14px + var(--safe-l));
+    padding-right: calc(14px + var(--safe-r));
+    gap: 8px;
+  }
   .header-badge { display: none; }
-  .main { padding: 24px 12px 60px; }
-  .user-header { padding: 13px 14px; }
-  .user-body-inner { padding: 13px 14px 16px; }
-  .download-platform { flex-direction: column; align-items: flex-start; gap: 9px; }
+  .logo-title   { font-size: 13.5px; }
+  #logout-btn .logout-label { display: none; }
+  #logout-btn { padding: 8px; }
+  #add-user-btn { padding: 7px 12px; font-size: 12.5px; }
+
+  /* Login */
+  #login-view {
+    align-items: flex-start;
+    padding: 40px 16px 24px;
+    padding-bottom: calc(24px + var(--safe-b));
+  }
+  .login-wrap    { max-width: 100%; }
+  .login-brand   { margin-bottom: 24px; }
+  .login-brand h1 { font-size: 17px; }
+  .login-card    { padding: 22px 18px; border-radius: var(--r3); }
+  #login-btn     { min-height: 48px; font-size: 15px; }
+
+  /* Main */
+  .main {
+    padding: 20px 14px calc(56px + var(--safe-b));
+    padding-left:  max(14px, var(--safe-l));
+    padding-right: max(14px, var(--safe-r));
+  }
+
+  /* User cards — no hover lift on touch devices */
+  .user-card { border-radius: var(--r2); }
+  .user-card:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--bd);
+  }
+  .user-card:active { border-color: var(--bd2); }
+
+  .user-header {
+    padding: 0 14px;
+    min-height: 58px;
+  }
+  .user-body-inner { padding: 12px 14px 16px; }
+
+  .avatar { width: 34px; height: 34px; font-size: 14px; border-radius: var(--r1); }
+  .user-name { font-size: 13.5px; }
+
+  /* Delete user button — larger tap area */
+  .header-right .btn-danger { padding: 8px 10px; }
+
+  /* Device items — vertical stack on mobile */
+  .device-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  .device-left { gap: 10px; }
+  .device-icon { width: 30px; height: 30px; }
+
+  .device-actions {
+    display: flex;
+    gap: 7px;
+    padding-top: 2px;
+    border-top: 1px solid var(--bd);
+    margin-top: 2px;
+  }
+  /* Config button takes remaining width */
+  .device-actions .btn-secondary {
+    flex: 1;
+    min-height: 38px;
+    font-size: 13px;
+  }
+  /* Delete button stays compact */
+  .device-actions .btn-danger {
+    flex: 0 0 38px;
+    min-height: 38px;
+    padding: 8px;
+  }
+
+  /* Add Device button — full width */
+  .devices-toolbar .btn {
+    width: 100%;
+    min-height: 40px;
+    font-size: 13px;
+  }
+  .devices-toolbar { margin-bottom: 10px; }
+
+  /* Modal → bottom sheet */
+  .modal {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modal-backdrop { background: rgba(4,9,20,.8); }
+  .modal-box {
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--r4) var(--r4) 0 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: 24px 20px calc(24px + var(--safe-b));
+    animation: sheet-up .28s cubic-bezier(.22,1,.36,1);
+    box-shadow: 0 -8px 48px rgba(0,0,0,.55);
+  }
+  @keyframes sheet-up {
+    from { opacity: 0; transform: translateY(100%); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  /* Sheet drag handle hint */
+  .modal-box::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: rgba(255,255,255,.15);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+  .modal-box h3  { font-size: 16px; }
+  .modal-box .sub { margin-bottom: 18px; }
+  /* Stacked buttons — cancel below, confirm on top */
+  .modal-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .modal-actions .btn {
+    width: 100%;
+    min-height: 46px;
+    font-size: 14.5px;
+    justify-content: center;
+    border-radius: var(--r2);
+  }
+
+  /* Toasts — full width bottom bar */
+  .toast-container {
+    right: 12px;
+    left: 12px;
+    bottom: calc(16px + var(--safe-b));
+  }
+  .toast { min-width: 0; max-width: 100%; width: 100%; }
+
+  /* Download platforms — stack */
+  .download-platform {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .download-platform .btn {
+    width: 100%;
+    min-height: 42px;
+    justify-content: center;
+  }
+  .download-card { padding: 16px 16px 18px; border-radius: var(--r2); }
 }
+
+/* ─── SMALL MOBILE ≤ 360px ─────────────────────────────────────────────────── */
 @media (max-width: 360px) {
   .logo-title { display: none; }
+  .header { gap: 6px; padding: 0 12px; }
+  .main { padding-left: 12px; padding-right: 12px; }
+  .user-header { padding-left: 12px; padding-right: 12px; }
+  .user-body-inner { padding-left: 12px; padding-right: 12px; }
+  .section-head h2 { font-size: 16px; }
+}
+
+/* ─── LARGE MOBILE / SMALL TABLET  481px–768px ─────────────────────────────── */
+@media (min-width: 481px) and (max-width: 768px) {
+  .header { padding: 0 20px; }
+  .header-badge { display: none; }
+
+  .main { padding: 28px 18px 64px; }
+
+  .user-header { min-height: 54px; }
+  .device-item { padding: 10px 14px; }
+
+  /* Slightly larger touch targets on large phones */
+  .user-header, .device-item {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Modal: slightly narrower than full screen */
+  .modal { align-items: flex-end; padding: 0; }
+  .modal-box {
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--r4) var(--r4) 0 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: 28px 24px calc(28px + var(--safe-b));
+    animation: sheet-up .28s cubic-bezier(.22,1,.36,1);
+  }
+  .modal-box::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: rgba(255,255,255,.15);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+  .modal-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .modal-actions .btn {
+    width: 100%;
+    min-height: 46px;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .toast-container { right: 16px; left: 16px; }
+  .toast { min-width: 0; max-width: 100%; }
+}
+
+/* ─── TABLET  769px–1024px ────────────────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .main { padding: 30px 20px 68px; }
+  .header-badge { display: flex; }
+  .user-header { padding: 13px 18px; }
+  .user-body-inner { padding: 13px 18px 17px; }
+}
+
+/* ─── DESKTOP  1025px+ ─────────────────────────────────────────────────────── */
+@media (min-width: 1025px) {
+  .header-badge { display: flex; }
+  /* Restore hover lift on desktop only */
+  .user-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 1px rgba(82,113,232,.12), 0 4px 20px rgba(0,0,0,.22);
+    border-color: var(--bd2);
+  }
 }
 </style>
 </head>
@@ -731,9 +1005,7 @@ body {
         <input type="password" id="pw-input" placeholder="Admin password" autocomplete="current-password">
       </div>
       <div class="error-text" id="login-error"></div>
-      <button class="btn btn-primary" id="login-btn" style="width:100%;margin-top:8px;padding:10px;font-size:14px;font-weight:600;">
-        Sign in
-      </button>
+      <button class="btn btn-primary" id="login-btn">Sign in</button>
     </div>
   </div>
 </div>
@@ -763,13 +1035,13 @@ body {
         </svg>
         Add User
       </button>
-      <button class="btn btn-ghost btn-sm" id="logout-btn" title="Logout">
+      <button class="btn btn-ghost btn-sm" id="logout-btn" title="Sign out">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
           <polyline points="16 17 21 12 16 7"/>
           <line x1="21" y1="12" x2="9" y2="12"/>
         </svg>
-        <span>Sign out</span>
+        <span class="logout-label">Sign out</span>
       </button>
     </div>
   </header>
@@ -782,11 +1054,10 @@ body {
 
     <div id="users-list"></div>
 
-    <!-- Download card — shown only when URLs configured -->
     <div id="download-section" class="download-card hidden">
       <div class="download-card-header">
         <h3>Download Amnesia VPN Client</h3>
-        <p>Install the client app, then import your .conf file to connect</p>
+        <p>Install the client, then import your .conf file to connect</p>
       </div>
       <div class="download-platforms">
         <div class="download-platform" id="dl-android">
@@ -855,28 +1126,23 @@ body {
 <script>
 "use strict";
 
-// ── Config ────────────────────────────────────────────────────────────────────
 const API = "/api";
-
-// ── State ─────────────────────────────────────────────────────────────────────
 let _token = localStorage.getItem("vpn_token");
 const _open = new Set();
 let _pendingUser = null;
 
-// ── Avatar color palette (deterministic by first char code) ───────────────────
 const _AVATAR_PALETTE = [
-  { bg:"rgba(82,113,232,.15)",  bd:"rgba(82,113,232,.30)",  tx:"#7b9af4" },  // blue
-  { bg:"rgba(34,197,94,.12)",   bd:"rgba(34,197,94,.28)",   tx:"#4ade80" },  // green
-  { bg:"rgba(245,158,11,.12)",  bd:"rgba(245,158,11,.28)",  tx:"#fbbf24" },  // amber
-  { bg:"rgba(168,85,247,.13)",  bd:"rgba(168,85,247,.28)",  tx:"#c084fc" },  // purple
-  { bg:"rgba(20,184,166,.12)",  bd:"rgba(20,184,166,.28)",  tx:"#2dd4bf" },  // teal
-  { bg:"rgba(244,63,94,.12)",   bd:"rgba(244,63,94,.28)",   tx:"#fb7185" },  // rose
+  { bg:"rgba(82,113,232,.15)",  bd:"rgba(82,113,232,.30)",  tx:"#7b9af4" },
+  { bg:"rgba(34,197,94,.12)",   bd:"rgba(34,197,94,.28)",   tx:"#4ade80" },
+  { bg:"rgba(245,158,11,.12)",  bd:"rgba(245,158,11,.28)",  tx:"#fbbf24" },
+  { bg:"rgba(168,85,247,.13)",  bd:"rgba(168,85,247,.28)",  tx:"#c084fc" },
+  { bg:"rgba(20,184,166,.12)",  bd:"rgba(20,184,166,.28)",  tx:"#2dd4bf" },
+  { bg:"rgba(244,63,94,.12)",   bd:"rgba(244,63,94,.28)",   tx:"#fb7185" },
 ];
 function _avatarStyle(name) {
   return _AVATAR_PALETTE[name.charCodeAt(0) % _AVATAR_PALETTE.length];
 }
 
-// ── Request helpers ───────────────────────────────────────────────────────────
 async function req(method, path, body = null) {
   const opts = {
     method,
@@ -903,7 +1169,6 @@ async function rj(method, path, body = null) {
   return json.data !== undefined ? json.data : json;
 }
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
 async function _login() {
   const pw  = $("pw-input").value;
   const btn = $("login-btn");
@@ -917,7 +1182,7 @@ async function _login() {
     localStorage.setItem("vpn_token", _token);
     _showDashboard();
   } catch (e) {
-    err.textContent = e.message.includes("401") || e.message.toLowerCase().includes("invalid")
+    err.textContent = e.message.toLowerCase().includes("invalid") || e.message.includes("401")
       ? "Incorrect password" : e.message;
   } finally {
     btn.disabled = false;
@@ -935,14 +1200,12 @@ function _logout() {
   $("login-error").textContent = "";
 }
 
-// ── Views ─────────────────────────────────────────────────────────────────────
 async function _showDashboard() {
   hide("login-view");
   show("dashboard-view");
   await Promise.all([_loadUsers(), _loadDownloads()]);
 }
 
-// ── Downloads ─────────────────────────────────────────────────────────────────
 async function _loadDownloads() {
   const section = $("download-section");
   ["dl-android","dl-windows","dl-github"].forEach(id => {
@@ -964,7 +1227,6 @@ async function _loadDownloads() {
   } catch { /* optional */ }
 }
 
-// ── Users list ────────────────────────────────────────────────────────────────
 async function _loadUsers() {
   const list = $("users-list");
   list.innerHTML = '<div class="loading-row"><span class="spinner spinner-dark"></span> Loading…</div>';
@@ -989,7 +1251,7 @@ function _renderUsers(users) {
           </svg>
         </div>
         <h3>No users yet</h3>
-        <p>Click <strong>Add User</strong> in the header to get started.</p>
+        <p>Tap <strong>Add User</strong> to get started.</p>
       </div>`;
     return;
   }
@@ -1007,15 +1269,15 @@ function _userCard(u) {
     <div class="user-header" data-action="toggle" data-user="${esc(u.name)}">
       <div class="user-info">
         <div class="avatar" style="background:${av.bg};border:1px solid ${av.bd};color:${av.tx};">${esc(u.name[0].toUpperCase())}</div>
-        <div>
+        <div class="user-text">
           <div class="user-name">${esc(u.name)}</div>
           <div class="user-meta" id="meta-${esc(u.name)}">${u.device_count} device${u.device_count !== 1 ? "s" : ""}</div>
         </div>
       </div>
       <div class="header-right">
         <button class="btn btn-xs btn-danger" data-action="del-user" data-user="${esc(u.name)}"
-          style="padding:4px 8px;" title="Delete user">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          style="padding:7px 9px;" title="Delete user">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3 6 5 6 21 6"/>
             <path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/>
           </svg>
@@ -1035,7 +1297,6 @@ function _userCard(u) {
   return card;
 }
 
-// ── Accordion ─────────────────────────────────────────────────────────────────
 async function _toggle(name) {
   const body    = document.getElementById("body-" + name);
   const card    = document.querySelector(`[data-user="${name}"].user-card`) || body?.closest(".user-card");
@@ -1106,8 +1367,8 @@ function _renderDevices(userName, devices, container) {
             </button>
             <button class="btn btn-xs btn-danger"
               data-action="del-device" data-user="${esc(userName)}" data-id="${esc(d.id)}"
-              title="Delete device" style="padding:4px 8px;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              title="Delete device" style="padding:6px 8px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="3 6 5 6 21 6"/>
                 <path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6"/>
               </svg>
@@ -1128,7 +1389,6 @@ function _renderDevices(userName, devices, container) {
     <div class="devices-list">${rows}</div>`;
 }
 
-// ── Config download ───────────────────────────────────────────────────────────
 async function _download(deviceId, filename) {
   try {
     const res  = await req("GET", `/devices/${encodeURIComponent(deviceId)}/config`);
@@ -1142,7 +1402,6 @@ async function _download(deviceId, filename) {
   } catch (e) { toast(e.message, "error"); }
 }
 
-// ── Delete device ─────────────────────────────────────────────────────────────
 async function _delDevice(userName, deviceId, btn = null) {
   if (!confirm("Delete this device? This cannot be undone.")) return;
   const orig = btn?.innerHTML;
@@ -1158,7 +1417,6 @@ async function _delDevice(userName, deviceId, btn = null) {
   }
 }
 
-// ── Delete user ───────────────────────────────────────────────────────────────
 async function _delUser(name, btn = null) {
   if (!confirm(`Delete user "${name}" and all their devices? This cannot be undone.`)) return;
   const orig = btn?.innerHTML;
@@ -1185,7 +1443,6 @@ async function _refreshMeta(name) {
   } catch {}
 }
 
-// ── User modal ────────────────────────────────────────────────────────────────
 function _openUserModal() {
   $("user-name-input").value = "";
   show("user-modal");
@@ -1212,7 +1469,6 @@ async function _submitUser() {
   }
 }
 
-// ── Device modal ──────────────────────────────────────────────────────────────
 function _openDeviceModal(userName) {
   _pendingUser = userName;
   $("device-modal-user").textContent = userName;
@@ -1243,7 +1499,6 @@ async function _submitDevice() {
   }
 }
 
-// ── Toast ─────────────────────────────────────────────────────────────────────
 function toast(msg, type = "info") {
   const icon = {
     success: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
@@ -1259,27 +1514,20 @@ function toast(msg, type = "info") {
   }, 3500);
 }
 
-// ── Event delegation ──────────────────────────────────────────────────────────
 document.addEventListener("click", e => {
   const t = e.target;
-
   const delUser = t.closest("[data-action='del-user']");
   if (delUser) { e.stopPropagation(); _delUser(delUser.dataset.user, delUser); return; }
-
   const toggle = t.closest("[data-action='toggle']");
   if (toggle && !t.closest("[data-action='del-user']")) { _toggle(toggle.dataset.user); return; }
-
   const addDev = t.closest("[data-action='add-device']");
   if (addDev) { _openDeviceModal(addDev.dataset.user); return; }
-
   const dl = t.closest("[data-action='download']");
   if (dl) { _download(dl.dataset.id, dl.dataset.filename); return; }
-
   const delDev = t.closest("[data-action='del-device']");
   if (delDev) { _delDevice(delDev.dataset.user, delDev.dataset.id, delDev); return; }
 });
 
-// ── Utilities ─────────────────────────────────────────────────────────────────
 function $(id) { return document.getElementById(id); }
 function show(id) { $(id).classList.remove("hidden"); }
 function hide(id) { $(id).classList.add("hidden"); }
@@ -1288,28 +1536,22 @@ function esc(s) {
     .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
-// ── Static event wiring ───────────────────────────────────────────────────────
 $("login-btn").addEventListener("click", _login);
 $("pw-input").addEventListener("keydown", e => { if (e.key === "Enter") _login(); });
-
 $("logout-btn").addEventListener("click", _logout);
 $("add-user-btn").addEventListener("click", _openUserModal);
-
 $("user-cancel-btn").addEventListener("click",  _closeUserModal);
 $("user-confirm-btn").addEventListener("click", _submitUser);
 $("user-name-input").addEventListener("keydown", e => { if (e.key === "Enter") _submitUser(); });
 $("user-modal-bg").addEventListener("click", _closeUserModal);
-
 $("device-cancel-btn").addEventListener("click",  _closeDeviceModal);
 $("device-confirm-btn").addEventListener("click", _submitDevice);
 $("device-name-input").addEventListener("keydown", e => { if (e.key === "Enter") _submitDevice(); });
 $("device-modal-bg").addEventListener("click", _closeDeviceModal);
-
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") { _closeUserModal(); _closeDeviceModal(); }
 });
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
 if (_token) _showDashboard().catch(() => _logout());
 </script>
 </body>
