@@ -7,599 +7,468 @@
 <style>
 /* ─── ТОКЕНЫ ───────────────────────────────────────────────────────────────── */
 :root {
-  --s0:  #07101f;
-  --s1:  #0b1628;
-  --s2:  #0f1d33;
-  --s3:  #132240;
-  --s4:  #162847;
+  --s0: #07101f;  --s1: #0b1628;  --s2: #0f1d33;
+  --s3: #132240;  --s4: #162847;
 
   --bd:  rgba(255,255,255,.07);
   --bd2: rgba(255,255,255,.12);
-  --bd3: rgba(255,255,255,.20);
 
-  --a:     #5271e8;
-  --a-hv:  #4060d4;
-  --a-bg:  rgba(82,113,232,.11);
-  --a-ri:  rgba(82,113,232,.28);
-  --a-tx:  #7b9af4;
+  --a:    #5271e8;  --a-hv: #4060d4;
+  --a-bg: rgba(82,113,232,.11);
+  --a-ri: rgba(82,113,232,.28);
+  --a-tx: #7b9af4;
 
   --gn:    #1fc96a;
   --gn-bg: rgba(31,201,106,.09);
   --gn-ri: rgba(31,201,106,.25);
   --gn-tx: #3fb87a;
 
-  --rd:    #e55e5e;
-  --rd-hv: #d44f4f;
+  --am:    #f59e0b;   /* amber — recently active */
+  --am-bg: rgba(245,158,11,.1);
+
+  --rd:    #e55e5e;  --rd-hv: #d44f4f;
   --rd-bg: rgba(229,94,94,.10);
   --rd-ri: rgba(229,94,94,.26);
 
-  --t1: #cfd9ee;
-  --t2: #5c738f;
-  --t3: #293d54;
+  --t1: #cfd9ee;  --t2: #5c738f;  --t3: #293d54;
 
-  --r1: 6px;  --r2: 9px;  --r3: 12px;  --r4: 16px;  --r5: 20px;
+  --r1:6px;  --r2:9px;  --r3:12px;  --r4:16px;
 
   --tf: 160ms cubic-bezier(.2,0,.13,1);
   --tm: 240ms cubic-bezier(.2,0,.13,1);
 
-  --safe-b: env(safe-area-inset-bottom, 0px);
-  --safe-l: env(safe-area-inset-left,   0px);
-  --safe-r: env(safe-area-inset-right,  0px);
+  --safe-b: env(safe-area-inset-bottom,0px);
+  --safe-l: env(safe-area-inset-left,0px);
+  --safe-r: env(safe-area-inset-right,0px);
 }
 
-/* ─── СБРОС И БАЗА ─────────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { -webkit-text-size-adjust: 100%; }
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
-  background: var(--s0);
-  min-height: 100vh; min-height: 100dvh;
-  color: var(--t1);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+/* ─── RESET ────────────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,sans-serif;
+  background:var(--s0);min-height:100vh;min-height:100dvh;
+  color:var(--t1);line-height:1.5;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
 }
-
-.hidden { display: none !important; }
-
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+.hidden{display:none!important}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
 
 /* ─── КНОПКИ ───────────────────────────────────────────────────────────────── */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: 6px; padding: 8px 16px;
-  font-size: 13.5px; font-weight: 500; line-height: 1; letter-spacing: .01em;
-  border: 1px solid transparent; border-radius: var(--r2);
-  cursor: pointer; text-decoration: none; white-space: nowrap;
-  background: none; color: inherit; user-select: none;
-  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-  transition: background var(--tf), border-color var(--tf),
-              color var(--tf), box-shadow var(--tf), transform var(--tf);
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px 16px;font-size:13.5px;font-weight:500;line-height:1;letter-spacing:.01em;
+  border:1px solid transparent;border-radius:var(--r2);
+  cursor:pointer;text-decoration:none;white-space:nowrap;
+  background:none;color:inherit;user-select:none;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  transition:background var(--tf),border-color var(--tf),
+             color var(--tf),box-shadow var(--tf),transform var(--tf);
 }
-.btn:active:not(:disabled) { transform: scale(.95); }
-.btn:disabled { opacity: .4; cursor: not-allowed; transform: none !important; }
+.btn:active:not(:disabled){transform:scale(.95)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 
-.btn-primary {
-  background: var(--a); color: #fff;
-  box-shadow: 0 1px 6px rgba(82,113,232,.28), inset 0 1px 0 rgba(255,255,255,.12);
+.btn-primary{
+  background:var(--a);color:#fff;
+  box-shadow:0 1px 6px rgba(82,113,232,.28),inset 0 1px 0 rgba(255,255,255,.12);
 }
-.btn-primary:hover:not(:disabled) {
-  background: var(--a-hv);
-  box-shadow: 0 2px 14px rgba(82,113,232,.38);
-  transform: translateY(-1px);
+.btn-primary:hover:not(:disabled){
+  background:var(--a-hv);box-shadow:0 2px 14px rgba(82,113,232,.38);transform:translateY(-1px);
 }
-.btn-primary:active:not(:disabled) { transform: translateY(0) scale(.95); }
+.btn-primary:active:not(:disabled){transform:translateY(0) scale(.95)}
 
-.btn-secondary {
-  background: var(--s2); color: var(--t1); border-color: var(--bd);
-}
-.btn-secondary:hover:not(:disabled) { background: var(--s3); border-color: var(--bd2); }
+.btn-secondary{background:var(--s2);color:var(--t1);border-color:var(--bd)}
+.btn-secondary:hover:not(:disabled){background:var(--s3);border-color:var(--bd2)}
 
-.btn-ghost { background: transparent; color: var(--t2); }
-.btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,.05); color: var(--t1); }
+.btn-ghost{background:transparent;color:var(--t2)}
+.btn-ghost:hover:not(:disabled){background:rgba(255,255,255,.05);color:var(--t1)}
 
-.btn-danger { color: var(--rd); border-color: rgba(229,94,94,.22); }
-.btn-danger:hover:not(:disabled) { background: var(--rd-bg); border-color: var(--rd-ri); }
+.btn-danger{color:var(--rd);border-color:rgba(229,94,94,.22)}
+.btn-danger:hover:not(:disabled){background:var(--rd-bg);border-color:var(--rd-ri)}
 
-.btn-windows {
-  background: rgba(255,255,255,.06); color: var(--t1); border-color: var(--bd);
-}
-.btn-windows:hover:not(:disabled) { background: rgba(255,255,255,.09); border-color: var(--bd2); }
+.btn-windows{background:rgba(255,255,255,.06);color:var(--t1);border-color:var(--bd)}
+.btn-windows:hover:not(:disabled){background:rgba(255,255,255,.09);border-color:var(--bd2)}
 
-.btn-sm  { padding: 5px 11px; font-size: 12.5px; }
-.btn-xs  { padding: 4px 9px;  font-size: 12px; }
+.btn-sm{padding:5px 11px;font-size:12.5px}
+.btn-xs{padding:4px 9px;font-size:12px}
 
-/* ─── СТРАНИЦА ВХОДА ───────────────────────────────────────────────────────── */
-#login-view {
-  min-height: 100vh; min-height: 100dvh;
-  display: flex; align-items: center; justify-content: center;
-  padding: 24px;
-  padding-bottom: calc(24px + var(--safe-b));
+/* ─── ВХОД ─────────────────────────────────────────────────────────────────── */
+#login-view{
+  min-height:100vh;min-height:100dvh;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;padding-bottom:calc(24px + var(--safe-b));
 }
-.login-wrap {
-  width: 100%; max-width: 352px;
-  animation: fade-up .36s cubic-bezier(.22,1,.36,1);
-}
-@keyframes fade-up {
-  from { opacity:0; transform:translateY(18px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-.login-brand { text-align: center; margin-bottom: 28px; }
-.login-icon-wrap {
-  width: 50px; height: 50px;
-  margin: 0 auto 14px;
-  background: var(--a-bg); border: 1px solid var(--a-ri); border-radius: var(--r3);
-  display: flex; align-items: center; justify-content: center; color: var(--a-tx);
-}
-.login-brand h1 { font-size: 19px; font-weight: 700; letter-spacing: -.4px; margin-bottom: 4px; }
-.login-brand p  { font-size: 13px; color: var(--t2); }
+.login-wrap{width:100%;max-width:352px;animation:fade-up .36s cubic-bezier(.22,1,.36,1)}
+@keyframes fade-up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 
-.login-card {
-  background: var(--s1); border: 1px solid var(--bd); border-radius: var(--r4);
-  padding: 26px;
-  box-shadow: 0 20px 56px rgba(0,0,0,.48), 0 1px 0 rgba(255,255,255,.04) inset;
+.login-brand{text-align:center;margin-bottom:28px}
+.login-icon-wrap{
+  width:50px;height:50px;margin:0 auto 14px;
+  background:var(--a-bg);border:1px solid var(--a-ri);border-radius:var(--r3);
+  display:flex;align-items:center;justify-content:center;color:var(--a-tx);
 }
+.login-brand h1{font-size:19px;font-weight:700;letter-spacing:-.4px;margin-bottom:4px}
+.login-brand p{font-size:13px;color:var(--t2)}
 
-.field { margin-bottom: 16px; }
-.field label {
-  display: block; font-size: 11.5px; font-weight: 600;
-  letter-spacing: .05em; text-transform: uppercase; color: var(--t2); margin-bottom: 7px;
+.login-card{
+  background:var(--s1);border:1px solid var(--bd);border-radius:var(--r4);padding:26px;
+  box-shadow:0 20px 56px rgba(0,0,0,.48),0 1px 0 rgba(255,255,255,.04) inset;
 }
-.field input {
-  width: 100%; padding: 11px 13px;
-  background: var(--s2); border: 1px solid var(--bd); border-radius: var(--r2);
-  font-size: 16px; color: var(--t1); outline: none;
-  -webkit-appearance: none; appearance: none;
-  transition: border-color var(--tf), box-shadow var(--tf), background var(--tf);
+.field{margin-bottom:16px}
+.field label{
+  display:block;font-size:11.5px;font-weight:600;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--t2);margin-bottom:7px;
 }
-.field input::placeholder { color: var(--t3); }
-.field input:focus {
-  background: rgba(82,113,232,.05); border-color: var(--a);
-  box-shadow: 0 0 0 3px var(--a-ri);
+.field input{
+  width:100%;padding:11px 13px;background:var(--s2);
+  border:1px solid var(--bd);border-radius:var(--r2);
+  font-size:16px;color:var(--t1);outline:none;
+  -webkit-appearance:none;appearance:none;
+  transition:border-color var(--tf),box-shadow var(--tf),background var(--tf);
 }
-.error-text { font-size: 12.5px; color: var(--rd); min-height: 1.3em; margin-top: 10px; }
-
-#login-btn { width: 100%; margin-top: 8px; padding: 12px; font-size: 14px; font-weight: 600; min-height: 46px; }
+.field input::placeholder{color:var(--t3)}
+.field input:focus{background:rgba(82,113,232,.05);border-color:var(--a);box-shadow:0 0 0 3px var(--a-ri)}
+.error-text{font-size:12.5px;color:var(--rd);min-height:1.3em;margin-top:10px}
+#login-btn{width:100%;margin-top:8px;padding:12px;font-size:14px;font-weight:600;min-height:46px}
 
 /* ─── ШАПКА ────────────────────────────────────────────────────────────────── */
-.header {
-  position: sticky; top: 0; z-index: 50; height: 54px;
-  background: rgba(7,16,31,.9);
-  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-  border-bottom: 1px solid var(--bd);
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 24px;
-  padding-left:  calc(24px + var(--safe-l));
-  padding-right: calc(24px + var(--safe-r));
-  gap: 12px;
+.header{
+  position:sticky;top:0;z-index:50;height:54px;
+  background:rgba(7,16,31,.9);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;
+  padding-left:calc(24px + var(--safe-l));
+  padding-right:calc(24px + var(--safe-r));
+  gap:12px;
 }
-.logo { display: flex; align-items: center; gap: 9px; flex-shrink: 0; min-width: 0; }
-.logo-mark {
-  width: 30px; height: 30px; flex-shrink: 0;
-  background: var(--a-bg); border: 1px solid rgba(82,113,232,.25); border-radius: var(--r2);
-  display: flex; align-items: center; justify-content: center; color: var(--a-tx);
+.logo{display:flex;align-items:center;gap:9px;flex-shrink:0;min-width:0}
+.logo-mark{
+  width:30px;height:30px;flex-shrink:0;
+  background:var(--a-bg);border:1px solid rgba(82,113,232,.25);border-radius:var(--r2);
+  display:flex;align-items:center;justify-content:center;color:var(--a-tx);
 }
-.logo-title {
-  font-size: 14.5px; font-weight: 650; color: var(--t1); letter-spacing: -.3px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+.logo-title{font-size:14.5px;font-weight:650;color:var(--t1);letter-spacing:-.3px;white-space:nowrap}
+.header-badge{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:500;color:var(--gn-tx);
+  padding:4px 10px;background:var(--gn-bg);border:1px solid var(--gn-ri);border-radius:20px;
+  flex-shrink:0;
 }
-.header-badge {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 500; color: var(--gn-tx);
-  padding: 4px 10px; background: var(--gn-bg); border: 1px solid var(--gn-ri); border-radius: 20px;
-  flex-shrink: 0;
+.badge-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--gn);flex-shrink:0;
+  animation:dot-pulse 2.5s ease-in-out infinite;
 }
-.badge-dot {
-  width: 6px; height: 6px; border-radius: 50%; background: var(--gn); flex-shrink: 0;
-  animation: dot-pulse 2.5s ease-in-out infinite;
-}
-@keyframes dot-pulse { 0%,100% { opacity:1; } 50% { opacity:.5; } }
+@keyframes dot-pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.header-controls{display:flex;align-items:center;gap:6px;flex-shrink:0}
 
-.header-controls { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-
-/* ─── ОСНОВНОЙ КОНТЕЙНЕР ───────────────────────────────────────────────────── */
-.main {
-  max-width: 880px; margin: 0 auto;
-  padding: clamp(20px,4vw,36px) clamp(14px,3vw,20px) clamp(56px,8vw,80px);
-  padding-left:  max(clamp(14px,3vw,20px), var(--safe-l));
-  padding-right: max(clamp(14px,3vw,20px), var(--safe-r));
+/* ─── КОНТЕЙНЕР ────────────────────────────────────────────────────────────── */
+.main{
+  max-width:880px;margin:0 auto;
+  padding:clamp(20px,4vw,36px) clamp(14px,3vw,20px) clamp(56px,8vw,80px);
+  padding-left:max(clamp(14px,3vw,20px),var(--safe-l));
+  padding-right:max(clamp(14px,3vw,20px),var(--safe-r));
 }
 
 /* ─── КАРТОЧКИ СТАТИСТИКИ ──────────────────────────────────────────────────── */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 28px;
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat-card{
+  background:var(--s1);border:1px solid var(--bd);border-radius:var(--r3);
+  padding:18px 20px;transition:border-color var(--tm);
 }
-.stat-card {
-  background: var(--s1); border: 1px solid var(--bd); border-radius: var(--r3);
-  padding: 18px 20px;
-  transition: border-color var(--tm);
-}
-.stat-card:hover { border-color: var(--bd2); }
+.stat-card:hover{border-color:var(--bd2)}
+.stat-val{font-size:26px;font-weight:700;letter-spacing:-.6px;color:var(--t1);line-height:1.1;margin-bottom:6px}
+.stat-lbl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t2)}
 
-.stat-val {
-  font-size: 26px; font-weight: 700; letter-spacing: -.6px; color: var(--t1);
-  line-height: 1.1; margin-bottom: 6px;
+/* ─── ОНЛАЙН ПАНЕЛЬ ────────────────────────────────────────────────────────── */
+.online-panel{
+  background:var(--gn-bg);border:1px solid var(--gn-ri);border-radius:var(--r3);
+  padding:11px 16px;margin-bottom:18px;
+  display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;
 }
-.stat-val-online {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 16px; font-weight: 600; color: var(--gn);
-  line-height: 1.1; margin-bottom: 6px;
+.online-panel-label{
+  display:flex;align-items:center;gap:7px;
+  font-size:11.5px;font-weight:600;color:var(--gn-tx);
+  text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;padding-top:2px;
+  white-space:nowrap;
 }
-.stat-online-dot {
-  width: 8px; height: 8px; border-radius: 50%; background: var(--gn); flex-shrink: 0;
-  animation: dot-pulse 2.5s ease-in-out infinite;
+.online-panel-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--gn);flex-shrink:0;
+  animation:dot-pulse 2.5s ease-in-out infinite;
 }
-.stat-lbl {
-  font-size: 11px; font-weight: 600; letter-spacing: .06em;
-  text-transform: uppercase; color: var(--t2);
+.online-tags{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.online-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;background:rgba(31,201,106,.13);
+  border:1px solid rgba(31,201,106,.22);border-radius:20px;
+  font-size:12.5px;font-weight:500;color:var(--t1);
 }
+.online-user{font-size:11px;color:var(--gn-tx);font-weight:400}
 
-/* ─── БЛОК СЕКЦИИ (заголовок + кнопка) ────────────────────────────────────── */
-.section-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; margin-bottom: 14px;
-}
-.section-bar-left {
-  display: flex; align-items: center; gap: 8px; min-width: 0;
-}
-.section-bar-left h2 {
-  font-size: clamp(16px,3.5vw,19px); font-weight: 700; letter-spacing: -.4px;
-  white-space: nowrap;
-}
-.count-badge {
-  display: inline-flex; align-items: center; justify-content: center;
-  min-width: 22px; height: 20px; padding: 0 6px;
-  background: var(--a-bg); border: 1px solid var(--a-ri); border-radius: 10px;
-  font-size: 11px; font-weight: 700; color: var(--a-tx);
-  flex-shrink: 0;
+/* ─── СЕКЦИЯ: заголовок + кнопка ───────────────────────────────────────────── */
+.section-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.section-bar-left{display:flex;align-items:center;gap:8px;min-width:0}
+.section-bar-left h2{font-size:clamp(16px,3.5vw,19px);font-weight:700;letter-spacing:-.4px;white-space:nowrap}
+.count-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:22px;height:20px;padding:0 6px;
+  background:var(--a-bg);border:1px solid var(--a-ri);border-radius:10px;
+  font-size:11px;font-weight:700;color:var(--a-tx);flex-shrink:0;
 }
 
 /* ─── КАРТОЧКИ ПОЛЬЗОВАТЕЛЕЙ ───────────────────────────────────────────────── */
-#users-list { display: flex; flex-direction: column; gap: 8px; }
-
-.user-card {
-  background: var(--s1); border: 1px solid var(--bd); border-radius: var(--r3);
-  overflow: hidden;
-  transition: border-color var(--tm), box-shadow var(--tm);
+#users-list{display:flex;flex-direction:column;gap:8px}
+.user-card{
+  background:var(--s1);border:1px solid var(--bd);border-radius:var(--r3);overflow:hidden;
+  transition:border-color var(--tm),box-shadow var(--tm);
 }
-.user-card:hover {
-  border-color: var(--bd2);
-  box-shadow: 0 0 0 1px rgba(82,113,232,.12), 0 4px 20px rgba(0,0,0,.22);
+.user-card:hover{border-color:var(--bd2);box-shadow:0 0 0 1px rgba(82,113,232,.12),0 4px 20px rgba(0,0,0,.22)}
+.user-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;cursor:pointer;user-select:none;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  gap:10px;min-height:56px;transition:background var(--tf);
 }
-
-.user-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 18px; cursor: pointer; user-select: none;
-  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-  gap: 10px; min-height: 56px;
-  transition: background var(--tf);
+.user-header:hover{background:rgba(255,255,255,.022)}
+.user-header:active{background:rgba(255,255,255,.035)}
+.user-info{display:flex;align-items:center;gap:13px;min-width:0;flex:1}
+.avatar{
+  width:38px;height:38px;border-radius:var(--r2);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:15px;flex-shrink:0;letter-spacing:-.3px;
 }
-.user-header:hover  { background: rgba(255,255,255,.022); }
-.user-header:active { background: rgba(255,255,255,.035); }
-
-.user-info { display: flex; align-items: center; gap: 13px; min-width: 0; flex: 1; }
-
-.avatar {
-  width: 38px; height: 38px; border-radius: var(--r2);
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 15px; flex-shrink: 0; letter-spacing: -.3px;
-}
-.user-text { min-width: 0; }
-.user-name {
-  font-weight: 600; font-size: 14px; color: var(--t1); letter-spacing: -.15px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.user-meta { font-size: 12px; color: var(--t2); margin-top: 2px; }
-
-.header-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-
-.chevron {
-  color: var(--t3); flex-shrink: 0;
-  transition: transform .26s cubic-bezier(.4,0,.2,1), color var(--tf);
-}
-.chevron.open { transform: rotate(90deg); color: var(--a-tx); }
-
-.user-body { height: 0; overflow: hidden; will-change: height; transition: height .3s cubic-bezier(.4,0,.2,1); }
-.user-body-inner { border-top: 1px solid var(--bd); padding: 14px 18px 18px; }
+.user-text{min-width:0}
+.user-name{font-weight:600;font-size:14px;color:var(--t1);letter-spacing:-.15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-meta{font-size:12px;color:var(--t2);margin-top:2px}
+.header-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.chevron{color:var(--t3);flex-shrink:0;transition:transform .26s cubic-bezier(.4,0,.2,1),color var(--tf)}
+.chevron.open{transform:rotate(90deg);color:var(--a-tx)}
+.user-body{height:0;overflow:hidden;will-change:height;transition:height .3s cubic-bezier(.4,0,.2,1)}
+.user-body-inner{border-top:1px solid var(--bd);padding:14px 18px 18px}
 
 /* ─── СПИСОК УСТРОЙСТВ ─────────────────────────────────────────────────────── */
-.devices-toolbar { display: flex; justify-content: flex-end; margin-bottom: 10px; }
-.devices-list    { display: flex; flex-direction: column; gap: 6px; }
+.devices-toolbar{display:flex;justify-content:flex-end;margin-bottom:10px}
+.devices-list{display:flex;flex-direction:column;gap:6px}
 
-.device-item {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 12px; background: var(--s2); border: 1px solid var(--bd);
-  border-radius: var(--r2); gap: 10px;
-  transition: background var(--tf), border-color var(--tf);
+.device-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 12px;background:var(--s2);border:1px solid var(--bd);
+  border-radius:var(--r2);gap:10px;
+  transition:background var(--tf),border-color var(--tf);
 }
-.device-item:hover { background: var(--s3); border-color: var(--bd2); }
+.device-item:hover{background:var(--s3);border-color:var(--bd2)}
 
-.device-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
-.device-icon {
-  width: 32px; height: 32px; border-radius: var(--r1);
-  background: var(--a-bg); border: 1px solid rgba(82,113,232,.18);
-  color: var(--a-tx); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+.device-left{display:flex;align-items:center;gap:9px;min-width:0;flex:1}
+
+/* Индикатор статуса */
+.dev-dot{
+  width:9px;height:9px;border-radius:50%;background:var(--t3);flex-shrink:0;
+  transition:background .4s,box-shadow .4s;
 }
-.device-name {
-  font-size: 13.5px; font-weight: 500; color: var(--t1);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+.dev-dot.online{
+  background:var(--gn);
+  box-shadow:0 0 0 2.5px rgba(31,201,106,.2);
+  animation:dot-pulse 2.5s ease-in-out infinite;
 }
-.device-ip {
-  font-size: 11.5px; color: var(--t2);
-  font-family: "SF Mono","JetBrains Mono","Cascadia Code",ui-monospace,monospace;
-  margin-top: 2px; letter-spacing: .01em;
+.dev-dot.recent{background:var(--am)}
+.dev-dot.offline{background:var(--t3)}
+
+.device-icon{
+  width:32px;height:32px;border-radius:var(--r1);
+  background:var(--a-bg);border:1px solid rgba(82,113,232,.18);
+  color:var(--a-tx);display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.device-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.device-info{min-width:0}
+.device-name{font-size:13.5px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.device-sub{
+  display:flex;align-items:baseline;flex-wrap:wrap;
+  margin-top:2px;font-size:11.5px;color:var(--t2);
+}
+.device-ip{font-family:"SF Mono","JetBrains Mono",ui-monospace,monospace;letter-spacing:.01em}
+.device-activity:not(:empty)::before,
+.device-traffic:not(:empty)::before{content:' · ';color:var(--t3)}
+.device-traffic{font-family:"SF Mono","JetBrains Mono",ui-monospace,monospace;white-space:nowrap}
+
+.device-actions{display:flex;align-items:center;gap:5px;flex-shrink:0}
 
 /* ─── ПУСТЫЕ СОСТОЯНИЯ ─────────────────────────────────────────────────────── */
-.empty-page { padding: clamp(36px,7vw,56px) 20px; text-align: center; }
-.empty-icon {
-  width: 52px; height: 52px; margin: 0 auto 14px;
-  background: var(--s2); border: 1px solid var(--bd); border-radius: var(--r3);
-  display: flex; align-items: center; justify-content: center; color: var(--t3);
+.empty-page{padding:clamp(36px,7vw,56px) 20px;text-align:center}
+.empty-icon{
+  width:52px;height:52px;margin:0 auto 14px;
+  background:var(--s2);border:1px solid var(--bd);border-radius:var(--r3);
+  display:flex;align-items:center;justify-content:center;color:var(--t3);
 }
-.empty-page h3 { font-size: 15px; font-weight: 600; color: var(--t2); margin-bottom: 5px; }
-.empty-page p  { font-size: 13px; color: var(--t3); }
-.empty-page p strong { color: var(--a-tx); font-weight: 500; }
-
-.empty-devices { text-align: center; padding: 16px 0 6px; font-size: 13px; color: var(--t3); }
+.empty-page h3{font-size:15px;font-weight:600;color:var(--t2);margin-bottom:5px}
+.empty-page p{font-size:13px;color:var(--t3)}
+.empty-page p strong{color:var(--a-tx);font-weight:500}
+.empty-devices{text-align:center;padding:16px 0 6px;font-size:13px;color:var(--t3)}
 
 /* ─── ЗАГРУЗКА ─────────────────────────────────────────────────────────────── */
-.loading-row {
-  display: flex; align-items: center; justify-content: center;
-  gap: 9px; padding: 24px; font-size: 13px; color: var(--t2);
-}
-.spinner {
-  display: inline-block; width: 14px; height: 14px;
-  border: 1.5px solid rgba(255,255,255,.15); border-top-color: #fff;
-  border-radius: 50%; animation: spin .6s linear infinite; flex-shrink: 0;
-}
-.spinner-dark { border-color: rgba(82,113,232,.18); border-top-color: var(--a); }
-@keyframes spin { to { transform: rotate(360deg); } }
+.loading-row{display:flex;align-items:center;justify-content:center;gap:9px;padding:24px;font-size:13px;color:var(--t2)}
+.spinner{display:inline-block;width:14px;height:14px;border:1.5px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+.spinner-dark{border-color:rgba(82,113,232,.18);border-top-color:var(--a)}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* ─── МОДАЛЬНЫЕ ОКНА ───────────────────────────────────────────────────────── */
-.modal {
-  position: fixed; inset: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: center; padding: 20px;
+.modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-backdrop{position:absolute;inset:0;background:rgba(4,9,20,.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.modal-box{
+  position:relative;background:var(--s4);
+  border:1px solid var(--bd2);border-radius:var(--r4);
+  box-shadow:0 28px 72px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.05) inset;
+  padding:28px;width:100%;max-width:392px;
+  animation:modal-in .22s cubic-bezier(.34,1.32,.64,1);
 }
-.modal-backdrop {
-  position: absolute; inset: 0; background: rgba(4,9,20,.75);
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-}
-.modal-box {
-  position: relative; background: var(--s4);
-  border: 1px solid var(--bd2); border-radius: var(--r4);
-  box-shadow: 0 28px 72px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.05) inset;
-  padding: 28px; width: 100%; max-width: 392px;
-  animation: modal-in .22s cubic-bezier(.34,1.32,.64,1);
-}
-@keyframes modal-in {
-  from { opacity:0; transform: scale(.93) translateY(-10px); }
-  to   { opacity:1; transform: scale(1)   translateY(0); }
-}
-.modal-box h3 { font-size: 17px; font-weight: 700; letter-spacing: -.4px; margin-bottom: 6px; }
-.modal-box .sub { font-size: 13px; color: var(--t2); margin-bottom: 22px; }
-.modal-box .sub strong { color: var(--a-tx); font-weight: 500; }
-.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 22px; }
+@keyframes modal-in{from{opacity:0;transform:scale(.93) translateY(-10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-box h3{font-size:17px;font-weight:700;letter-spacing:-.4px;margin-bottom:6px}
+.modal-box .sub{font-size:13px;color:var(--t2);margin-bottom:22px}
+.modal-box .sub strong{color:var(--a-tx);font-weight:500}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:22px}
 
 /* ─── УВЕДОМЛЕНИЯ ──────────────────────────────────────────────────────────── */
-.toast-container {
-  position: fixed; bottom: calc(24px + var(--safe-b)); right: 20px;
-  z-index: 200; display: flex; flex-direction: column; gap: 7px; pointer-events: none;
-}
-.toast {
-  display: flex; align-items: center; gap: 9px; padding: 11px 15px;
-  border-radius: var(--r2); font-size: 13px; font-weight: 500;
-  min-width: 210px; max-width: 320px;
-  animation: toast-in .2s cubic-bezier(.22,1,.36,1);
-  background: var(--s4); border: 1px solid var(--bd2); color: var(--t1);
-  box-shadow: 0 8px 28px rgba(0,0,0,.45);
-}
-.toast.success { background: rgba(31,201,106,.1); border-color: var(--gn-ri); color: #4ece8e; }
-.toast.error   { background: rgba(229,94,94,.1);  border-color: var(--rd-ri); color: #e87c7c; }
-@keyframes toast-in  { from { opacity:0; transform: translateX(14px) scale(.97); } }
-@keyframes toast-out { to   { opacity:0; transform: translateX(14px) scale(.97); } }
+.toast-container{position:fixed;bottom:calc(24px + var(--safe-b));right:20px;z-index:200;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:9px;padding:11px 15px;border-radius:var(--r2);font-size:13px;font-weight:500;min-width:210px;max-width:320px;animation:toast-in .2s cubic-bezier(.22,1,.36,1);background:var(--s4);border:1px solid var(--bd2);color:var(--t1);box-shadow:0 8px 28px rgba(0,0,0,.45)}
+.toast.success{background:rgba(31,201,106,.1);border-color:var(--gn-ri);color:#4ece8e}
+.toast.error{background:rgba(229,94,94,.1);border-color:var(--rd-ri);color:#e87c7c}
+@keyframes toast-in{from{opacity:0;transform:translateX(14px) scale(.97)}}
+@keyframes toast-out{to{opacity:0;transform:translateX(14px) scale(.97)}}
 
-/* ─── КЛИЕНТЫ WIREGUARD (ФУТЕР СТРАНИЦЫ) ───────────────────────────────────── */
-.clients-section {
-  margin-top: 40px;
-  padding-top: 32px;
-  border-top: 1px solid var(--bd);
-}
-.clients-head { margin-bottom: 14px; }
-.clients-head h3 {
-  font-size: 11px; font-weight: 700; letter-spacing: .08em;
-  text-transform: uppercase; color: var(--t2); margin-bottom: 3px;
-}
-.clients-head p { font-size: 12px; color: var(--t3); }
+/* ─── КЛИЕНТЫ (ФУТЕР) ──────────────────────────────────────────────────────── */
+.clients-section{margin-top:40px;padding-top:32px;border-top:1px solid var(--bd)}
+.clients-head{margin-bottom:14px}
+.clients-head h3{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t2);margin-bottom:3px}
+.clients-head p{font-size:12px;color:var(--t3)}
+.clients-list{display:flex;flex-direction:column;gap:6px}
+.client-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);gap:12px;transition:background var(--tf),border-color var(--tf)}
+.client-row:hover{background:var(--s3);border-color:var(--bd2)}
+.client-info{display:flex;align-items:center;gap:10px}
+.client-os-icon{font-size:17px;line-height:1}
+.client-os{font-size:13.5px;font-weight:500;color:var(--t1)}
+.client-os-sub{font-size:11px;color:var(--t3);margin-top:1px}
+.client-github-row{padding:6px 1px 0}
+.github-link{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--t2);text-decoration:none;transition:color var(--tf);padding:3px 0}
+.github-link:hover{color:var(--a-tx)}
 
-.clients-list { display: flex; flex-direction: column; gap: 6px; }
-
-.client-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 11px 14px; background: var(--s2);
-  border: 1px solid var(--bd); border-radius: var(--r2); gap: 12px;
-  transition: background var(--tf), border-color var(--tf);
-}
-.client-row:hover { background: var(--s3); border-color: var(--bd2); }
-
-.client-info { display: flex; align-items: center; gap: 10px; }
-.client-os-icon { font-size: 17px; line-height: 1; }
-.client-os      { font-size: 13.5px; font-weight: 500; color: var(--t1); }
-.client-os-sub  { font-size: 11px; color: var(--t3); margin-top: 1px; }
-
-.client-github-row { padding: 6px 1px 0; }
-.github-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12.5px; color: var(--t2); text-decoration: none;
-  transition: color var(--tf); padding: 3px 0;
-}
-.github-link:hover { color: var(--a-tx); }
-
-/* ─── АДАПТИВНОСТЬ ─────────────────────────────────────────────────────────── */
+/* ═══ АДАПТИВНОСТЬ ═══════════════════════════════════════════════════════════ */
 
 /* Мобильные ≤ 480px */
-@media (max-width: 480px) {
-  .header {
-    height: 50px; padding: 0 14px;
-    padding-left: calc(14px + var(--safe-l));
-    padding-right: calc(14px + var(--safe-r));
-    gap: 8px;
+@media(max-width:480px){
+  .header{height:50px;padding:0 14px;padding-left:calc(14px + var(--safe-l));padding-right:calc(14px + var(--safe-r));gap:8px}
+  .header-badge{display:none}
+  .logo-title{font-size:13.5px}
+  #logout-btn .logout-label{display:none}
+  #logout-btn{padding:8px}
+
+  #login-view{align-items:flex-start;padding:40px 16px 24px;padding-bottom:calc(24px + var(--safe-b))}
+  .login-wrap{max-width:100%}
+  .login-brand{margin-bottom:22px}
+  .login-brand h1{font-size:17px}
+  .login-card{padding:22px 18px;border-radius:var(--r3)}
+  #login-btn{min-height:48px;font-size:15px}
+
+  .main{padding:20px 14px calc(56px + var(--safe-b));padding-left:max(14px,var(--safe-l));padding-right:max(14px,var(--safe-r))}
+
+  .stats-grid{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+  .stat-card{padding:14px}
+  .stat-card:last-child{grid-column:span 2}
+  .stat-val{font-size:22px}
+  .stat-lbl{font-size:10px}
+
+  .online-panel{padding:10px 13px;margin-bottom:14px}
+  .online-panel-label{font-size:11px}
+
+  .section-bar{flex-wrap:wrap;gap:10px;margin-bottom:10px}
+  .section-bar .btn{width:100%;justify-content:center;min-height:42px}
+
+  .user-card{border-radius:var(--r2)}
+  .user-card:hover{transform:none;box-shadow:none;border-color:var(--bd)}
+  .user-card:active{border-color:var(--bd2)}
+  .user-header{padding:0 14px;min-height:58px}
+  .user-body-inner{padding:12px 14px 16px}
+  .avatar{width:34px;height:34px;font-size:14px;border-radius:var(--r1)}
+  .user-name{font-size:13.5px}
+  .header-right .btn-danger{padding:8px 10px}
+
+  .device-item{flex-direction:column;align-items:stretch;gap:10px;padding:12px 14px}
+  .device-icon{width:30px;height:30px}
+  .device-actions{display:flex;gap:7px;padding-top:2px;border-top:1px solid var(--bd);margin-top:2px}
+  .device-actions .btn-secondary{flex:1;min-height:38px;font-size:13px}
+  .device-actions .btn-danger{flex:0 0 38px;min-height:38px;padding:8px}
+  .devices-toolbar .btn{width:100%;min-height:40px;font-size:13px}
+
+  .modal{align-items:flex-end;padding:0}
+  .modal-backdrop{background:rgba(4,9,20,.8)}
+  .modal-box{
+    width:100%;max-width:100%;border-radius:var(--r4) var(--r4) 0 0;
+    border-left:none;border-right:none;border-bottom:none;
+    padding:24px 20px calc(24px + var(--safe-b));
+    animation:sheet-up .28s cubic-bezier(.22,1,.36,1);box-shadow:0 -8px 48px rgba(0,0,0,.55);
   }
-  .header-badge { display: none; }
-  .logo-title   { font-size: 13.5px; }
-  #logout-btn .logout-label { display: none; }
-  #logout-btn { padding: 8px; }
+  @keyframes sheet-up{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
+  .modal-box::before{content:'';display:block;width:36px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 20px}
+  .modal-box h3{font-size:16px}
+  .modal-box .sub{margin-bottom:18px}
+  .modal-actions{flex-direction:column-reverse;gap:8px;margin-top:20px}
+  .modal-actions .btn{width:100%;min-height:46px;font-size:14.5px;justify-content:center}
 
-  #login-view {
-    align-items: flex-start; padding: 40px 16px 24px;
-    padding-bottom: calc(24px + var(--safe-b));
-  }
-  .login-wrap { max-width: 100%; }
-  .login-brand { margin-bottom: 22px; }
-  .login-brand h1 { font-size: 17px; }
-  .login-card { padding: 22px 18px; border-radius: var(--r3); }
-  #login-btn  { min-height: 48px; font-size: 15px; }
+  .toast-container{right:12px;left:12px;bottom:calc(16px + var(--safe-b))}
+  .toast{min-width:0;max-width:100%;width:100%}
 
-  .main {
-    padding: 20px 14px calc(56px + var(--safe-b));
-    padding-left:  max(14px, var(--safe-l));
-    padding-right: max(14px, var(--safe-r));
-  }
-
-  /* Статистика — 2 + 1 на мобайле */
-  .stats-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px; margin-bottom: 20px;
-  }
-  .stat-card { padding: 14px 14px; }
-  .stat-card:last-child { grid-column: span 2; }
-  .stat-val { font-size: 22px; }
-  .stat-val-online { font-size: 14px; }
-  .stat-lbl { font-size: 10px; }
-
-  /* Секция */
-  .section-bar { flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
-  .section-bar .btn { width: 100%; justify-content: center; min-height: 42px; }
-
-  /* Карточки пользователей */
-  .user-card { border-radius: var(--r2); }
-  .user-card:hover { transform: none; box-shadow: none; border-color: var(--bd); }
-  .user-card:active { border-color: var(--bd2); }
-  .user-header { padding: 0 14px; min-height: 58px; }
-  .user-body-inner { padding: 12px 14px 16px; }
-  .avatar { width: 34px; height: 34px; font-size: 14px; border-radius: var(--r1); }
-  .user-name { font-size: 13.5px; }
-  .header-right .btn-danger { padding: 8px 10px; }
-
-  /* Устройства — вертикальный стек */
-  .device-item { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px 14px; }
-  .device-icon { width: 30px; height: 30px; }
-  .device-actions {
-    display: flex; gap: 7px; padding-top: 2px;
-    border-top: 1px solid var(--bd); margin-top: 2px;
-  }
-  .device-actions .btn-secondary { flex: 1; min-height: 38px; font-size: 13px; }
-  .device-actions .btn-danger    { flex: 0 0 38px; min-height: 38px; padding: 8px; }
-  .devices-toolbar .btn { width: 100%; min-height: 40px; font-size: 13px; }
-
-  /* Модальное окно → нижний шторка */
-  .modal { align-items: flex-end; padding: 0; }
-  .modal-backdrop { background: rgba(4,9,20,.8); }
-  .modal-box {
-    width: 100%; max-width: 100%;
-    border-radius: var(--r4) var(--r4) 0 0;
-    border-left: none; border-right: none; border-bottom: none;
-    padding: 24px 20px calc(24px + var(--safe-b));
-    animation: sheet-up .28s cubic-bezier(.22,1,.36,1);
-    box-shadow: 0 -8px 48px rgba(0,0,0,.55);
-  }
-  @keyframes sheet-up {
-    from { opacity:0; transform: translateY(100%); }
-    to   { opacity:1; transform: translateY(0); }
-  }
-  .modal-box::before {
-    content: ''; display: block; width: 36px; height: 4px;
-    background: rgba(255,255,255,.15); border-radius: 2px; margin: 0 auto 20px;
-  }
-  .modal-box h3  { font-size: 16px; }
-  .modal-box .sub { margin-bottom: 18px; }
-  .modal-actions { flex-direction: column-reverse; gap: 8px; margin-top: 20px; }
-  .modal-actions .btn { width: 100%; min-height: 46px; font-size: 14.5px; justify-content: center; }
-
-  /* Уведомления — полная ширина */
-  .toast-container { right: 12px; left: 12px; bottom: calc(16px + var(--safe-b)); }
-  .toast { min-width: 0; max-width: 100%; width: 100%; }
-
-  /* Клиенты — кнопки на полную ширину */
-  .client-row { flex-direction: column; align-items: stretch; gap: 10px; }
-  .client-row .btn { width: 100%; min-height: 42px; justify-content: center; }
-  .clients-section { margin-top: 28px; padding-top: 24px; }
+  .client-row{flex-direction:column;align-items:stretch;gap:10px}
+  .client-row .btn{width:100%;min-height:42px;justify-content:center}
+  .clients-section{margin-top:28px;padding-top:24px}
 }
 
 /* Маленький телефон ≤ 360px */
-@media (max-width: 360px) {
-  .logo-title { display: none; }
-  .header { gap: 6px; padding: 0 12px; }
-  .main { padding-left: 12px; padding-right: 12px; }
-  .user-header { padding-left: 12px; padding-right: 12px; }
-  .user-body-inner { padding-left: 12px; padding-right: 12px; }
+@media(max-width:360px){
+  .logo-title{display:none}
+  .header{gap:6px;padding:0 12px}
+  .main{padding-left:12px;padding-right:12px}
+  .user-header{padding-left:12px;padding-right:12px}
+  .user-body-inner{padding-left:12px;padding-right:12px}
 }
 
-/* Планшет / большой телефон 481–768px */
-@media (min-width: 481px) and (max-width: 768px) {
-  .header { padding: 0 20px; }
-  .header-badge { display: none; }
-  .main { padding: 28px 18px 64px; }
-  .stats-grid { gap: 8px; }
-  .stat-card { padding: 16px 16px; }
-  .stat-val { font-size: 24px; }
-  .modal { align-items: flex-end; padding: 0; }
-  .modal-box {
-    width: 100%; max-width: 100%;
-    border-radius: var(--r4) var(--r4) 0 0;
-    border-left: none; border-right: none; border-bottom: none;
-    padding: 28px 24px calc(28px + var(--safe-b));
-    animation: sheet-up .28s cubic-bezier(.22,1,.36,1);
+/* Планшет 481–768px */
+@media(min-width:481px) and (max-width:768px){
+  .header{padding:0 20px}
+  .header-badge{display:none}
+  .main{padding:28px 18px 64px}
+  .stats-grid{gap:8px}
+  .stat-card{padding:16px}
+  .stat-val{font-size:24px}
+  .modal{align-items:flex-end;padding:0}
+  .modal-box{
+    width:100%;max-width:100%;border-radius:var(--r4) var(--r4) 0 0;
+    border-left:none;border-right:none;border-bottom:none;
+    padding:28px 24px calc(28px + var(--safe-b));
+    animation:sheet-up .28s cubic-bezier(.22,1,.36,1);
   }
-  .modal-box::before {
-    content:''; display:block; width:36px; height:4px;
-    background:rgba(255,255,255,.15); border-radius:2px; margin:0 auto 20px;
-  }
-  .modal-actions { flex-direction: column-reverse; gap: 8px; margin-top: 20px; }
-  .modal-actions .btn { width: 100%; min-height: 46px; justify-content: center; font-size: 14px; }
-  .toast-container { right: 16px; left: 16px; }
-  .toast { min-width: 0; max-width: 100%; }
+  .modal-box::before{content:'';display:block;width:36px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 20px}
+  .modal-actions{flex-direction:column-reverse;gap:8px;margin-top:20px}
+  .modal-actions .btn{width:100%;min-height:46px;justify-content:center;font-size:14px}
+  .toast-container{right:16px;left:16px}
+  .toast{min-width:0;max-width:100%}
 }
 
 /* Планшет 769–1024px */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .main { padding: 30px 20px 68px; }
+@media(min-width:769px) and (max-width:1024px){
+  .main{padding:30px 20px 68px}
 }
 
 /* Десктоп 1025px+ */
-@media (min-width: 1025px) {
-  .header-badge { display: flex; }
-  .user-card:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 0 1px rgba(82,113,232,.12), 0 4px 20px rgba(0,0,0,.22);
-    border-color: var(--bd2);
-  }
+@media(min-width:1025px){
+  .header-badge{display:flex}
+  .user-card:hover{transform:translateY(-1px);box-shadow:0 0 0 1px rgba(82,113,232,.12),0 4px 20px rgba(0,0,0,.22);border-color:var(--bd2)}
 }
 </style>
 </head>
 <body>
 
-<!-- Уведомления -->
 <div class="toast-container" id="toasts"></div>
 
-<!-- ─── СТРАНИЦА ВХОДА ─────────────────────────────────────────────────────── -->
+<!-- ─── ВХОД ───────────────────────────────────────────────────────────────── -->
 <div id="login-view">
   <div class="login-wrap">
     <div class="login-brand">
@@ -635,18 +504,12 @@ body {
       </div>
       <span class="logo-title">VPN Панель</span>
     </div>
-
-    <div class="header-badge">
-      <div class="badge-dot"></div>
-      Online
-    </div>
-
+    <div class="header-badge"><div class="badge-dot"></div>Online</div>
     <div class="header-controls">
       <button class="btn btn-ghost btn-sm" id="logout-btn" title="Выйти">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
-          <polyline points="16 17 21 12 16 7"/>
-          <line x1="21" y1="12" x2="9" y2="12"/>
+          <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
         </svg>
         <span class="logout-label">Выйти</span>
       </button>
@@ -655,7 +518,7 @@ body {
 
   <main class="main">
 
-    <!-- Карточки статистики -->
+    <!-- Статистика -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-val" id="stat-users-val">—</div>
@@ -666,15 +529,21 @@ body {
         <div class="stat-lbl">Устройства</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val-online">
-          <div class="stat-online-dot"></div>
-          Online
-        </div>
-        <div class="stat-lbl">Сервер</div>
+        <div class="stat-val" id="stat-online-val">—</div>
+        <div class="stat-lbl">Онлайн сейчас</div>
       </div>
     </div>
 
-    <!-- Блок пользователей -->
+    <!-- Список онлайн-устройств -->
+    <div id="online-section" class="online-panel hidden">
+      <div class="online-panel-label">
+        <span class="online-panel-dot"></span>
+        Сейчас подключены
+      </div>
+      <div id="online-list" class="online-tags"></div>
+    </div>
+
+    <!-- Пользователи -->
     <div class="section-bar">
       <div class="section-bar-left">
         <h2>Пользователи</h2>
@@ -690,7 +559,7 @@ body {
 
     <div id="users-list"></div>
 
-    <!-- Клиенты WireGuard (футер страницы) -->
+    <!-- Клиенты WireGuard -->
     <div id="download-section" class="clients-section hidden">
       <div class="clients-head">
         <h3>Клиенты WireGuard</h3>
@@ -700,26 +569,16 @@ body {
         <div class="client-row" id="dl-android">
           <div class="client-info">
             <span class="client-os-icon">📱</span>
-            <div>
-              <div class="client-os">Android</div>
-              <div class="client-os-sub">Google Play или APK</div>
-            </div>
+            <div><div class="client-os">Android</div><div class="client-os-sub">Google Play или APK</div></div>
           </div>
-          <a id="dl-android-btn" class="btn btn-primary btn-sm" target="_blank" rel="noopener noreferrer">
-            Скачать
-          </a>
+          <a id="dl-android-btn" class="btn btn-primary btn-sm" target="_blank" rel="noopener noreferrer">Скачать</a>
         </div>
         <div class="client-row" id="dl-windows">
           <div class="client-info">
             <span class="client-os-icon">🪟</span>
-            <div>
-              <div class="client-os">Windows</div>
-              <div class="client-os-sub">Установщик 64-bit</div>
-            </div>
+            <div><div class="client-os">Windows</div><div class="client-os-sub">Установщик 64-bit</div></div>
           </div>
-          <a id="dl-windows-btn" class="btn btn-windows btn-sm" target="_blank" rel="noopener noreferrer">
-            Скачать .exe
-          </a>
+          <a id="dl-windows-btn" class="btn btn-windows btn-sm" target="_blank" rel="noopener noreferrer">Скачать .exe</a>
         </div>
         <div class="client-github-row" id="dl-github">
           <a id="dl-github-link" class="github-link" target="_blank" rel="noopener noreferrer">
@@ -771,139 +630,185 @@ body {
 
 <script>
 "use strict";
-
 const API = "/api";
 let _token = localStorage.getItem("vpn_token");
 const _open = new Set();
-let _pendingUser = null;
+let _pendingUser  = null;
+let _wgTimer      = null;
+let _lastWgStatus = null;
 
-/* Палитра аватаров — детерминировано по коду первой буквы */
-const _PALETTE = [
-  { bg:"rgba(82,113,232,.15)",  bd:"rgba(82,113,232,.30)",  tx:"#7b9af4" },
-  { bg:"rgba(34,197,94,.12)",   bd:"rgba(34,197,94,.28)",   tx:"#4ade80" },
-  { bg:"rgba(245,158,11,.12)",  bd:"rgba(245,158,11,.28)",  tx:"#fbbf24" },
-  { bg:"rgba(168,85,247,.13)",  bd:"rgba(168,85,247,.28)",  tx:"#c084fc" },
-  { bg:"rgba(20,184,166,.12)",  bd:"rgba(20,184,166,.28)",  tx:"#2dd4bf" },
-  { bg:"rgba(244,63,94,.12)",   bd:"rgba(244,63,94,.28)",   tx:"#fb7185" },
+/* Палитра аватаров */
+const _PAL = [
+  {bg:"rgba(82,113,232,.15)", bd:"rgba(82,113,232,.30)", tx:"#7b9af4"},
+  {bg:"rgba(34,197,94,.12)",  bd:"rgba(34,197,94,.28)",  tx:"#4ade80"},
+  {bg:"rgba(245,158,11,.12)", bd:"rgba(245,158,11,.28)", tx:"#fbbf24"},
+  {bg:"rgba(168,85,247,.13)", bd:"rgba(168,85,247,.28)", tx:"#c084fc"},
+  {bg:"rgba(20,184,166,.12)", bd:"rgba(20,184,166,.28)", tx:"#2dd4bf"},
+  {bg:"rgba(244,63,94,.12)",  bd:"rgba(244,63,94,.28)",  tx:"#fb7185"},
 ];
-function _av(name) { return _PALETTE[name.charCodeAt(0) % _PALETTE.length]; }
+const _av  = n => _PAL[n.charCodeAt(0) % _PAL.length];
 
-/* Русское склонение "устройство" */
+/* Склонение "устройство" */
 function _nDev(n) {
-  const r10 = n % 10, r100 = n % 100;
-  if (r10 === 1 && r100 !== 11) return `${n} устройство`;
-  if (r10 >= 2 && r10 <= 4 && (r100 < 10 || r100 >= 20)) return `${n} устройства`;
+  const r10=n%10, r100=n%100;
+  if(r10===1&&r100!==11)  return `${n} устройство`;
+  if(r10>=2&&r10<=4&&(r100<10||r100>=20)) return `${n} устройства`;
   return `${n} устройств`;
 }
 
-/* Обновление счётчиков статистики */
-function _updateStats(users) {
-  const total = users.reduce((s, u) => s + (u.device_count || 0), 0);
-  const eU = $("stat-users-val"),  eD = $("stat-devices-val"), eB = $("section-users-count");
-  if (eU) eU.textContent = users.length;
-  if (eD) eD.textContent = total;
-  if (eB) eB.textContent = users.length;
+/* Форматирование времени */
+function _fmtAge(s) {
+  if(s<60)    return `${s} сек`;
+  if(s<3600)  return `${Math.floor(s/60)} мин`;
+  if(s<86400) return `${Math.floor(s/3600)} ч`;
+  return `${Math.floor(s/86400)} дн`;
+}
+
+/* Форматирование байт */
+function _fmtBytes(b) {
+  if(!b||b<=0)       return "0 Б";
+  if(b<1024)         return `${b} Б`;
+  if(b<1048576)      return `${(b/1024).toFixed(1)} КБ`;
+  if(b<1073741824)   return `${(b/1048576).toFixed(1)} МБ`;
+  return `${(b/1073741824).toFixed(2)} ГБ`;
 }
 
 /* ── Запросы ──────────────────────────────────────────────────────────────── */
-async function req(method, path, body = null) {
+async function req(method, path, body=null) {
   const opts = {
     method,
-    headers: Object.assign(
-      { "Content-Type": "application/json" },
-      _token ? { "X-API-TOKEN": _token } : {}
-    ),
+    headers: Object.assign({"Content-Type":"application/json"}, _token?{"X-API-TOKEN":_token}:{}),
   };
-  if (body !== null) opts.body = JSON.stringify(body);
-  const res = await fetch(API + path, opts);
-  if (res.status === 401) { _logout(); throw new Error("Сессия истекла"); }
-  if (!res.ok) {
-    let msg = "Ошибка запроса";
-    try { const j = await res.json(); msg = j.error || j.detail || msg; } catch {}
+  if(body!==null) opts.body=JSON.stringify(body);
+  const res = await fetch(API+path, opts);
+  if(res.status===401){ _logout(); throw new Error("Сессия истекла"); }
+  if(!res.ok){
+    let msg="Ошибка запроса";
+    try{ const j=await res.json(); msg=j.error||j.detail||msg; }catch{}
     throw new Error(msg);
   }
   return res;
 }
-async function rj(method, path, body = null) {
-  const res  = await req(method, path, body);
-  if (res.status === 204) return null;
-  const json = await res.json();
-  return json.data !== undefined ? json.data : json;
+async function rj(method,path,body=null){
+  const res=await req(method,path,body);
+  if(res.status===204) return null;
+  const j=await res.json();
+  return j.data!==undefined?j.data:j;
 }
 
 /* ── Авторизация ──────────────────────────────────────────────────────────── */
 async function _login() {
-  const pw  = $("pw-input").value;
-  const btn = $("login-btn");
-  const err = $("login-error");
-  err.textContent = "";
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Вход…';
-  try {
-    const data = await rj("POST", "/auth/login", { password: pw });
-    _token = data.token;
-    localStorage.setItem("vpn_token", _token);
-    _showDashboard();
-  } catch (e) {
-    err.textContent = e.message.toLowerCase().includes("invalid") || e.message.includes("401")
-      ? "Неверный пароль" : e.message;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Войти";
-  }
+  const pw=$("#pw-input").value, btn=$("#login-btn"), err=$("#login-error");
+  err.textContent=""; btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span> Вход…';
+  try{
+    const data=await rj("POST","/auth/login",{password:pw});
+    _token=data.token; localStorage.setItem("vpn_token",_token); _showDashboard();
+  }catch(e){
+    err.textContent=e.message.toLowerCase().includes("invalid")||e.message.includes("401")
+      ?"Неверный пароль":e.message;
+  }finally{ btn.disabled=false; btn.textContent="Войти"; }
 }
 
 function _logout() {
-  _token = null;
-  localStorage.removeItem("vpn_token");
-  _open.clear();
+  if(_wgTimer){ clearInterval(_wgTimer); _wgTimer=null; }
+  _lastWgStatus=null;
+  _token=null; localStorage.removeItem("vpn_token"); _open.clear();
   show("login-view"); hide("dashboard-view");
-  $("pw-input").value = "";
-  $("login-error").textContent = "";
+  $("#pw-input").value=""; $("#login-error").textContent="";
 }
 
-/* ── Экраны ───────────────────────────────────────────────────────────────── */
+/* ── Дашборд ──────────────────────────────────────────────────────────────── */
 async function _showDashboard() {
   hide("login-view"); show("dashboard-view");
   await Promise.all([_loadUsers(), _loadDownloads()]);
+  _loadWgStatus();
+  if(_wgTimer) clearInterval(_wgTimer);
+  _wgTimer = setInterval(_loadWgStatus, 30000);
 }
 
-/* ── Загрузка клиентов ────────────────────────────────────────────────────── */
-async function _loadDownloads() {
-  const section = $("download-section");
-  ["dl-android","dl-windows","dl-github"].forEach(id => {
-    const el = $(id); if (el) el.classList.remove("hidden");
-  });
-  section.classList.add("hidden");
-  try {
-    const data = await rj("GET", "/downloads");
-    const aUrl = (data.android_play_store || data.android_apk || "").trim();
-    const wUrl = (data.windows_exe  || "").trim();
-    const gUrl = (data.github_repo  || "").trim();
-    if (aUrl) $("dl-android-btn").href = aUrl; else $("dl-android").classList.add("hidden");
-    if (wUrl) $("dl-windows-btn").href = wUrl; else $("dl-windows").classList.add("hidden");
-    if (gUrl) $("dl-github-link").href = gUrl; else $("dl-github").classList.add("hidden");
-    if (aUrl || wUrl || gUrl) section.classList.remove("hidden");
-  } catch { /* опционально */ }
+/* ── WireGuard статус ─────────────────────────────────────────────────────── */
+async function _loadWgStatus() {
+  try{
+    const data = await rj("GET","/wireguard/status");
+    _lastWgStatus = data;
+    _applyWgStatus(data);
+  }catch{ /* WG статус опционален */ }
 }
 
-/* ── Список пользователей ─────────────────────────────────────────────────── */
-async function _loadUsers() {
-  const list = $("users-list");
-  list.innerHTML = '<div class="loading-row"><span class="spinner spinner-dark"></span> Загрузка…</div>';
-  try {
-    const users = await rj("GET", "/users");
-    _renderUsers(users);
-  } catch (e) {
-    list.innerHTML = `<div class="empty-page"><p>${esc(e.message)}</p></div>`;
+function _applyWgStatus(data) {
+  /* Обновить счётчик онлайн */
+  const elO = $("#stat-online-val");
+  if(elO) elO.textContent = data.online_devices ?? "—";
+
+  /* Список онлайн */
+  _renderOnlineList(data.online_list || []);
+
+  /* Обновить каждое устройство */
+  for(const p of (data.peers||[])){
+    const dot = $("#dot-"+p.id);
+    if(dot){ dot.className="dev-dot "+(p.status||"offline"); }
+
+    const act = $("#act-"+p.id);
+    if(act){ act.textContent = p.last_handshake_seconds!=null ? _fmtAge(p.last_handshake_seconds) : ""; }
+
+    const trf = $("#trf-"+p.id);
+    if(trf){
+      const rx=p.rx_bytes||0, tx=p.tx_bytes||0;
+      trf.textContent = (rx||tx) ? `↓ ${_fmtBytes(rx)} ↑ ${_fmtBytes(tx)}` : "";
+    }
   }
+}
+
+function _renderOnlineList(list) {
+  const sec = $("#online-section"), box = $("#online-list");
+  if(!sec||!box) return;
+  if(!list.length){ sec.classList.add("hidden"); return; }
+  sec.classList.remove("hidden");
+  box.innerHTML = list.map(p =>
+    `<span class="online-tag">${esc(p.name)} <span class="online-user">${esc(p.user)}</span></span>`
+  ).join("");
+}
+
+/* ── Статистика ───────────────────────────────────────────────────────────── */
+function _updateStats(users) {
+  const total = users.reduce((s,u)=>s+(u.device_count||0),0);
+  const eU=$("#stat-users-val"), eD=$("#stat-devices-val"), eB=$("#section-users-count");
+  if(eU) eU.textContent=users.length;
+  if(eD) eD.textContent=total;
+  if(eB) eB.textContent=users.length;
+}
+
+/* ── Клиенты ──────────────────────────────────────────────────────────────── */
+async function _loadDownloads() {
+  const sec=$("#download-section");
+  ["dl-android","dl-windows","dl-github"].forEach(id=>{ const el=$(id); if(el) el.classList.remove("hidden"); });
+  sec.classList.add("hidden");
+  try{
+    const d=await rj("GET","/downloads");
+    const aU=(d.android_play_store||d.android_apk||"").trim();
+    const wU=(d.windows_exe||"").trim(), gU=(d.github_repo||"").trim();
+    if(aU) $("#dl-android-btn").href=aU; else $("#dl-android").classList.add("hidden");
+    if(wU) $("#dl-windows-btn").href=wU; else $("#dl-windows").classList.add("hidden");
+    if(gU) $("#dl-github-link").href=gU; else $("#dl-github").classList.add("hidden");
+    if(aU||wU||gU) sec.classList.remove("hidden");
+  }catch{}
+}
+
+/* ── Пользователи ─────────────────────────────────────────────────────────── */
+async function _loadUsers() {
+  const list=$("#users-list");
+  list.innerHTML='<div class="loading-row"><span class="spinner spinner-dark"></span> Загрузка…</div>';
+  try{
+    const users=await rj("GET","/users"); _renderUsers(users);
+  }catch(e){ list.innerHTML=`<div class="empty-page"><p>${esc(e.message)}</p></div>`; }
 }
 
 function _renderUsers(users) {
   _updateStats(users);
-  const list = $("users-list");
-  if (!users.length) {
-    list.innerHTML = `
+  const list=$("#users-list");
+  if(!users.length){
+    list.innerHTML=`
       <div class="empty-page">
         <div class="empty-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
@@ -917,17 +822,15 @@ function _renderUsers(users) {
       </div>`;
     return;
   }
-  list.innerHTML = "";
-  for (const u of users) list.appendChild(_userCard(u));
+  list.innerHTML="";
+  for(const u of users) list.appendChild(_userCard(u));
 }
 
 function _userCard(u) {
-  const card = document.createElement("div");
-  card.className = "user-card";
-  card.dataset.user = u.name;
-  const isOpen = _open.has(u.name);
-  const av = _av(u.name);
-  card.innerHTML = `
+  const card=document.createElement("div");
+  card.className="user-card"; card.dataset.user=u.name;
+  const isOpen=_open.has(u.name), av=_av(u.name);
+  card.innerHTML=`
     <div class="user-header" data-action="toggle" data-user="${esc(u.name)}">
       <div class="user-info">
         <div class="avatar" style="background:${av.bg};border:1px solid ${av.bd};color:${av.tx};">${esc(u.name[0].toUpperCase())}</div>
@@ -944,7 +847,7 @@ function _userCard(u) {
             <path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/>
           </svg>
         </button>
-        <svg class="chevron${isOpen ? " open" : ""}" width="16" height="16" viewBox="0 0 24 24"
+        <svg class="chevron${isOpen?" open":""}" width="16" height="16" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
           <polyline points="9 18 15 12 9 6"/>
         </svg>
@@ -955,65 +858,63 @@ function _userCard(u) {
         <div class="loading-row"><span class="spinner spinner-dark"></span></div>
       </div>
     </div>`;
-  if (isOpen) setTimeout(() => _loadDevices(u.name), 0);
+  if(isOpen) setTimeout(()=>_loadDevices(u.name),0);
   return card;
 }
 
 /* ── Аккордеон ────────────────────────────────────────────────────────────── */
 async function _toggle(name) {
-  const body    = document.getElementById("body-" + name);
-  const card    = document.querySelector(`[data-user="${name}"].user-card`) || body?.closest(".user-card");
-  const chevron = card?.querySelector(".chevron");
-  if (!body) return;
-  if (_open.has(name)) {
+  const body=document.getElementById("body-"+name);
+  const card=document.querySelector(`[data-user="${name}"].user-card`)||body?.closest(".user-card");
+  const chevron=card?.querySelector(".chevron");
+  if(!body) return;
+  if(_open.has(name)){
     _open.delete(name);
-    body.style.height = body.offsetHeight + "px";
-    requestAnimationFrame(() => { body.style.height = "0"; });
+    body.style.height=body.offsetHeight+"px";
+    requestAnimationFrame(()=>{ body.style.height="0"; });
     chevron?.classList.remove("open");
-  } else {
-    _open.add(name);
-    chevron?.classList.add("open");
-    await _loadDevices(name);
-    _expandBody(body, name);
+  }else{
+    _open.add(name); chevron?.classList.add("open");
+    await _loadDevices(name); _expandBody(body,name);
   }
 }
-function _expandBody(body, name) {
-  body.style.height = body.scrollHeight + "px";
-  body.addEventListener("transitionend", () => {
-    if (_open.has(name)) body.style.height = "auto";
-  }, { once: true });
+function _expandBody(body,name){
+  body.style.height=body.scrollHeight+"px";
+  body.addEventListener("transitionend",()=>{ if(_open.has(name)) body.style.height="auto"; },{once:true});
 }
 
 /* ── Устройства ───────────────────────────────────────────────────────────── */
 async function _loadDevices(name) {
-  const inner = document.getElementById("inner-" + name);
-  if (!inner) return;
-  inner.innerHTML = '<div class="loading-row"><span class="spinner spinner-dark"></span></div>';
-  try {
-    const user = await rj("GET", `/users/${encodeURIComponent(name)}`);
-    _renderDevices(name, user.devices, inner);
-    const body = document.getElementById("body-" + name);
-    if (body && _open.has(name) && body.style.height !== "auto")
-      body.style.height = body.scrollHeight + "px";
-  } catch (e) {
-    inner.innerHTML = `<div class="empty-page" style="padding:16px 0"><p>${esc(e.message)}</p></div>`;
+  const inner=document.getElementById("inner-"+name);
+  if(!inner) return;
+  inner.innerHTML='<div class="loading-row"><span class="spinner spinner-dark"></span></div>';
+  try{
+    const user=await rj("GET",`/users/${encodeURIComponent(name)}`);
+    _renderDevices(name,user.devices,inner);
+    if(_lastWgStatus) _applyWgStatus(_lastWgStatus);  // применить кешированный статус сразу
+    const body=document.getElementById("body-"+name);
+    if(body&&_open.has(name)&&body.style.height!=="auto")
+      body.style.height=body.scrollHeight+"px";
+  }catch(e){
+    inner.innerHTML=`<div class="empty-page" style="padding:16px 0"><p>${esc(e.message)}</p></div>`;
   }
 }
 
-function _renderDevices(userName, devices, container) {
-  const rows = devices.length
-    ? devices.map(d => `
+function _renderDevices(userName,devices,container){
+  const rows=devices.length
+    ?devices.map(d=>`
         <div class="device-item">
           <div class="device-left">
+            <div class="dev-dot" id="dot-${esc(d.id)}"></div>
             <div class="device-icon">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="5" y="2" width="14" height="20" rx="2"/>
                 <line x1="12" y1="18" x2="12.01" y2="18"/>
               </svg>
             </div>
-            <div>
+            <div class="device-info">
               <div class="device-name">${esc(d.name)}</div>
-              <div class="device-ip">${esc(d.ip)}</div>
+              <div class="device-sub"><span class="device-ip">${esc(d.ip)}</span><span class="device-activity" id="act-${esc(d.id)}"></span><span class="device-traffic" id="trf-${esc(d.id)}"></span></div>
             </div>
           </div>
           <div class="device-actions">
@@ -1023,8 +924,7 @@ function _renderDevices(userName, devices, container) {
               title="Скачать конфигурацию">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
+                <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
               Конфиг
             </button>
@@ -1038,9 +938,9 @@ function _renderDevices(userName, devices, container) {
             </button>
           </div>
         </div>`).join("")
-    : '<div class="empty-devices">Нет устройств.</div>';
+    :'<div class="empty-devices">Нет устройств.</div>';
 
-  container.innerHTML = `
+  container.innerHTML=`
     <div class="devices-toolbar">
       <button class="btn btn-sm btn-primary" data-action="add-device" data-user="${esc(userName)}">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8">
@@ -1052,172 +952,123 @@ function _renderDevices(userName, devices, container) {
     <div class="devices-list">${rows}</div>`;
 }
 
-/* ── Скачивание конфига ───────────────────────────────────────────────────── */
-async function _download(deviceId, filename) {
-  try {
-    const res  = await req("GET", `/devices/${encodeURIComponent(deviceId)}/config`);
-    const blob = await res.blob();
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement("a");
-    a.href = url; a.download = filename;
-    document.body.appendChild(a); a.click();
-    document.body.removeChild(a); URL.revokeObjectURL(url);
-    toast("Конфиг скачан", "success");
-  } catch (e) { toast(e.message, "error"); }
+/* ── Скачать конфиг ───────────────────────────────────────────────────────── */
+async function _download(deviceId,filename){
+  try{
+    const res=await req("GET",`/devices/${encodeURIComponent(deviceId)}/config`);
+    const blob=await res.blob(), url=URL.createObjectURL(blob);
+    const a=document.createElement("a"); a.href=url; a.download=filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    toast("Конфиг скачан","success");
+  }catch(e){ toast(e.message,"error"); }
 }
 
-/* ── Удаление устройства ──────────────────────────────────────────────────── */
-async function _delDevice(userName, deviceId, btn = null) {
-  if (!confirm("Удалить это устройство? Действие нельзя отменить.")) return;
-  const orig = btn?.innerHTML;
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner spinner-dark"></span>'; }
-  try {
-    await req("DELETE", `/users/${encodeURIComponent(userName)}/devices/${encodeURIComponent(deviceId)}`);
-    toast("Устройство удалено", "success");
-    await _loadDevices(userName);
-    await _refreshMeta(userName);
-  } catch (e) {
-    toast(e.message, "error");
-    if (btn) { btn.disabled = false; btn.innerHTML = orig; }
-  }
+/* ── Удаление ─────────────────────────────────────────────────────────────── */
+async function _delDevice(userName,deviceId,btn=null){
+  if(!confirm("Удалить это устройство? Действие нельзя отменить.")) return;
+  const orig=btn?.innerHTML;
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner spinner-dark"></span>'; }
+  try{
+    await req("DELETE",`/users/${encodeURIComponent(userName)}/devices/${encodeURIComponent(deviceId)}`);
+    toast("Устройство удалено","success");
+    await _loadDevices(userName); await _refreshMeta(userName);
+  }catch(e){ toast(e.message,"error"); if(btn){ btn.disabled=false; btn.innerHTML=orig; } }
 }
 
-/* ── Удаление пользователя ────────────────────────────────────────────────── */
-async function _delUser(name, btn = null) {
-  if (!confirm(`Удалить пользователя «${name}» и все его устройства? Действие нельзя отменить.`)) return;
-  const orig = btn?.innerHTML;
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner spinner-dark"></span>'; }
-  try {
-    await req("DELETE", `/users/${encodeURIComponent(name)}`);
-    _open.delete(name);
-    toast(`Пользователь «${name}» удалён`, "success");
-    await _loadUsers();
-  } catch (e) {
-    toast(e.message, "error");
-    if (btn) { btn.disabled = false; btn.innerHTML = orig; }
-  }
+async function _delUser(name,btn=null){
+  if(!confirm(`Удалить пользователя «${name}» и все его устройства? Действие нельзя отменить.`)) return;
+  const orig=btn?.innerHTML;
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner spinner-dark"></span>'; }
+  try{
+    await req("DELETE",`/users/${encodeURIComponent(name)}`);
+    _open.delete(name); toast(`Пользователь «${name}» удалён`,"success"); await _loadUsers();
+  }catch(e){ toast(e.message,"error"); if(btn){ btn.disabled=false; btn.innerHTML=orig; } }
 }
 
-async function _refreshMeta(name) {
-  try {
-    const users = await rj("GET", "/users");
-    _updateStats(users);
-    const u = users.find(x => x.name === name);
-    if (u) {
-      const el = document.getElementById("meta-" + name);
-      if (el) el.textContent = _nDev(u.device_count);
-    }
-  } catch {}
+async function _refreshMeta(name){
+  try{
+    const users=await rj("GET","/users"); _updateStats(users);
+    const u=users.find(x=>x.name===name);
+    if(u){ const el=document.getElementById("meta-"+name); if(el) el.textContent=_nDev(u.device_count); }
+  }catch{}
 }
 
-/* ── Модал: новый пользователь ────────────────────────────────────────────── */
-function _openUserModal()  { $("user-name-input").value = ""; show("user-modal"); setTimeout(() => $("user-name-input").focus(), 60); }
+/* ── Модалы ───────────────────────────────────────────────────────────────── */
+function _openUserModal()  { $("#user-name-input").value=""; show("user-modal"); setTimeout(()=>$("#user-name-input").focus(),60); }
 function _closeUserModal() { hide("user-modal"); }
 
-async function _submitUser() {
-  const name = $("user-name-input").value.trim();
-  if (!name) return;
-  const btn = $("user-confirm-btn");
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
-  try {
-    await rj("POST", "/users", { name });
-    _closeUserModal();
-    toast(`Пользователь «${name}» создан`, "success");
-    await _loadUsers();
-  } catch (e) {
-    toast(e.message, "error");
-  } finally {
-    btn.disabled = false; btn.textContent = "Создать";
-  }
+async function _submitUser(){
+  const name=$("#user-name-input").value.trim(); if(!name) return;
+  const btn=$("#user-confirm-btn"); btn.disabled=true; btn.innerHTML='<span class="spinner"></span>';
+  try{
+    await rj("POST","/users",{name}); _closeUserModal();
+    toast(`Пользователь «${name}» создан`,"success"); await _loadUsers();
+  }catch(e){ toast(e.message,"error"); }
+  finally{ btn.disabled=false; btn.textContent="Создать"; }
 }
 
-/* ── Модал: новое устройство ──────────────────────────────────────────────── */
-function _openDeviceModal(userName) {
-  _pendingUser = userName;
-  $("device-modal-user").textContent = userName;
-  $("device-name-input").value = "";
-  show("device-modal");
-  setTimeout(() => $("device-name-input").focus(), 60);
+function _openDeviceModal(userName){
+  _pendingUser=userName; $("#device-modal-user").textContent=userName;
+  $("#device-name-input").value=""; show("device-modal"); setTimeout(()=>$("#device-name-input").focus(),60);
 }
-function _closeDeviceModal() { hide("device-modal"); _pendingUser = null; }
+function _closeDeviceModal(){ hide("device-modal"); _pendingUser=null; }
 
-async function _submitDevice() {
-  const name = $("device-name-input").value.trim();
-  if (!name || !_pendingUser) return;
-  const btn = $("device-confirm-btn"), user = _pendingUser;
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Добавление…';
-  try {
-    await rj("POST", `/users/${encodeURIComponent(user)}/devices`, { name });
-    _closeDeviceModal();
-    toast("Устройство добавлено", "success");
-    await _loadDevices(user);
-    await _refreshMeta(user);
-  } catch (e) {
-    toast(e.message, "error");
-  } finally {
-    btn.disabled = false; btn.textContent = "Добавить";
-  }
+async function _submitDevice(){
+  const name=$("#device-name-input").value.trim(); if(!name||!_pendingUser) return;
+  const btn=$("#device-confirm-btn"), user=_pendingUser;
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Добавление…';
+  try{
+    await rj("POST",`/users/${encodeURIComponent(user)}/devices`,{name});
+    _closeDeviceModal(); toast("Устройство добавлено","success");
+    await _loadDevices(user); await _refreshMeta(user);
+  }catch(e){ toast(e.message,"error"); }
+  finally{ btn.disabled=false; btn.textContent="Добавить"; }
 }
 
 /* ── Уведомления ──────────────────────────────────────────────────────────── */
-function toast(msg, type = "info") {
-  const icon = {
+function toast(msg,type="info"){
+  const icon={
     success:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
     error:  `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
   };
-  const el = document.createElement("div");
-  el.className = `toast ${type}`;
-  el.innerHTML = `${icon[type] || ""}<span>${esc(msg)}</span>`;
-  $("toasts").appendChild(el);
-  setTimeout(() => {
-    el.style.animation = "toast-out .2s cubic-bezier(.22,1,.36,1) forwards";
-    el.addEventListener("animationend", () => el.remove(), { once: true });
-  }, 3500);
+  const el=document.createElement("div"); el.className=`toast ${type}`;
+  el.innerHTML=`${icon[type]||""}<span>${esc(msg)}</span>`; $("#toasts").appendChild(el);
+  setTimeout(()=>{ el.style.animation="toast-out .2s cubic-bezier(.22,1,.36,1) forwards"; el.addEventListener("animationend",()=>el.remove(),{once:true}); },3500);
 }
 
 /* ── Делегирование событий ────────────────────────────────────────────────── */
-document.addEventListener("click", e => {
-  const t = e.target;
-  const delUser = t.closest("[data-action='del-user']");
-  if (delUser) { e.stopPropagation(); _delUser(delUser.dataset.user, delUser); return; }
-  const toggle = t.closest("[data-action='toggle']");
-  if (toggle && !t.closest("[data-action='del-user']")) { _toggle(toggle.dataset.user); return; }
-  const addDev = t.closest("[data-action='add-device']");
-  if (addDev) { _openDeviceModal(addDev.dataset.user); return; }
-  const dl = t.closest("[data-action='download']");
-  if (dl) { _download(dl.dataset.id, dl.dataset.filename); return; }
-  const delDev = t.closest("[data-action='del-device']");
-  if (delDev) { _delDevice(delDev.dataset.user, delDev.dataset.id, delDev); return; }
+document.addEventListener("click",e=>{
+  const t=e.target;
+  const dU=t.closest("[data-action='del-user']");    if(dU){ e.stopPropagation(); _delUser(dU.dataset.user,dU); return; }
+  const tg=t.closest("[data-action='toggle']");      if(tg&&!t.closest("[data-action='del-user']")){ _toggle(tg.dataset.user); return; }
+  const aD=t.closest("[data-action='add-device']");  if(aD){ _openDeviceModal(aD.dataset.user); return; }
+  const dl=t.closest("[data-action='download']");    if(dl){ _download(dl.dataset.id,dl.dataset.filename); return; }
+  const dD=t.closest("[data-action='del-device']");  if(dD){ _delDevice(dD.dataset.user,dD.dataset.id,dD); return; }
 });
 
 /* ── Утилиты ──────────────────────────────────────────────────────────────── */
-function $(id) { return document.getElementById(id); }
-function show(id) { $(id).classList.remove("hidden"); }
-function hide(id) { $(id).classList.add("hidden"); }
-function esc(s) {
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
+function $(id){ return typeof id==="string"&&id.startsWith("#")?document.getElementById(id.slice(1)):document.getElementById(id); }
+function show(id){ $(id).classList.remove("hidden"); }
+function hide(id){ $(id).classList.add("hidden"); }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
 /* ── Привязка событий ─────────────────────────────────────────────────────── */
-$("login-btn").addEventListener("click", _login);
-$("pw-input").addEventListener("keydown",  e => { if (e.key === "Enter") _login(); });
-$("logout-btn").addEventListener("click", _logout);
-$("add-user-btn").addEventListener("click", _openUserModal);
-$("user-cancel-btn").addEventListener("click",   _closeUserModal);
-$("user-confirm-btn").addEventListener("click",  _submitUser);
-$("user-name-input").addEventListener("keydown", e => { if (e.key === "Enter") _submitUser(); });
-$("user-modal-bg").addEventListener("click", _closeUserModal);
-$("device-cancel-btn").addEventListener("click",   _closeDeviceModal);
-$("device-confirm-btn").addEventListener("click",  _submitDevice);
-$("device-name-input").addEventListener("keydown", e => { if (e.key === "Enter") _submitDevice(); });
-$("device-modal-bg").addEventListener("click", _closeDeviceModal);
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") { _closeUserModal(); _closeDeviceModal(); }
-});
+$("#login-btn").addEventListener("click",_login);
+$("#pw-input").addEventListener("keydown",e=>{ if(e.key==="Enter") _login(); });
+$("#logout-btn").addEventListener("click",_logout);
+$("#add-user-btn").addEventListener("click",_openUserModal);
+$("#user-cancel-btn").addEventListener("click",_closeUserModal);
+$("#user-confirm-btn").addEventListener("click",_submitUser);
+$("#user-name-input").addEventListener("keydown",e=>{ if(e.key==="Enter") _submitUser(); });
+$("#user-modal-bg").addEventListener("click",_closeUserModal);
+$("#device-cancel-btn").addEventListener("click",_closeDeviceModal);
+$("#device-confirm-btn").addEventListener("click",_submitDevice);
+$("#device-name-input").addEventListener("keydown",e=>{ if(e.key==="Enter") _submitDevice(); });
+$("#device-modal-bg").addEventListener("click",_closeDeviceModal);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ _closeUserModal(); _closeDeviceModal(); } });
 
 /* ── Старт ────────────────────────────────────────────────────────────────── */
-if (_token) _showDashboard().catch(() => _logout());
+if(_token) _showDashboard().catch(()=>_logout());
 </script>
 </body>
 </html>

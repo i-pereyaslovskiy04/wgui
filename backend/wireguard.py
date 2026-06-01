@@ -139,6 +139,71 @@ def _derive_ipv6(ipv4: str) -> str:
     return f"fd42:42:42::{last}"
 
 
+# ── Live peer statistics ──────────────────────────────────────────────────────
+
+def get_peer_stats() -> dict[str, dict]:
+    """
+    Run `wg show <WG_INTERFACE> dump` and return per-peer stats keyed by public key.
+
+    Each value dict contains:
+        last_handshake  — Unix timestamp (int), 0 if no handshake ever
+        rx_bytes        — bytes received by the server from this peer
+        tx_bytes        — bytes sent by the server to this peer
+        endpoint        — "host:port" string or None
+
+    Returns an empty dict when wg binary is not installed (dev mode).
+    Raises WireGuardError when wg is present but the command fails.
+
+    `wg show <iface> dump` format (tab-separated):
+      Line 0 (interface): priv-key  pub-key  listen-port  fwmark
+      Lines 1+ (peers):   pub-key   psk   endpoint   allowed-ips
+                          latest-handshake   transfer-rx   transfer-tx
+                          persistent-keepalive
+    """
+    try:
+        raw = subprocess.check_output(
+            ["wg", "show", WG_INTERFACE, "dump"],
+            stderr=subprocess.DEVNULL, timeout=_TIMEOUT,
+        ).decode().strip()
+    except FileNotFoundError:
+        log.debug("wg not found — returning empty peer stats (dev mode)")
+        return {}
+    except subprocess.CalledProcessError as e:
+        stderr = (e.stderr or b"").decode(errors="replace").strip()
+        raise WireGuardError(f"wg show dump failed: {stderr}") from e
+    except subprocess.TimeoutExpired:
+        raise WireGuardError("wg show dump timed out")
+
+    peers: dict[str, dict] = {}
+    lines = raw.splitlines()
+
+    # Skip the first line (interface line: private-key, public-key, port, fwmark)
+    for line in lines[1:]:
+        parts = line.split("\t")
+        if len(parts) < 8:
+            continue
+
+        pub_key  = parts[0]
+        endpoint = parts[2]
+        try:    last_hs = int(parts[4])
+        except ValueError: last_hs = 0
+        try:    rx = int(parts[5])
+        except ValueError: rx = 0
+        try:    tx = int(parts[6])
+        except ValueError: tx = 0
+
+        peers[pub_key] = {
+            "last_handshake": last_hs,
+            "rx_bytes":       rx,
+            "tx_bytes":       tx,
+            "endpoint":       endpoint if endpoint not in ("(none)", "") else None,
+        }
+        log.debug(f"peer {pub_key[:8]}… hs={last_hs} rx={rx} tx={tx}")
+
+    log.debug(f"get_peer_stats: {len(peers)} peer(s) parsed")
+    return peers
+
+
 # ── Peer management ───────────────────────────────────────────────────────────
 
 def add_peer(public_key: str, ip: str, psk: str) -> bool:
