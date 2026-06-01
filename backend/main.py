@@ -44,7 +44,8 @@ from routes.downloads import router as downloads_router
 from routes.wg_status import router as wg_status_router
 
 FRONTEND    = Path(__file__).parent.parent / "frontend" / "index.html"
-PUBLIC_PATHS = {"/api/auth/login", "/health", "/"}
+FAVICON     = Path(__file__).parent.parent / "frontend" / "favicon.svg"
+PUBLIC_PATHS = {"/api/auth/login", "/health", "/", "/favicon.svg"}
 
 
 # ── Lifespan ──────────────────────────────────────────────────────────────────
@@ -121,6 +122,13 @@ async def serve_frontend():
     if not FRONTEND.exists():
         return JSONResponse({"ok": False, "error": "Frontend not found"}, status_code=404)
     return FileResponse(FRONTEND)
+
+
+@app.get("/favicon.svg")
+async def serve_favicon():
+    if not FAVICON.exists():
+        return JSONResponse({"ok": False, "error": "Not found"}, status_code=404)
+    return FileResponse(FAVICON, media_type="image/svg+xml")
 
 
 @app.get("/health")
