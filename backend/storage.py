@@ -81,13 +81,12 @@ def _migrate(data: dict) -> bool:
                 dirty = True
                 log.info(f"Migration: added stats to device '{dev.get('name')}' of user '{uname}'")
 
-    # v4: add subscription block to every device that lacks one (unlimited by default)
+    # v5: add subscription block to every user that lacks one (unlimited by default)
     for uname, udata in data.get("users", {}).items():
-        for dev in udata.get("devices", []):
-            if "subscription" not in dev:
-                dev["subscription"] = dict(_EMPTY_SUBSCRIPTION)
-                dirty = True
-                log.info(f"Migration: added subscription to device '{dev.get('name')}' of user '{uname}'")
+        if "subscription" not in udata:
+            udata["subscription"] = dict(_EMPTY_SUBSCRIPTION)
+            dirty = True
+            log.info(f"Migration: added subscription to user '{uname}'")
 
     return dirty
 
@@ -190,7 +189,7 @@ def create_user_atomic(name: str) -> None:
         data = _read()
         if name in data["users"]:
             raise ValueError(f"User '{name}' already exists")
-        data["users"][name] = {"devices": []}
+        data["users"][name] = {"subscription": dict(_EMPTY_SUBSCRIPTION), "devices": []}
         _write_safe(data)
         log.info(f"User created: {name}")
 
@@ -257,8 +256,6 @@ def commit_device(username: str, device: dict) -> None:
 
     Raises KeyError if user not found, ValueError on duplicate device name.
     """
-    if "subscription" not in device:
-        device["subscription"] = dict(_EMPTY_SUBSCRIPTION)
     with _lock:
         data = _read()
         if username not in data["users"]:
@@ -337,42 +334,44 @@ def get_user_usage(username: str) -> dict:
         }
 
 
-def update_device_subscription(device_id: str, sub_type: str, expires_at: int) -> tuple[str, dict]:
+def update_user_subscription(username: str, sub_type: str, expires_at: int) -> dict:
     """
-    Update subscription type/expires_at for a device.
-    Sets active=True when the subscription is valid, False when already expired.
-    Returns (username, device_dict).
-    Raises KeyError if device not found.
+    Update subscription for a user.
+    Sets active=True for 'unlimited' or a future 'time' date; False for 'disabled' or expired.
+    Returns the updated user dict (with devices).
+    Raises KeyError if user not found.
     """
     now = int(time.time())
     with _lock:
         data = _read()
-        for username, udata in data["users"].items():
-            for dev in udata.get("devices", []):
-                if dev.get("id") == device_id:
-                    sub = dev.setdefault("subscription", dict(_EMPTY_SUBSCRIPTION))
-                    sub["type"] = sub_type
-                    sub["expires_at"] = expires_at if sub_type == "time" else 0
-                    sub["active"] = True if sub_type == "unlimited" else (expires_at > now)
-                    _write_safe(data)
-                    log.info(
-                        "Subscription updated: device=%s type=%s expires_at=%d active=%s",
-                        dev.get("name"), sub_type, expires_at, sub["active"],
-                    )
-                    return username, dev
-        raise KeyError(f"Device '{device_id}' not found")
+        if username not in data["users"]:
+            raise KeyError(f"User '{username}' not found")
+        udata = data["users"][username]
+        sub = udata.setdefault("subscription", dict(_EMPTY_SUBSCRIPTION))
+        sub["type"] = sub_type
+        sub["expires_at"] = expires_at if sub_type == "time" else 0
+        if sub_type == "unlimited":
+            sub["active"] = True
+        elif sub_type == "disabled":
+            sub["active"] = False
+        else:  # time
+            sub["active"] = expires_at > now
+        _write_safe(data)
+        log.info(
+            "Subscription updated: user=%s type=%s expires_at=%d active=%s",
+            username, sub_type, expires_at, sub["active"],
+        )
+        return udata
 
 
-def set_device_active(device_id: str, active: bool) -> None:
-    """Set subscription.active for a device (called by the stats worker on expiry)."""
+def set_user_active(username: str, active: bool) -> None:
+    """Set subscription.active for a user (called by the stats worker on expiry)."""
     with _lock:
         data = _read()
-        for udata in data["users"].values():
-            for dev in udata.get("devices", []):
-                if dev.get("id") == device_id:
-                    dev.setdefault("subscription", dict(_EMPTY_SUBSCRIPTION))["active"] = active
-                    _write_safe(data)
-                    return
+        if username in data["users"]:
+            udata = data["users"][username]
+            udata.setdefault("subscription", dict(_EMPTY_SUBSCRIPTION))["active"] = active
+            _write_safe(data)
 
 
 def delete_device_atomic(username: str, device_id: str) -> dict:

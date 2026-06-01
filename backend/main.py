@@ -118,7 +118,7 @@ async def auth_middleware(request: Request, call_next):
 app.include_router(auth_router,         prefix="/api/auth",       tags=["auth"])
 app.include_router(users_router,        prefix="/api/users",      tags=["users"])
 app.include_router(devices_router,      prefix="/api/devices",    tags=["devices"])
-app.include_router(subscription_router, prefix="/api/devices",    tags=["subscription"])
+app.include_router(subscription_router, prefix="/api/users",      tags=["subscription"])
 app.include_router(downloads_router,    prefix="/api/downloads",  tags=["downloads"])
 app.include_router(wg_status_router,    prefix="/api/wireguard",  tags=["wireguard"])
 

@@ -43,7 +43,10 @@ def wireguard_status():
     peers      = []
     online_list = []
 
+    _EMPTY_SUB = {"type": "unlimited", "expires_at": 0, "active": True}
+
     for username, udata in data["users"].items():
+        user_sub = udata.get("subscription", _EMPTY_SUB)
         for dev in udata.get("devices", []):
             pub_key = dev.get("public_key") or ""
             wg      = raw_stats.get(pub_key, {})
@@ -61,7 +64,7 @@ def wireguard_status():
                 "rx_bytes":               wg.get("rx_bytes", 0),
                 "tx_bytes":               wg.get("tx_bytes", 0),
                 "stats":        dev.get("stats", {"total_rx": 0, "total_tx": 0, "last_seen": 0}),
-                "subscription": dev.get("subscription", {"type": "unlimited", "expires_at": 0, "active": True}),
+                "subscription": user_sub,
             }
             peers.append(peer)
 

@@ -2,7 +2,7 @@ import logging
 import threading
 import time
 
-from storage import get_data, set_device_active, update_device_stats
+from storage import get_data, set_user_active, update_device_stats
 from wireguard import WireGuardError, disable_peer, get_peer_stats
 
 log = logging.getLogger(__name__)
@@ -11,28 +11,31 @@ _INTERVAL = 60  # seconds between polls
 
 
 def _check_subscriptions() -> None:
-    """Disable any devices whose time-based subscription has expired."""
+    """Disable all devices for users whose time-based subscription has expired."""
     now = int(time.time())
     data = get_data()
-    for udata in data["users"].values():
-        for dev in udata.get("devices", []):
-            sub = dev.get("subscription", {})
-            if sub.get("type") != "time":
-                continue
-            if not sub.get("active", True):
-                continue  # already disabled
-            if now <= sub.get("expires_at", 0):
-                continue  # still valid
-            pub_key   = dev.get("public_key", "")
-            device_id = dev.get("id", "")
-            name      = dev.get("name", "")
+    for username, udata in data["users"].items():
+        sub = udata.get("subscription", {})
+        if sub.get("type") != "time":
+            continue
+        if not sub.get("active", True):
+            continue  # already disabled
+        if now <= sub.get("expires_at", 0):
+            continue  # still valid
+        # Subscription expired — disable all peers for this user
+        devices = udata.get("devices", [])
+        for dev in devices:
+            pub_key = dev.get("public_key", "")
             if pub_key:
                 try:
                     disable_peer(pub_key)
                 except WireGuardError as e:
-                    log.warning("StatsWorker: failed to disable peer '%s': %s", name, e)
-            set_device_active(device_id, False)
-            log.info("StatsWorker: subscription expired → device disabled: %s", name)
+                    log.warning(
+                        "StatsWorker: failed to disable peer '%s' (user '%s'): %s",
+                        dev.get("name"), username, e,
+                    )
+        set_user_active(username, False)
+        log.info("StatsWorker: subscription expired → user disabled: %s", username)
 
 
 class StatsWorker:

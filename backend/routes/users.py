@@ -55,11 +55,18 @@ class CreateDeviceBody(BaseModel):
 
 # ── Users ──────────────────────────────────────────────────────────────────────
 
+_EMPTY_SUB = {"type": "unlimited", "expires_at": 0, "active": True}
+
+
 @router.get("")
 def list_users():
     data = get_data()
     users = [
-        {"name": n, "device_count": len(u.get("devices", []))}
+        {
+            "name":         n,
+            "device_count": len(u.get("devices", [])),
+            "subscription": u.get("subscription", _EMPTY_SUB),
+        }
         for n, u in data["users"].items()
     ]
     return _ok(users)
@@ -80,16 +87,13 @@ def get_user(user: str):
     data = get_data()
     if user not in data["users"]:
         raise HTTPException(404, "User not found")
+    udata        = data["users"][user]
+    subscription = udata.get("subscription", _EMPTY_SUB)
     devices = [
-        {
-            "id":           d["id"],
-            "name":         d["name"],
-            "ip":           d["ip"],
-            "subscription": d.get("subscription", {"type": "unlimited", "expires_at": 0, "active": True}),
-        }
-        for d in data["users"][user].get("devices", [])
+        {"id": d["id"], "name": d["name"], "ip": d["ip"]}
+        for d in udata.get("devices", [])
     ]
-    return _ok({"name": user, "devices": devices})
+    return _ok({"name": user, "subscription": subscription, "devices": devices})
 
 
 @router.delete("/{user}")
