@@ -81,7 +81,12 @@ def get_user(user: str):
     if user not in data["users"]:
         raise HTTPException(404, "User not found")
     devices = [
-        {"id": d["id"], "name": d["name"], "ip": d["ip"]}
+        {
+            "id":           d["id"],
+            "name":         d["name"],
+            "ip":           d["ip"],
+            "subscription": d.get("subscription", {"type": "unlimited", "expires_at": 0, "active": True}),
+        }
         for d in data["users"][user].get("devices", [])
     ]
     return _ok({"name": user, "devices": devices})

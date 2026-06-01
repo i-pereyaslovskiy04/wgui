@@ -244,6 +244,60 @@ def add_peer(public_key: str, ip: str, psk: str) -> bool:
         raise WireGuardError("wg set peer timed out")
 
 
+def disable_peer(public_key: str) -> bool:
+    """
+    Soft-disable peer by clearing its allowed-ips.
+    The peer record and PSK are preserved; only traffic routing is blocked.
+    Returns True on success, False when wg binary is not installed (dev mode).
+    Raises WireGuardError when wg is installed but the command fails.
+    """
+    try:
+        subprocess.run(
+            ["wg", "set", WG_INTERFACE, "peer", public_key, "allowed-ips", ""],
+            check=True, capture_output=True, timeout=_TIMEOUT,
+        )
+        log.info(f"wg: peer disabled (allowed-ips cleared) — pubkey={public_key[:8]}…")
+        _save_config()
+        return True
+    except FileNotFoundError:
+        log.debug(f"wg not found — peer disable skipped (dev mode) pubkey={public_key[:8]}…")
+        return False
+    except subprocess.CalledProcessError as e:
+        stderr = (e.stderr or b"").decode(errors="replace").strip()
+        log.error(f"wg disable peer FAILED — pubkey={public_key[:8]}… stderr={stderr!r}")
+        raise WireGuardError(f"wg disable peer failed: {stderr}") from e
+    except subprocess.TimeoutExpired:
+        raise WireGuardError("wg disable peer timed out")
+
+
+def enable_peer(public_key: str, ip: str) -> bool:
+    """
+    Re-enable a soft-disabled peer by restoring dual-stack allowed-ips.
+    Does not set the PSK — it is preserved from original peer registration.
+    Returns True on success, False when wg binary is not installed (dev mode).
+    Raises WireGuardError when wg is installed but the command fails.
+    """
+    ipv6 = _derive_ipv6(ip)
+    try:
+        subprocess.run(
+            ["wg", "set", WG_INTERFACE, "peer", public_key,
+             "allowed-ips", f"{ip}/32,{ipv6}/128"],
+            check=True, capture_output=True, timeout=_TIMEOUT,
+        )
+        log.info(f"wg: peer enabled (allowed-ips restored) — pubkey={public_key[:8]}… ip={ip}")
+        _save_config()
+        return True
+    except FileNotFoundError:
+        log.debug(f"wg not found — peer enable skipped (dev mode) ip={ip}")
+        return False
+    except subprocess.CalledProcessError as e:
+        stderr = (e.stderr or b"").decode(errors="replace").strip()
+        log.error(f"wg enable peer FAILED — pubkey={public_key[:8]}… ip={ip} stderr={stderr!r}")
+        raise WireGuardError(f"wg enable peer failed: {stderr}") from e
+    except subprocess.TimeoutExpired:
+        raise WireGuardError("wg enable peer timed out")
+
+
 def remove_peer(public_key: str) -> None:
     """
     Remove peer from the WireGuard interface.

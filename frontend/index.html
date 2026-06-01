@@ -414,6 +414,77 @@ body{
 /* Подпись — тот же уровень читаемости, что и основной текст warning */
 .warn-hint{margin-top:8px;font-size:12.5px;color:var(--t2);line-height:1.55}
 
+/* ─── ПОДПИСКА: бейджи ──────────────────────────────────────────────────────── */
+.sub-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:20px;
+  font-size:11.5px;font-weight:500;white-space:nowrap;
+  border:1px solid transparent;cursor:pointer;
+  background:none;user-select:none;
+  transition:background var(--tf),border-color var(--tf);
+  -webkit-tap-highlight-color:transparent;flex-shrink:0;
+}
+.sub-unlimited{background:var(--a-bg);border-color:var(--a-ri);color:var(--a-tx)}
+.sub-unlimited:hover{background:rgba(82,113,232,.18)}
+.sub-active{background:var(--gn-bg);border-color:var(--gn-ri);color:var(--gn-tx)}
+.sub-active:hover{background:rgba(31,201,106,.14)}
+.sub-expired{background:var(--rd-bg);border-color:var(--rd-ri);color:var(--rd)}
+.sub-expired:hover{background:rgba(229,94,94,.16)}
+
+/* ─── ПОДПИСКА: календарь-поповер ───────────────────────────────────────────── */
+.cal-popover{
+  position:fixed;z-index:300;
+  background:var(--s4);
+  border:1px solid var(--bd2);border-radius:var(--r3);
+  box-shadow:0 16px 48px rgba(0,0,0,.52),0 1px 0 rgba(255,255,255,.05) inset;
+  padding:14px;width:272px;
+  animation:modal-in .18s cubic-bezier(.34,1.32,.64,1);
+}
+.cal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;
+}
+.cal-month-label{
+  font-size:13px;font-weight:600;color:var(--t1);letter-spacing:-.1px;
+}
+.cal-nav{
+  width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+  background:none;border:1px solid var(--bd);border-radius:var(--r1);
+  color:var(--t2);cursor:pointer;font-size:16px;line-height:1;padding:0;
+  transition:background var(--tf),color var(--tf),border-color var(--tf);
+  user-select:none;-webkit-tap-highlight-color:transparent;
+}
+.cal-nav:hover{background:var(--s3);border-color:var(--bd2);color:var(--t1)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-dow{
+  text-align:center;font-size:9.5px;font-weight:600;
+  color:var(--t3);letter-spacing:.04em;text-transform:uppercase;
+  padding:0 0 5px;
+}
+.cal-day{
+  text-align:center;font-size:12px;color:var(--t1);
+  border-radius:var(--r1);cursor:pointer;
+  border:1px solid transparent;
+  padding:4px 2px;min-height:26px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background var(--tf),border-color var(--tf);line-height:1;
+}
+.cal-day-empty,.cal-day-past{cursor:default;pointer-events:none}
+.cal-day-past{color:var(--t3)}
+.cal-day:not(.cal-day-empty):not(.cal-day-past):hover{background:var(--s3);border-color:var(--bd)}
+.cal-day-today{border-color:var(--a-ri)!important;color:var(--a-tx);background:var(--a-bg)}
+.cal-day-selected{background:var(--a)!important;color:#fff!important;border-color:var(--a)!important}
+.cal-day-selected:hover{background:var(--a-hv)!important}
+.cal-footer{
+  margin-top:10px;padding-top:10px;
+  border-top:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.cal-current-label{
+  font-size:11px;color:var(--t2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;
+}
+
 /* ═══ АДАПТИВНОСТЬ ═══════════════════════════════════════════════════════════ */
 
 /* Мобильные ≤ 480px */
@@ -459,6 +530,7 @@ body{
   .device-actions{display:flex;gap:7px;padding-top:2px;border-top:1px solid var(--bd);margin-top:2px}
   .device-actions .btn-secondary{flex:1;min-height:38px;font-size:13px}
   .device-actions .btn-danger{flex:0 0 38px;min-height:38px;padding:8px}
+  .device-actions .sub-badge{min-height:38px;font-size:12.5px;border-radius:var(--r1);padding:0 12px}
   .device-hint{display:none}
   .devices-toolbar .btn{width:100%;min-height:40px;font-size:13px}
 
@@ -796,6 +868,10 @@ const _open = new Set();
 let _pendingUser  = null;
 let _wgTimer      = null;
 let _lastWgStatus = null;
+const _devCache   = new Map();   // deviceId → device object (for calendar)
+let _calDevice    = null;        // device currently open in calendar
+let _calDate      = null;        // selected Date in calendar
+let _calMonth     = null;        // { year, month } displayed in calendar
 
 /* Палитра аватаров */
 const _PAL = [
@@ -872,7 +948,7 @@ async function _login() {
 
 function _logout() {
   if(_wgTimer){ clearInterval(_wgTimer); _wgTimer=null; }
-  _lastWgStatus=null;
+  _lastWgStatus=null; _devCache.clear(); _closeCalendar();
   _token=null; localStorage.removeItem("vpn_token"); _open.clear();
   show("login-view"); hide("dashboard-view");
   $("#pw-input").value=""; $("#login-error").textContent="";
@@ -916,6 +992,23 @@ function _applyWgStatus(data) {
     if(trf){
       const rx=(p.stats&&p.stats.total_rx)||0, tx=(p.stats&&p.stats.total_tx)||0;
       trf.textContent = (rx||tx) ? `↓ ${_fmtBytes(rx)} ↑ ${_fmtBytes(tx)}` : "";
+    }
+
+    /* Обновить кэш и бейдж подписки из WG статуса */
+    if(p.subscription){
+      const cached=_devCache.get(p.id);
+      if(cached){ cached.subscription=p.subscription; }
+      const badge=document.querySelector(`[data-action='open-sub'][data-id='${p.id}']`);
+      if(badge){
+        const status=_subStatus(p.subscription);
+        const cls=status==="unlimited"?"sub-unlimited":status==="active"?"sub-active":"sub-expired";
+        let label;
+        if(status==="unlimited")   label="∞ Безлимит";
+        else if(status==="active") label=`до ${_fmtDateShort(new Date(p.subscription.expires_at*1000))}`;
+        else                       label="Истёк";
+        badge.className=`sub-badge ${cls}`;
+        badge.textContent=label;
+      }
     }
   }
 }
@@ -1063,6 +1156,7 @@ async function _loadDevices(name) {
 }
 
 function _renderDevices(userName,devices,container){
+  for(const d of devices) _devCache.set(d.id, d);
   const rows=devices.length
     ?devices.map(d=>`
         <div class="device-item">
@@ -1080,6 +1174,7 @@ function _renderDevices(userName,devices,container){
             </div>
           </div>
           <div class="device-actions">
+            ${_subBadgeHTML(d)}
             <button class="btn btn-xs btn-secondary"
               data-action="download" data-id="${esc(d.id)}"
               data-filename="${esc(userName)}-${esc(d.name)}.conf"
@@ -1204,6 +1299,150 @@ function toast(msg,type="info"){
   setTimeout(()=>{ el.style.animation="toast-out .2s cubic-bezier(.22,1,.36,1) forwards"; el.addEventListener("animationend",()=>el.remove(),{once:true}); },3500);
 }
 
+/* ── Подписка: хелперы ────────────────────────────────────────────────────── */
+const _MONTHS_SHORT = ["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"];
+const _MONTHS_FULL  = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+const _DAYS_SHORT   = ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
+
+function _subStatus(sub){
+  if(!sub||sub.type==="unlimited") return "unlimited";
+  if(!sub.active) return "expired";
+  const now=Math.floor(Date.now()/1000);
+  return sub.expires_at>now?"active":"expired";
+}
+function _fmtDateShort(dt){return `${dt.getDate()} ${_MONTHS_SHORT[dt.getMonth()]}`}
+function _fmtDateFull(dt){return `${dt.getDate()} ${_MONTHS_SHORT[dt.getMonth()]} ${dt.getFullYear()}`}
+
+function _subBadgeHTML(d){
+  const sub=d.subscription||{type:"unlimited",expires_at:0,active:true};
+  const status=_subStatus(sub);
+  const cls=status==="unlimited"?"sub-unlimited":status==="active"?"sub-active":"sub-expired";
+  let label;
+  if(status==="unlimited")  label="∞ Безлимит";
+  else if(status==="active") label=`до ${_fmtDateShort(new Date(sub.expires_at*1000))}`;
+  else                       label="Истёк";
+  return `<button class="sub-badge ${cls}" data-action="open-sub" data-id="${esc(d.id)}" title="Управление подпиской">${esc(label)}</button>`;
+}
+
+/* ── Календарь ────────────────────────────────────────────────────────────── */
+function _openCalendar(deviceId, anchorEl){
+  _closeCalendar();
+  const dev=_devCache.get(deviceId);
+  if(!dev) return;
+  _calDevice=dev;
+  const sub=dev.subscription||{type:"unlimited",expires_at:0,active:true};
+  _calDate = (sub.type==="time"&&sub.expires_at>0) ? new Date(sub.expires_at*1000) : null;
+  const base = _calDate||new Date();
+  _calMonth = {year:base.getFullYear(), month:base.getMonth()};
+
+  const pop=document.createElement("div");
+  pop.id="cal-popover"; pop.className="cal-popover";
+  document.body.appendChild(pop);
+  _renderCalendar(pop);
+
+  const rect=anchorEl.getBoundingClientRect(), pw=272, ph=310;
+  let left=rect.left, top=rect.bottom+6;
+  if(left+pw>window.innerWidth-8) left=window.innerWidth-pw-8;
+  if(top+ph>window.innerHeight-8) top=rect.top-ph-6;
+  if(left<8) left=8;
+  pop.style.left=left+"px"; pop.style.top=top+"px";
+
+  setTimeout(()=>document.addEventListener("click",_calOutsideClick,{once:true}),0);
+}
+
+function _calOutsideClick(e){
+  const pop=document.getElementById("cal-popover");
+  if(!pop) return;
+  if(e.composedPath&&e.composedPath().includes(pop)){
+    setTimeout(()=>document.addEventListener("click",_calOutsideClick,{once:true}),0);
+  }else{
+    _closeCalendar();
+  }
+}
+
+function _closeCalendar(){
+  const pop=document.getElementById("cal-popover");
+  if(pop) pop.remove();
+  _calDevice=null;
+  document.removeEventListener("click",_calOutsideClick);
+}
+
+function _renderCalendar(pop){
+  if(!pop||!_calMonth) return;
+  const {year,month}=_calMonth;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const firstDay=new Date(year,month,1);
+  const lastDay=new Date(year,month+1,0);
+  let startDow=firstDay.getDay()-1; if(startDow<0) startDow=6;
+  const selY=_calDate?_calDate.getFullYear():null,
+        selM=_calDate?_calDate.getMonth():null,
+        selD=_calDate?_calDate.getDate():null;
+
+  let grid=_DAYS_SHORT.map(d=>`<div class="cal-dow">${d}</div>`).join("");
+  for(let i=0;i<startDow;i++) grid+=`<div class="cal-day cal-day-empty"></div>`;
+  for(let day=1;day<=lastDay.getDate();day++){
+    const dt=new Date(year,month,day);
+    const isPast=dt<today, isToday=dt.getTime()===today.getTime();
+    const isSel=selY===year&&selM===month&&selD===day;
+    let cls="cal-day";
+    if(isPast) cls+=" cal-day-past";
+    if(isToday) cls+=" cal-day-today";
+    if(isSel)  cls+=" cal-day-selected";
+    const ts=Math.floor(new Date(year,month,day,23,59,59).getTime()/1000);
+    grid+=`<div class="${cls}"${!isPast?` data-action="cal-pick" data-ts="${ts}"`:""}>${day}</div>`;
+  }
+
+  const infoLabel=_calDate?`Дата: ${_fmtDateFull(_calDate)}`:"Не выбрана";
+  const sub=_calDevice?.subscription||{};
+  const isUnlimited=!sub.type||sub.type==="unlimited";
+  pop.innerHTML=`
+    <div class="cal-header">
+      <button class="cal-nav" data-action="cal-prev">&#8249;</button>
+      <span class="cal-month-label">${_MONTHS_FULL[month]} ${year}</span>
+      <button class="cal-nav" data-action="cal-next">&#8250;</button>
+    </div>
+    <div class="cal-grid">${grid}</div>
+    <div class="cal-footer">
+      <span class="cal-current-label">${esc(infoLabel)}</span>
+      <button class="btn btn-xs ${isUnlimited?"btn-primary":"btn-secondary"}" data-action="cal-unlimited">∞ Безлимит</button>
+    </div>`;
+}
+
+async function _calPickDate(ts){
+  if(!_calDevice) return;
+  const dev=_calDevice;
+  _calDate=new Date(ts*1000);
+  const pop=document.getElementById("cal-popover");
+  if(pop) _renderCalendar(pop);
+  try{
+    await rj("PATCH",`/devices/${encodeURIComponent(dev.id)}/subscription`,{type:"time",expires_at:ts});
+    const now=Math.floor(Date.now()/1000);
+    dev.subscription={type:"time",expires_at:ts,active:ts>now};
+    _devCache.set(dev.id,dev);
+    const badge=document.querySelector(`[data-action='open-sub'][data-id='${dev.id}']`);
+    if(badge){
+      const status=_subStatus(dev.subscription);
+      badge.className=`sub-badge ${status==="active"?"sub-active":"sub-expired"}`;
+      badge.textContent=status==="active"?`до ${_fmtDateShort(new Date(ts*1000))}`:"Истёк";
+    }
+    toast("Подписка обновлена","success");
+  }catch(e){ toast(e.message,"error"); }
+}
+
+async function _calSetUnlimited(){
+  if(!_calDevice) return;
+  const dev=_calDevice;
+  _closeCalendar();
+  try{
+    await rj("PATCH",`/devices/${encodeURIComponent(dev.id)}/subscription`,{type:"unlimited",expires_at:0});
+    dev.subscription={type:"unlimited",expires_at:0,active:true};
+    _devCache.set(dev.id,dev);
+    const badge=document.querySelector(`[data-action='open-sub'][data-id='${dev.id}']`);
+    if(badge){ badge.className="sub-badge sub-unlimited"; badge.textContent="∞ Безлимит"; }
+    toast("Подписка: безлимитный","success");
+  }catch(e){ toast(e.message,"error"); }
+}
+
 /* ── Делегирование событий ────────────────────────────────────────────────── */
 document.addEventListener("click",e=>{
   const t=e.target;
@@ -1212,6 +1451,11 @@ document.addEventListener("click",e=>{
   const aD=t.closest("[data-action='add-device']");  if(aD){ _openDeviceModal(aD.dataset.user); return; }
   const dl=t.closest("[data-action='download']");    if(dl){ _download(dl.dataset.id,dl.dataset.filename); return; }
   const dD=t.closest("[data-action='del-device']");  if(dD){ _delDevice(dD.dataset.user,dD.dataset.id,dD); return; }
+  const oS=t.closest("[data-action='open-sub']");    if(oS){ _openCalendar(oS.dataset.id,oS); return; }
+  const cP=t.closest("[data-action='cal-prev']");    if(cP){ const p=document.getElementById("cal-popover"); if(p){_calMonth.month--;if(_calMonth.month<0){_calMonth.month=11;_calMonth.year--;}_renderCalendar(p);} return; }
+  const cN=t.closest("[data-action='cal-next']");    if(cN){ const p=document.getElementById("cal-popover"); if(p){_calMonth.month++;if(_calMonth.month>11){_calMonth.month=0;_calMonth.year++;}_renderCalendar(p);} return; }
+  const cD=t.closest("[data-action='cal-pick']");    if(cD){ _calPickDate(parseInt(cD.dataset.ts)); return; }
+  const cU=t.closest("[data-action='cal-unlimited']"); if(cU){ _calSetUnlimited(); return; }
 });
 
 /* ── Утилиты ──────────────────────────────────────────────────────────────── */
@@ -1233,7 +1477,7 @@ $("#device-cancel-btn").addEventListener("click",_closeDeviceModal);
 $("#device-confirm-btn").addEventListener("click",_submitDevice);
 $("#device-name-input").addEventListener("keydown",e=>{ if(e.key==="Enter") _submitDevice(); });
 $("#device-modal-bg").addEventListener("click",_closeDeviceModal);
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ _closeUserModal(); _closeDeviceModal(); } });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ _closeUserModal(); _closeDeviceModal(); _closeCalendar(); } });
 
 /* ── Аккордеон "Скачать Amnezia VPN" ─────────────────────────────────────── */
 (function(){

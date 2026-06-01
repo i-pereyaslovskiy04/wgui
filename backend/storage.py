@@ -13,8 +13,9 @@ CONFIGS_DIR  = PROJECT_ROOT / "configs"
 
 _lock = threading.Lock()
 
-_EMPTY_DATA: dict  = {"users": {}, "ip_pool": {"next": 10, "used": {}}}
-_EMPTY_STATS: dict = {"last_rx": 0, "last_tx": 0, "total_rx": 0, "total_tx": 0, "last_seen": 0}
+_EMPTY_DATA: dict         = {"users": {}, "ip_pool": {"next": 10, "used": {}}}
+_EMPTY_STATS: dict        = {"last_rx": 0, "last_tx": 0, "total_rx": 0, "total_tx": 0, "last_seen": 0}
+_EMPTY_SUBSCRIPTION: dict = {"type": "unlimited", "expires_at": 0, "active": True}
 
 
 # ── Internal ──────────────────────────────────────────────────────────────────
@@ -79,6 +80,14 @@ def _migrate(data: dict) -> bool:
                 dev["stats"] = dict(_EMPTY_STATS)
                 dirty = True
                 log.info(f"Migration: added stats to device '{dev.get('name')}' of user '{uname}'")
+
+    # v4: add subscription block to every device that lacks one (unlimited by default)
+    for uname, udata in data.get("users", {}).items():
+        for dev in udata.get("devices", []):
+            if "subscription" not in dev:
+                dev["subscription"] = dict(_EMPTY_SUBSCRIPTION)
+                dirty = True
+                log.info(f"Migration: added subscription to device '{dev.get('name')}' of user '{uname}'")
 
     return dirty
 
@@ -248,6 +257,8 @@ def commit_device(username: str, device: dict) -> None:
 
     Raises KeyError if user not found, ValueError on duplicate device name.
     """
+    if "subscription" not in device:
+        device["subscription"] = dict(_EMPTY_SUBSCRIPTION)
     with _lock:
         data = _read()
         if username not in data["users"]:
@@ -324,6 +335,44 @@ def get_user_usage(username: str) -> dict:
             "total_tx":  sum(d.get("stats", {}).get("total_tx", 0) for d in devices),
             "device_count": len(devices),
         }
+
+
+def update_device_subscription(device_id: str, sub_type: str, expires_at: int) -> tuple[str, dict]:
+    """
+    Update subscription type/expires_at for a device.
+    Sets active=True when the subscription is valid, False when already expired.
+    Returns (username, device_dict).
+    Raises KeyError if device not found.
+    """
+    now = int(time.time())
+    with _lock:
+        data = _read()
+        for username, udata in data["users"].items():
+            for dev in udata.get("devices", []):
+                if dev.get("id") == device_id:
+                    sub = dev.setdefault("subscription", dict(_EMPTY_SUBSCRIPTION))
+                    sub["type"] = sub_type
+                    sub["expires_at"] = expires_at if sub_type == "time" else 0
+                    sub["active"] = True if sub_type == "unlimited" else (expires_at > now)
+                    _write_safe(data)
+                    log.info(
+                        "Subscription updated: device=%s type=%s expires_at=%d active=%s",
+                        dev.get("name"), sub_type, expires_at, sub["active"],
+                    )
+                    return username, dev
+        raise KeyError(f"Device '{device_id}' not found")
+
+
+def set_device_active(device_id: str, active: bool) -> None:
+    """Set subscription.active for a device (called by the stats worker on expiry)."""
+    with _lock:
+        data = _read()
+        for udata in data["users"].values():
+            for dev in udata.get("devices", []):
+                if dev.get("id") == device_id:
+                    dev.setdefault("subscription", dict(_EMPTY_SUBSCRIPTION))["active"] = active
+                    _write_safe(data)
+                    return
 
 
 def delete_device_atomic(username: str, device_id: str) -> dict:

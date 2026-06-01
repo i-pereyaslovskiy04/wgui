@@ -38,11 +38,12 @@ from fastapi.responses import FileResponse, JSONResponse
 from auth import verify_token
 from stats_worker import StatsWorker
 from storage import init_storage
-from routes.auth      import router as auth_router
-from routes.users     import router as users_router
-from routes.devices   import router as devices_router
-from routes.downloads import router as downloads_router
-from routes.wg_status import router as wg_status_router
+from routes.auth         import router as auth_router
+from routes.users        import router as users_router
+from routes.devices      import router as devices_router
+from routes.downloads    import router as downloads_router
+from routes.subscription import router as subscription_router
+from routes.wg_status    import router as wg_status_router
 
 FRONTEND    = Path(__file__).parent.parent / "frontend" / "index.html"
 FAVICON     = Path(__file__).parent.parent / "frontend" / "favicon.svg"
@@ -114,11 +115,12 @@ async def auth_middleware(request: Request, call_next):
 
 # ── Routers ───────────────────────────────────────────────────────────────────
 
-app.include_router(auth_router,      prefix="/api/auth",       tags=["auth"])
-app.include_router(users_router,     prefix="/api/users",      tags=["users"])
-app.include_router(devices_router,   prefix="/api/devices",    tags=["devices"])
-app.include_router(downloads_router, prefix="/api/downloads",  tags=["downloads"])
-app.include_router(wg_status_router, prefix="/api/wireguard",  tags=["wireguard"])
+app.include_router(auth_router,         prefix="/api/auth",       tags=["auth"])
+app.include_router(users_router,        prefix="/api/users",      tags=["users"])
+app.include_router(devices_router,      prefix="/api/devices",    tags=["devices"])
+app.include_router(subscription_router, prefix="/api/devices",    tags=["subscription"])
+app.include_router(downloads_router,    prefix="/api/downloads",  tags=["downloads"])
+app.include_router(wg_status_router,    prefix="/api/wireguard",  tags=["wireguard"])
 
 
 # ── Static / health ───────────────────────────────────────────────────────────

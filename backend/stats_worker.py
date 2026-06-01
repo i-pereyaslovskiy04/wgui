@@ -1,17 +1,43 @@
 import logging
 import threading
+import time
 
-from storage import update_device_stats
-from wireguard import WireGuardError, get_peer_stats
+from storage import get_data, set_device_active, update_device_stats
+from wireguard import WireGuardError, disable_peer, get_peer_stats
 
 log = logging.getLogger(__name__)
 
 _INTERVAL = 60  # seconds between polls
 
 
+def _check_subscriptions() -> None:
+    """Disable any devices whose time-based subscription has expired."""
+    now = int(time.time())
+    data = get_data()
+    for udata in data["users"].values():
+        for dev in udata.get("devices", []):
+            sub = dev.get("subscription", {})
+            if sub.get("type") != "time":
+                continue
+            if not sub.get("active", True):
+                continue  # already disabled
+            if now <= sub.get("expires_at", 0):
+                continue  # still valid
+            pub_key   = dev.get("public_key", "")
+            device_id = dev.get("id", "")
+            name      = dev.get("name", "")
+            if pub_key:
+                try:
+                    disable_peer(pub_key)
+                except WireGuardError as e:
+                    log.warning("StatsWorker: failed to disable peer '%s': %s", name, e)
+            set_device_active(device_id, False)
+            log.info("StatsWorker: subscription expired → device disabled: %s", name)
+
+
 class StatsWorker:
-    """Background thread: polls `wg show dump` every _INTERVAL seconds and
-    accumulates per-device RX/TX counters in data.json via update_device_stats()."""
+    """Background thread: polls `wg show dump` every _INTERVAL seconds,
+    accumulates per-device RX/TX counters, and enforces subscription expiry."""
 
     def __init__(self) -> None:
         self._stop   = threading.Event()
@@ -38,11 +64,14 @@ class StatsWorker:
     def _tick(self) -> None:
         try:
             peer_stats = get_peer_stats()
-            if not peer_stats:
-                return
-            n = update_device_stats(peer_stats)
-            log.debug("StatsWorker: updated %d device(s)", n)
+            if peer_stats:
+                n = update_device_stats(peer_stats)
+                log.debug("StatsWorker: updated %d device(s)", n)
         except WireGuardError as e:
             log.warning("StatsWorker: wg error — %s", e)
         except Exception:
-            log.exception("StatsWorker: unexpected error in _tick")
+            log.exception("StatsWorker: unexpected error in _tick (stats)")
+        try:
+            _check_subscriptions()
+        except Exception:
+            log.exception("StatsWorker: unexpected error in _check_subscriptions")
