@@ -645,6 +645,20 @@ body{
             Скачать Amnezia VPN Android
           </a>
         </div>
+        <div class="client-row" id="dl-ios">
+          <div class="client-info">
+            <span class="client-os-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="2" width="14" height="20" rx="3"/>
+                <path d="M9.5 5.5h5"/>
+              </svg>
+            </span>
+            <div><div class="client-os">iOS</div><div class="client-os-sub">App Store</div></div>
+          </div>
+          <a id="dl-ios-btn" class="btn btn-primary btn-sm dl-btn" target="_blank" rel="noopener noreferrer">
+            Скачать Amnezia VPN iOS
+          </a>
+        </div>
         <div class="client-row" id="dl-windows">
           <div class="client-info">
             <span class="client-os-icon">
@@ -919,16 +933,18 @@ function _updateStats(users) {
 /* ── Клиенты ──────────────────────────────────────────────────────────────── */
 async function _loadDownloads() {
   const sec=$("#download-section");
-  ["dl-android","dl-windows","dl-github"].forEach(id=>{ const el=$(id); if(el) el.classList.remove("hidden"); });
+  ["dl-android","dl-ios","dl-windows","dl-github"].forEach(id=>{ const el=$(id); if(el) el.classList.remove("hidden"); });
   sec.classList.add("hidden");
   try{
     const d=await rj("GET","/downloads");
     const aU=(d.android_play_store||d.android_apk||"").trim();
+    const iU=(d.ios_app_store||"").trim();
     const wU=(d.windows_exe||"").trim(), gU=(d.github_repo||"").trim();
     if(aU) $("#dl-android-btn").href=aU; else $("#dl-android").classList.add("hidden");
+    if(iU) $("#dl-ios-btn").href=iU; else $("#dl-ios").classList.add("hidden");
     if(wU) $("#dl-windows-btn").href=wU; else $("#dl-windows").classList.add("hidden");
     if(gU) $("#dl-github-link").href=gU; else $("#dl-github").classList.add("hidden");
-    if(aU||wU||gU) sec.classList.remove("hidden");
+    if(aU||iU||wU||gU) sec.classList.remove("hidden");
   }catch{}
 }
 

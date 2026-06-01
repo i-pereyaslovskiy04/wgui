@@ -9,6 +9,7 @@ router = APIRouter()
 _ENV_KEYS = {
     "android_play_store": "ANDROID_PLAY_STORE_URL",
     "android_apk":        "ANDROID_APK_URL",
+    "ios_app_store":      "IOS_APP_STORE_URL",
     "windows_exe":        "WINDOWS_EXE_URL",
     "github_repo":        "GITHUB_REPO_URL",
 }
