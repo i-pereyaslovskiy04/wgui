@@ -347,7 +347,8 @@ body{
 .client-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);gap:12px;transition:background var(--tf),border-color var(--tf)}
 .client-row:hover{background:var(--s3);border-color:var(--bd2)}
 .client-info{display:flex;align-items:center;gap:10px}
-.client-os-icon{font-size:17px;line-height:1}
+.client-os-icon{display:flex;align-items:center;justify-content:center;width:30px;height:30px;color:var(--t2);flex-shrink:0}
+.dl-btn{min-width:210px;justify-content:center;white-space:nowrap}
 .client-os{font-size:13.5px;font-weight:500;color:var(--t1)}
 .client-os-sub{font-size:11px;color:var(--t3);margin-top:1px}
 .client-github-row{padding:6px 1px 0}
@@ -621,10 +622,10 @@ body{
 
     <div id="users-list"></div>
 
-    <!-- Скачать Amnesia VPN -->
+    <!-- Скачать Amnezia VPN -->
     <div id="download-section" class="clients-section hidden">
       <div class="clients-head">
-        <h3>Скачать Amnesia VPN</h3>
+        <h3>Скачать Amnezia VPN</h3>
         <p>Установите приложение и импортируйте .conf файл для подключения к VPN</p>
       </div>
 
@@ -632,20 +633,30 @@ body{
       <div class="clients-list">
         <div class="client-row" id="dl-android">
           <div class="client-info">
-            <span class="client-os-icon">📱</span>
+            <span class="client-os-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="2" width="14" height="20" rx="3"/>
+                <circle cx="12" cy="18.5" r=".5" fill="currentColor"/>
+              </svg>
+            </span>
             <div><div class="client-os">Android</div><div class="client-os-sub">Google Play или APK</div></div>
           </div>
-          <a id="dl-android-btn" class="btn btn-primary btn-sm" target="_blank" rel="noopener noreferrer">
-            Скачать Amnesia VPN (Android)
+          <a id="dl-android-btn" class="btn btn-primary btn-sm dl-btn" target="_blank" rel="noopener noreferrer">
+            Скачать Amnezia VPN Android
           </a>
         </div>
         <div class="client-row" id="dl-windows">
           <div class="client-info">
-            <span class="client-os-icon">🪟</span>
+            <span class="client-os-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="13" rx="2"/>
+                <path d="M8 21h8M12 17v4"/>
+              </svg>
+            </span>
             <div><div class="client-os">Windows</div><div class="client-os-sub">Установщик 64-bit (.exe)</div></div>
           </div>
-          <a id="dl-windows-btn" class="btn btn-windows btn-sm" target="_blank" rel="noopener noreferrer">
-            Скачать Amnesia VPN (Windows)
+          <a id="dl-windows-btn" class="btn btn-primary btn-sm dl-btn" target="_blank" rel="noopener noreferrer">
+            Скачать Amnezia VPN Windows
           </a>
         </div>
         <div class="client-github-row" id="dl-github">
@@ -676,7 +687,7 @@ body{
                 <div class="step-num">1</div>
                 <div>
                   <div class="step-title">Установите приложение</div>
-                  <div class="step-desc">Скачайте и установите <strong>Amnesia VPN</strong> для вашей платформы, используя ссылки выше.</div>
+                  <div class="step-desc">Скачайте и установите <strong>Amnezia VPN</strong> для вашей платформы, используя ссылки выше.</div>
                 </div>
               </div>
               <div class="connect-step">
@@ -707,7 +718,7 @@ body{
                   ☑&nbsp; Включить аутфускацию WireGuard
                 </div>
                 <div class="warn-hint">
-                  Это галочка в интерфейсе Amnesia VPN, которую нужно активировать прямо во время импорта файла конфигурации.
+                  Это галочка в интерфейсе Amnezia VPN, которую нужно активировать прямо во время импорта файла конфигурации.
                 </div>
               </div>
             </div>
