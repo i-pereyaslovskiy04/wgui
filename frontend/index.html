@@ -624,12 +624,18 @@ body{
 
     <!-- Скачать Amnezia VPN -->
     <div id="download-section" class="clients-section hidden">
-      <div class="clients-head">
-        <h3>Скачать Amnezia VPN</h3>
-        <p>Установите приложение и импортируйте .conf файл для подключения к VPN</p>
+
+      <!-- Аккордеон: список загрузок -->
+      <div class="connect-guide-header" id="dl-toggle">
+        <span class="connect-guide-header-title">Скачать Amnezia VPN</span>
+        <svg class="connect-guide-chevron" width="16" height="16" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
       </div>
 
-      <!-- Список платформ: только Android / Windows / GitHub -->
+      <div class="connect-body" id="dl-body">
+        <div class="connect-body-inner">
       <div class="clients-list">
         <div class="client-row" id="dl-android">
           <div class="client-info">
@@ -680,6 +686,8 @@ body{
             </svg>
             Все версии на GitHub →
           </a>
+        </div>
+      </div>
         </div>
       </div>
 
@@ -1225,6 +1233,29 @@ $("#device-confirm-btn").addEventListener("click",_submitDevice);
 $("#device-name-input").addEventListener("keydown",e=>{ if(e.key==="Enter") _submitDevice(); });
 $("#device-modal-bg").addEventListener("click",_closeDeviceModal);
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ _closeUserModal(); _closeDeviceModal(); } });
+
+/* ── Аккордеон "Скачать Amnezia VPN" ─────────────────────────────────────── */
+(function(){
+  const toggle = document.getElementById("dl-toggle");
+  const body   = document.getElementById("dl-body");
+  if(!toggle||!body) return;
+  let open = false;
+  toggle.addEventListener("click",()=>{
+    const chevron = toggle.querySelector(".connect-guide-chevron");
+    if(open){
+      body.style.height = body.scrollHeight+"px";
+      requestAnimationFrame(()=>{ body.style.height="0"; });
+      chevron&&chevron.classList.remove("open");
+    }else{
+      body.style.height = body.scrollHeight+"px";
+      body.addEventListener("transitionend",()=>{
+        if(open) body.style.height="auto";
+      },{once:true});
+      chevron&&chevron.classList.add("open");
+    }
+    open=!open;
+  });
+})();
 
 /* ── Аккордеон "Как подключиться" ────────────────────────────────────────── */
 (function(){
