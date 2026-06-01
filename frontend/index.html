@@ -351,6 +351,42 @@ body{
 .github-link{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--t2);text-decoration:none;transition:color var(--tf);padding:3px 0}
 .github-link:hover{color:var(--a-tx)}
 
+/* ─── ИНСТРУКЦИЯ ПОДКЛЮЧЕНИЯ ───────────────────────────────────────────────── */
+.connect-guide{margin-top:20px;padding-top:20px;border-top:1px solid var(--bd)}
+.connect-guide-title{font-size:13.5px;font-weight:700;color:var(--t1);letter-spacing:-.15px;margin-bottom:14px}
+.connect-steps{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+.connect-step{display:flex;gap:12px;align-items:flex-start}
+.step-num{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;margin-top:1px;
+  background:var(--a-bg);border:1px solid var(--a-ri);color:var(--a-tx);
+  font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;
+}
+.step-title{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px}
+.step-desc{font-size:12.5px;color:var(--t2);line-height:1.55}
+.step-desc strong{color:var(--t1);font-weight:600}
+.step-desc code{
+  font-family:"SF Mono","JetBrains Mono",ui-monospace,monospace;font-size:11.5px;
+  background:var(--s3);padding:1px 5px;border-radius:4px;color:var(--t1);
+}
+
+.connect-warn{
+  background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.30);
+  border-radius:var(--r2);padding:13px 15px;
+}
+.connect-warn-title{
+  display:flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;color:#f59e0b;margin-bottom:9px;
+}
+.connect-warn-body{font-size:12.5px;color:var(--t2);line-height:1.55}
+.connect-warn-body strong{color:var(--t1);font-weight:600}
+.obfuscation-label{
+  display:inline-flex;align-items:center;gap:6px;margin-top:9px;
+  padding:6px 12px;background:rgba(245,158,11,.13);
+  border:1px solid rgba(245,158,11,.30);border-radius:var(--r1);
+  font-size:13px;font-weight:700;color:#fbbf24;letter-spacing:.01em;
+}
+.warn-hint{margin-top:8px;font-size:11.5px;color:var(--t3);line-height:1.5}
+
 /* ═══ АДАПТИВНОСТЬ ═══════════════════════════════════════════════════════════ */
 
 /* Мобильные ≤ 480px */
@@ -559,34 +595,86 @@ body{
 
     <div id="users-list"></div>
 
-    <!-- Клиенты WireGuard -->
+    <!-- Скачать Amnesia VPN -->
     <div id="download-section" class="clients-section hidden">
       <div class="clients-head">
-        <h3>Клиенты WireGuard</h3>
-        <p>Установите приложение и импортируйте .conf файл для подключения</p>
+        <h3>Скачать Amnesia VPN</h3>
+        <p>Установите приложение и импортируйте .conf файл для подключения к VPN</p>
       </div>
+
+      <!-- Список платформ: только Android / Windows / GitHub -->
       <div class="clients-list">
         <div class="client-row" id="dl-android">
           <div class="client-info">
             <span class="client-os-icon">📱</span>
             <div><div class="client-os">Android</div><div class="client-os-sub">Google Play или APK</div></div>
           </div>
-          <a id="dl-android-btn" class="btn btn-primary btn-sm" target="_blank" rel="noopener noreferrer">Скачать</a>
+          <a id="dl-android-btn" class="btn btn-primary btn-sm" target="_blank" rel="noopener noreferrer">
+            Скачать Amnesia VPN (Android)
+          </a>
         </div>
         <div class="client-row" id="dl-windows">
           <div class="client-info">
             <span class="client-os-icon">🪟</span>
-            <div><div class="client-os">Windows</div><div class="client-os-sub">Установщик 64-bit</div></div>
+            <div><div class="client-os">Windows</div><div class="client-os-sub">Установщик 64-bit (.exe)</div></div>
           </div>
-          <a id="dl-windows-btn" class="btn btn-windows btn-sm" target="_blank" rel="noopener noreferrer">Скачать .exe</a>
+          <a id="dl-windows-btn" class="btn btn-windows btn-sm" target="_blank" rel="noopener noreferrer">
+            Скачать Amnesia VPN (Windows)
+          </a>
         </div>
         <div class="client-github-row" id="dl-github">
           <a id="dl-github-link" class="github-link" target="_blank" rel="noopener noreferrer">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/>
             </svg>
-            Все релизы на GitHub →
+            Все версии на GitHub →
           </a>
+        </div>
+      </div>
+
+      <!-- Инструкция подключения -->
+      <div class="connect-guide">
+        <div class="connect-guide-title">Как подключиться</div>
+
+        <div class="connect-steps">
+          <div class="connect-step">
+            <div class="step-num">1</div>
+            <div>
+              <div class="step-title">Установите приложение</div>
+              <div class="step-desc">Скачайте и установите <strong>Amnesia VPN</strong> для вашей платформы, используя ссылки выше.</div>
+            </div>
+          </div>
+          <div class="connect-step">
+            <div class="step-num">2</div>
+            <div>
+              <div class="step-title">Импортируйте конфигурацию</div>
+              <div class="step-desc">
+                Откройте приложение и нажмите <strong>«Import configuration file»</strong>.<br>
+                Выберите файл <code>.conf</code>, скачанный в этой панели управления.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Warning: обфускация -->
+        <div class="connect-warn">
+          <div class="connect-warn-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            Если подключение не работает
+          </div>
+          <div class="connect-warn-body">
+            Некоторые сети и провайдеры могут блокировать WireGuard.
+            При импорте конфигурации <strong>обязательно включите</strong> опцию:
+            <div class="obfuscation-label">
+              ☑&nbsp; Enable obfuscation (WireGuard)
+            </div>
+            <div class="warn-hint">
+              Это галочка в интерфейсе Amnesia VPN, которую нужно активировать прямо во время импорта файла конфигурации.
+            </div>
+          </div>
         </div>
       </div>
     </div>
