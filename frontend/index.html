@@ -434,16 +434,52 @@ body{
 .sub-disabled:hover{background:rgba(255,255,255,.09)}
 .sub-badge-static{cursor:default!important;pointer-events:none}
 
-/* ─── ПОДПИСКА: панель в карточке пользователя ───────────────────────────── */
-.user-sub-panel{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:10px;flex-wrap:wrap;
-  padding:10px 14px;margin-bottom:12px;
-  background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);
+/* ─── ПОДПИСКА: панель управления доступом ───────────────────────────────────── */
+.sub-module{margin-bottom:14px;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r3);overflow:hidden}
+.sub-module-head{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--bd)}
+.sub-mod-icon{width:34px;height:34px;border-radius:var(--r2);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sub-mod-icon.si-ok {background:var(--gn-bg);border:1px solid var(--gn-ri);color:var(--gn-tx)}
+.sub-mod-icon.si-bad{background:var(--rd-bg);border:1px solid var(--rd-ri);color:var(--rd)}
+.sub-mod-icon.si-off{background:rgba(255,255,255,.05);border:1px solid var(--bd);color:var(--t3)}
+.sub-module-info{min-width:0}
+.sub-module-name{font-size:13px;font-weight:600;color:var(--t1)}
+.sub-module-desc{font-size:11.5px;color:var(--t2);margin-top:1px}
+.sub-module-controls{display:grid;grid-template-columns:1fr repeat(2,88px);gap:8px;padding:12px 16px;align-items:stretch}
+.sub-date-btn{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:10px 13px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);
+  cursor:pointer;text-align:left;
+  transition:background var(--tf),border-color var(--tf);
+  user-select:none;-webkit-tap-highlight-color:transparent;
 }
-.user-sub-status{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
-.user-sub-detail{font-size:11.5px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.user-sub-actions{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.sub-date-btn:hover{background:var(--s3);border-color:var(--bd2)}
+.sub-date-btn:active{transform:scale(.99)}
+.sub-date-lbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t2);margin-bottom:4px}
+.sub-date-val{font-size:14px;font-weight:600;color:var(--t1);letter-spacing:-.1px;white-space:nowrap}
+.sub-date-ico{color:var(--t2);flex-shrink:0}
+.sub-act-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  padding:10px 6px;border-radius:var(--r2);border:1px solid var(--bd);background:var(--s2);
+  cursor:pointer;font-size:12px;font-weight:500;color:var(--t1);white-space:nowrap;
+  transition:background var(--tf),border-color var(--tf),color var(--tf);
+  user-select:none;-webkit-tap-highlight-color:transparent;
+}
+.sub-act-btn:hover{background:var(--s3);border-color:var(--bd2)}
+.sub-act-btn:active{transform:scale(.98)}
+.sub-act-btn.sa-unlimited.on{background:var(--a-bg);border-color:var(--a-ri);color:var(--a-tx)}
+.sub-act-btn.sa-unlimited.on:hover{background:rgba(82,113,232,.18)}
+.sub-act-btn.sa-disable.on{background:var(--rd-bg);border-color:var(--rd-ri);color:var(--rd)}
+.sub-act-btn.sa-disable.on:hover{background:rgba(229,94,94,.16)}
+.inf-sym{font-size:17px;font-weight:300;line-height:1}
+.sub-module-foot{
+  display:flex;align-items:center;gap:9px;
+  padding:10px 16px;border-top:1px solid var(--bd);
+  font-size:12.5px;font-weight:500;line-height:1.4;
+}
+.sub-module-foot.sf-ok {background:var(--gn-bg);color:var(--gn-tx)}
+.sub-module-foot.sf-unl{background:var(--a-bg);color:var(--a-tx)}
+.sub-module-foot.sf-bad{background:var(--rd-bg);color:var(--rd)}
+.sub-module-foot.sf-exp{background:rgba(255,255,255,.04);color:var(--t2)}
 
 /* ─── ПОДПИСКА: календарь-поповер ───────────────────────────────────────────── */
 .cal-popover{
@@ -545,9 +581,8 @@ body{
   .device-actions .btn-secondary{flex:1;min-height:38px;font-size:13px}
   .device-actions .btn-danger{flex:0 0 38px;min-height:38px;padding:8px}
   .device-hint{display:none}
-  .user-sub-panel{flex-direction:column;align-items:stretch;gap:8px}
-  .user-sub-status{justify-content:center}
-  .user-sub-actions{justify-content:center;flex-wrap:wrap}
+  .sub-module-controls{grid-template-columns:1fr 1fr;grid-template-rows:auto auto}
+  .sub-date-btn{grid-column:span 2}
   .devices-toolbar .btn{width:100%;min-height:40px;font-size:13px}
 
   .modal{align-items:flex-end;padding:0}
@@ -1340,29 +1375,69 @@ function _subStatus(sub){
 function _fmtDateShort(dt){return `${dt.getDate()} ${_MONTHS_SHORT[dt.getMonth()]}`}
 function _fmtDateFull(dt){return `${dt.getDate()} ${_MONTHS_SHORT[dt.getMonth()]} ${dt.getFullYear()}`}
 
-/* Панель подписки внутри тела карточки пользователя */
+/* Панель управления доступом внутри тела карточки пользователя */
 function _subPanelHTML(userName, sub){
   const status=_subStatus(sub);
-  const cls=status==="unlimited"?"sub-unlimited":status==="active"?"sub-active":status==="disabled"?"sub-disabled":"sub-expired";
-  let label,detail="";
-  if(status==="unlimited")     {label="∞ Безлимит"; }
-  else if(status==="active")   {label="Активна"; detail=`до ${_fmtDateFull(new Date(sub.expires_at*1000))}`;}
-  else if(status==="disabled") {label="Отключён";}
-  else                         {label="Истёк"; if(sub.expires_at) detail=_fmtDateFull(new Date(sub.expires_at*1000));}
+  const iconCls=(status==="active"||status==="unlimited")?"si-ok":status==="disabled"?"si-bad":"si-off";
+
+  let dateLbl,dateVal;
+  if(status==="unlimited")     {dateLbl="Действует до"; dateVal="∞ Безлимит";}
+  else if(status==="active")   {dateLbl="Действует до"; dateVal=_fmtDateFull(new Date(sub.expires_at*1000));}
+  else if(status==="disabled") {dateLbl="Действует до"; dateVal="—";}
+  else                         {dateLbl="Истёкла";      dateVal=sub.expires_at?_fmtDateFull(new Date(sub.expires_at*1000)):"—";}
+
+  const isUnlimited=status==="unlimited";
   const isDisabled=status==="disabled";
-  return `<div class="user-sub-panel" id="user-sub-panel-${esc(userName)}">
-    <div class="user-sub-status">
-      <span class="sub-badge ${cls} sub-badge-static">${esc(label)}</span>${detail?`<span class="user-sub-detail">${esc(detail)}</span>`:""}
+
+  let footCls,footIcon,footText;
+  const icoCheck=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const icoSlash=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`;
+  const icoClock=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+  if(status==="unlimited"){footCls="sf-unl";footIcon=icoCheck;footText="Безлимитный доступ. Все устройства могут подключаться.";}
+  else if(status==="active"){footCls="sf-ok";footIcon=icoCheck;footText="Доступ активен. Все устройства могут подключаться.";}
+  else if(status==="disabled"){footCls="sf-bad";footIcon=icoSlash;footText="Доступ отключён. Все устройства заблокированы.";}
+  else{footCls="sf-exp";footIcon=icoClock;footText="Подписка истекла. Устройства заблокированы.";}
+
+  return `<div class="sub-module" id="user-sub-panel-${esc(userName)}">
+    <div class="sub-module-head">
+      <div class="sub-mod-icon ${iconCls}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <polyline points="9 12 11 14 15 10"/>
+        </svg>
+      </div>
+      <div class="sub-module-info">
+        <div class="sub-module-name">Управление доступом</div>
+        <div class="sub-module-desc">Глобальная подписка для всех устройств</div>
+      </div>
     </div>
-    <div class="user-sub-actions">
-      <button class="btn btn-xs btn-secondary" data-action="sub-calendar" data-user="${esc(userName)}" title="Установить дату">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Дата
+    <div class="sub-module-controls">
+      <button class="sub-date-btn" data-action="sub-calendar" data-user="${esc(userName)}" title="Изменить дату подписки">
+        <div>
+          <div class="sub-date-lbl">${esc(dateLbl)}</div>
+          <div class="sub-date-val">${esc(dateVal)}</div>
+        </div>
+        <div class="sub-date-ico">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
       </button>
-      <button class="btn btn-xs ${isDisabled?"btn-danger":"btn-secondary"}" data-action="sub-disable" data-user="${esc(userName)}" title="Отключить пользователя">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-        Откл
+      <button class="sub-act-btn sa-unlimited${isUnlimited?" on":""}" data-action="sub-unlimited" data-user="${esc(userName)}" title="Безлимитный доступ">
+        <span class="inf-sym">∞</span>
+        <span>Безлимит</span>
       </button>
+      <button class="sub-act-btn sa-disable${isDisabled?" on":""}" data-action="sub-disable" data-user="${esc(userName)}" title="Отключить пользователя">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18.36 6.64a9 9 0 11-12.73 0M12 2v10"/>
+        </svg>
+        <span>Отключить</span>
+      </button>
+    </div>
+    <div class="sub-module-foot ${footCls}">
+      ${footIcon}
+      <span>${esc(footText)}</span>
     </div>
   </div>`;
 }
@@ -1524,8 +1599,9 @@ async function _calPickDate(ts){
 document.addEventListener("click",e=>{
   const t=e.target;
   const dU=t.closest("[data-action='del-user']");    if(dU){ e.stopPropagation(); _delUser(dU.dataset.user,dU); return; }
-  const sC=t.closest("[data-action='sub-calendar']");if(sC){ e.stopPropagation(); _openCalendar(sC.dataset.user,sC); return; }
-  const sD=t.closest("[data-action='sub-disable']"); if(sD){ e.stopPropagation(); _setSubDisabled(sD.dataset.user); return; }
+  const sC=t.closest("[data-action='sub-calendar']"); if(sC){ e.stopPropagation(); _openCalendar(sC.dataset.user,sC); return; }
+  const sU=t.closest("[data-action='sub-unlimited']");if(sU){ e.stopPropagation(); _setSubUnlimited(sU.dataset.user); return; }
+  const sD=t.closest("[data-action='sub-disable']");  if(sD){ e.stopPropagation(); _setSubDisabled(sD.dataset.user); return; }
   const tg=t.closest("[data-action='toggle']");      if(tg){ _toggle(tg.dataset.user); return; }
   const aD=t.closest("[data-action='add-device']");  if(aD){ _openDeviceModal(aD.dataset.user); return; }
   const dl=t.closest("[data-action='download']");    if(dl){ _download(dl.dataset.id,dl.dataset.filename); return; }
