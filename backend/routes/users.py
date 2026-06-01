@@ -21,6 +21,7 @@ from wireguard import (
     add_peer,
     build_client_config,
     generate_keypair,
+    generate_preshared_key,
     remove_peer,
 )
 
@@ -130,6 +131,7 @@ def create_device(user: str, body: CreateDeviceBody):
         raise HTTPException(409, f"Device '{device_name}' already exists for user '{user}'")
 
     priv_key, pub_key = generate_keypair()
+    psk            = generate_preshared_key()
     device_id      = str(uuid.uuid4())
     config_filename = f"{user}-{device_id}.conf"
     config_path    = CONFIGS_DIR / config_filename
@@ -143,7 +145,7 @@ def create_device(user: str, body: CreateDeviceBody):
     try:
         # ── Phase 2: add WireGuard peer ────────────────────────────────────────
         # Returns False (dev mode) or True (added). Raises WireGuardError on failure.
-        add_peer(pub_key, ip)
+        add_peer(pub_key, ip, psk)
         peer_added = True
 
         # ── Phase 3: write config file atomically ─────────────────────────────
@@ -151,7 +153,7 @@ def create_device(user: str, body: CreateDeviceBody):
         # leaves the .tmp orphan, never a corrupt final config.
         _tmp = config_path.with_suffix(".tmp")
         try:
-            _tmp.write_text(build_client_config(priv_key, ip), encoding="utf-8")
+            _tmp.write_text(build_client_config(priv_key, ip, psk), encoding="utf-8")
             os.replace(_tmp, config_path)
             config_written = True
         except OSError:
