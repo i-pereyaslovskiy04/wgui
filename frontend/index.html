@@ -386,6 +386,89 @@ body {
 
 @keyframes slide-in  { from { opacity:0; transform: translateX(16px); } }
 @keyframes slide-out { to   { opacity:0; transform: translateX(16px); } }
+
+/* ── Download card ───────────────────────────────────────── */
+.download-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px 24px;
+  margin-top: 24px;
+}
+
+.download-card-header {
+  margin-bottom: 18px;
+}
+.download-card-header h3 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -.2px;
+}
+.download-card-header p {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+.download-platforms {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.download-platform {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 13px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 480px) {
+  .download-platform {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+.platform-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.platform-label span {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.btn-windows {
+  background: #1e293b;
+  color: #fff;
+  border-color: #1e293b;
+}
+.btn-windows:hover:not(:disabled) { background: #0f172a; border-color: #0f172a; }
+
+.dl-github-row {
+  padding: 6px 2px 2px;
+}
+.dl-github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color .15s;
+}
+.dl-github-link:hover { color: var(--primary); }
 </style>
 </head>
 <body>
@@ -444,6 +527,40 @@ body {
       </button>
     </div>
     <div id="users-list"></div>
+
+    <!-- Download Amnesia VPN card — shown only when URLs are configured -->
+    <div id="download-section" class="download-card hidden">
+      <div class="download-card-header">
+        <h3>Download Amnesia VPN</h3>
+        <p>Install the client app, then import your .conf file to connect</p>
+      </div>
+      <div class="download-platforms">
+        <div class="download-platform" id="dl-android">
+          <div class="platform-label">
+            <span>📱</span> Android
+          </div>
+          <a id="dl-android-btn" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+            Download for Android
+          </a>
+        </div>
+        <div class="download-platform" id="dl-windows">
+          <div class="platform-label">
+            <span>🪟</span> Windows
+          </div>
+          <a id="dl-windows-btn" class="btn btn-windows" target="_blank" rel="noopener noreferrer">
+            Download for Windows (.exe)
+          </a>
+        </div>
+        <div class="dl-github-row" id="dl-github">
+          <a id="dl-github-link" class="dl-github-link" target="_blank" rel="noopener noreferrer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/>
+            </svg>
+            View all releases on GitHub →
+          </a>
+        </div>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -563,7 +680,54 @@ function _logout() {
 async function _showDashboard() {
   hide("login-view");
   show("dashboard-view");
-  await _loadUsers();
+  // Load users and downloads in parallel; downloads section is optional
+  await Promise.all([_loadUsers(), _loadDownloads()]);
+}
+
+// ── Downloads section ─────────────────────────────────────────────────────────
+async function _loadDownloads() {
+  // Reset all sub-sections and hide the card before (re-)populating.
+  // Required so a second login after logout starts clean.
+  const section = $("download-section");
+  ["dl-android", "dl-windows", "dl-github"].forEach(id => {
+    const el = $(id);
+    if (el) el.classList.remove("hidden");
+  });
+  section.classList.add("hidden");
+
+  try {
+    const data = await rj("GET", "/downloads");
+
+    // Android: Play Store takes priority over direct APK
+    const androidUrl = (data.android_play_store || data.android_apk || "").trim();
+    const windowsUrl = (data.windows_exe  || "").trim();
+    const githubUrl  = (data.github_repo  || "").trim();
+
+    if (androidUrl) {
+      $("dl-android-btn").href = androidUrl;
+    } else {
+      $("dl-android").classList.add("hidden");
+    }
+
+    if (windowsUrl) {
+      $("dl-windows-btn").href = windowsUrl;
+    } else {
+      $("dl-windows").classList.add("hidden");
+    }
+
+    if (githubUrl) {
+      $("dl-github-link").href = githubUrl;
+    } else {
+      $("dl-github").classList.add("hidden");
+    }
+
+    // Show the card only when at least one URL is available
+    if (androidUrl || windowsUrl || githubUrl) {
+      section.classList.remove("hidden");
+    }
+  } catch {
+    // Downloads section is purely informational — never break the dashboard
+  }
 }
 
 // ── Users list ────────────────────────────────────────────────────────────────
