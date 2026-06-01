@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import threading
+import time
 from pathlib import Path
 
 log = logging.getLogger(__name__)
@@ -12,7 +13,8 @@ CONFIGS_DIR  = PROJECT_ROOT / "configs"
 
 _lock = threading.Lock()
 
-_EMPTY_DATA: dict = {"users": {}, "ip_pool": {"next": 10, "used": {}}}
+_EMPTY_DATA: dict  = {"users": {}, "ip_pool": {"next": 10, "used": {}}}
+_EMPTY_STATS: dict = {"last_rx": 0, "last_tx": 0, "total_rx": 0, "total_tx": 0, "last_seen": 0}
 
 
 # ── Internal ──────────────────────────────────────────────────────────────────
@@ -69,6 +71,14 @@ def _migrate(data: dict) -> bool:
             udata["devices"] = []
             dirty = True
             log.warning(f"Migration: repaired missing devices list for user '{uname}'")
+
+    # v3: add stats block to every device that lacks one
+    for uname, udata in data.get("users", {}).items():
+        for dev in udata.get("devices", []):
+            if "stats" not in dev:
+                dev["stats"] = dict(_EMPTY_STATS)
+                dirty = True
+                log.info(f"Migration: added stats to device '{dev.get('name')}' of user '{uname}'")
 
     return dirty
 
@@ -251,6 +261,69 @@ def commit_device(username: str, device: dict) -> None:
         data["users"][username]["devices"] = devices
         _write_safe(data)
         log.info(f"Device committed: user={username} name={device['name']} ip={ip}")
+
+
+def update_device_stats(peer_stats: dict) -> int:
+    """
+    Atomically compute traffic deltas and persist accumulated totals.
+
+    peer_stats: output of wireguard.get_peer_stats() — keyed by public_key.
+    Returns the number of devices updated.
+
+    Delta algorithm:
+      delta = current - last_snapshot
+      If delta < 0 (WireGuard counter reset), treat current value as the delta.
+    """
+    now = int(time.time())
+    updated = 0
+    with _lock:
+        data = _read()
+        for udata in data["users"].values():
+            for dev in udata.get("devices", []):
+                pub_key = dev.get("public_key", "")
+                if not pub_key or pub_key not in peer_stats:
+                    continue
+                wg = peer_stats[pub_key]
+                current_rx = wg.get("rx_bytes", 0)
+                current_tx = wg.get("tx_bytes", 0)
+
+                stats = dev.setdefault("stats", dict(_EMPTY_STATS))
+                delta_rx = current_rx - stats.get("last_rx", 0)
+                delta_tx = current_tx - stats.get("last_tx", 0)
+
+                # Counter reset after wg-quick down/up
+                if delta_rx < 0:
+                    delta_rx = current_rx
+                if delta_tx < 0:
+                    delta_tx = current_tx
+
+                stats["total_rx"] = stats.get("total_rx", 0) + delta_rx
+                stats["total_tx"] = stats.get("total_tx", 0) + delta_tx
+                stats["last_rx"]  = current_rx
+                stats["last_tx"]  = current_tx
+                stats["last_seen"] = now
+                updated += 1
+
+        if updated:
+            _write_safe(data)
+
+    return updated
+
+
+def get_user_usage(username: str) -> dict:
+    """Return aggregated traffic totals across all devices for a user."""
+    with _lock:
+        data = _read()
+        udata = data["users"].get(username)
+        if udata is None:
+            raise KeyError(f"User '{username}' not found")
+        devices = udata.get("devices", [])
+        return {
+            "username":  username,
+            "total_rx":  sum(d.get("stats", {}).get("total_rx", 0) for d in devices),
+            "total_tx":  sum(d.get("stats", {}).get("total_tx", 0) for d in devices),
+            "device_count": len(devices),
+        }
 
 
 def delete_device_atomic(username: str, device_id: str) -> dict:

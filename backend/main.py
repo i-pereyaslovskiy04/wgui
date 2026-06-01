@@ -36,6 +36,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 
 from auth import verify_token
+from stats_worker import StatsWorker
 from storage import init_storage
 from routes.auth      import router as auth_router
 from routes.users     import router as users_router
@@ -50,11 +51,16 @@ PUBLIC_PATHS = {"/api/auth/login", "/health", "/", "/favicon.svg"}
 
 # ── Lifespan ──────────────────────────────────────────────────────────────────
 
+_stats_worker = StatsWorker()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_storage()
+    _stats_worker.start()
     log.info("VPN Control Panel started")
     yield
+    _stats_worker.stop()
     log.info("VPN Control Panel shutting down")
 
 

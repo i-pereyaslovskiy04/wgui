@@ -914,7 +914,7 @@ function _applyWgStatus(data) {
 
     const trf = $("#trf-"+p.id);
     if(trf){
-      const rx=p.rx_bytes||0, tx=p.tx_bytes||0;
+      const rx=(p.stats&&p.stats.total_rx)||0, tx=(p.stats&&p.stats.total_tx)||0;
       trf.textContent = (rx||tx) ? `↓ ${_fmtBytes(rx)} ↑ ${_fmtBytes(tx)}` : "";
     }
   }

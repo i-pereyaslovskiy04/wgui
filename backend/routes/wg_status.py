@@ -60,6 +60,7 @@ def wireguard_status():
                 "last_handshake_seconds": secs_ago,
                 "rx_bytes":               wg.get("rx_bytes", 0),
                 "tx_bytes":               wg.get("tx_bytes", 0),
+                "stats":                  dev.get("stats", {"total_rx": 0, "total_tx": 0, "last_seen": 0}),
             }
             peers.append(peer)
 
