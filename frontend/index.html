@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>VPN Control Panel</title>
+<title>VPN Панель управления</title>
 <style>
-/* ─── DESIGN TOKENS ────────────────────────────────────────────────────────── */
+/* ─── ТОКЕНЫ ───────────────────────────────────────────────────────────────── */
 :root {
   --s0:  #07101f;
   --s1:  #0b1628;
@@ -26,6 +26,7 @@
   --gn:    #1fc96a;
   --gn-bg: rgba(31,201,106,.09);
   --gn-ri: rgba(31,201,106,.25);
+  --gn-tx: #3fb87a;
 
   --rd:    #e55e5e;
   --rd-hv: #d44f4f;
@@ -36,35 +37,27 @@
   --t2: #5c738f;
   --t3: #293d54;
 
-  --r1: 6px;
-  --r2: 9px;
-  --r3: 12px;
-  --r4: 16px;
-  --r5: 20px;
+  --r1: 6px;  --r2: 9px;  --r3: 12px;  --r4: 16px;  --r5: 20px;
 
   --tf: 160ms cubic-bezier(.2,0,.13,1);
   --tm: 240ms cubic-bezier(.2,0,.13,1);
 
-  /* Safe area for notch/home-bar aware padding */
   --safe-b: env(safe-area-inset-bottom, 0px);
-  --safe-l: env(safe-area-inset-left, 0px);
-  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-l: env(safe-area-inset-left,   0px);
+  --safe-r: env(safe-area-inset-right,  0px);
 }
 
-/* ─── RESET & BASE ─────────────────────────────────────────────────────────── */
+/* ─── СБРОС И БАЗА ─────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 html { -webkit-text-size-adjust: 100%; }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
   background: var(--s0);
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100vh; min-height: 100dvh;
   color: var(--t1);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
@@ -74,27 +67,15 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
 
-/* ─── BUTTON SYSTEM ────────────────────────────────────────────────────────── */
+/* ─── КНОПКИ ───────────────────────────────────────────────────────────────── */
 .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 16px;
-  font-size: 13.5px;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: .01em;
-  border: 1px solid transparent;
-  border-radius: var(--r2);
-  cursor: pointer;
-  text-decoration: none;
-  white-space: nowrap;
-  background: none;
-  color: inherit;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 8px 16px;
+  font-size: 13.5px; font-weight: 500; line-height: 1; letter-spacing: .01em;
+  border: 1px solid transparent; border-radius: var(--r2);
+  cursor: pointer; text-decoration: none; white-space: nowrap;
+  background: none; color: inherit; user-select: none;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
   transition: background var(--tf), border-color var(--tf),
               color var(--tf), box-shadow var(--tf), transform var(--tf);
 }
@@ -102,9 +83,7 @@ body {
 .btn:disabled { opacity: .4; cursor: not-allowed; transform: none !important; }
 
 .btn-primary {
-  background: var(--a);
-  color: #fff;
-  border-color: transparent;
+  background: var(--a); color: #fff;
   box-shadow: 0 1px 6px rgba(82,113,232,.28), inset 0 1px 0 rgba(255,255,255,.12);
 }
 .btn-primary:hover:not(:disabled) {
@@ -115,259 +94,177 @@ body {
 .btn-primary:active:not(:disabled) { transform: translateY(0) scale(.95); }
 
 .btn-secondary {
-  background: var(--s2);
-  color: var(--t1);
-  border-color: var(--bd);
+  background: var(--s2); color: var(--t1); border-color: var(--bd);
 }
-.btn-secondary:hover:not(:disabled) {
-  background: var(--s3);
-  border-color: var(--bd2);
-}
+.btn-secondary:hover:not(:disabled) { background: var(--s3); border-color: var(--bd2); }
 
-.btn-ghost {
-  background: transparent;
-  color: var(--t2);
-  border-color: transparent;
-}
-.btn-ghost:hover:not(:disabled) {
-  background: rgba(255,255,255,.05);
-  color: var(--t1);
-}
+.btn-ghost { background: transparent; color: var(--t2); }
+.btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,.05); color: var(--t1); }
 
-.btn-danger {
-  background: transparent;
-  color: var(--rd);
-  border-color: rgba(229,94,94,.22);
-}
-.btn-danger:hover:not(:disabled) {
-  background: var(--rd-bg);
-  border-color: var(--rd-ri);
-}
+.btn-danger { color: var(--rd); border-color: rgba(229,94,94,.22); }
+.btn-danger:hover:not(:disabled) { background: var(--rd-bg); border-color: var(--rd-ri); }
 
 .btn-windows {
-  background: rgba(255,255,255,.06);
-  color: var(--t1);
-  border-color: var(--bd);
+  background: rgba(255,255,255,.06); color: var(--t1); border-color: var(--bd);
 }
-.btn-windows:hover:not(:disabled) {
-  background: rgba(255,255,255,.09);
-  border-color: var(--bd2);
-}
+.btn-windows:hover:not(:disabled) { background: rgba(255,255,255,.09); border-color: var(--bd2); }
 
 .btn-sm  { padding: 5px 11px; font-size: 12.5px; }
-.btn-xs  { padding: 4px 9px;  font-size: 12px;   }
+.btn-xs  { padding: 4px 9px;  font-size: 12px; }
 
-/* ─── LOGIN ────────────────────────────────────────────────────────────────── */
+/* ─── СТРАНИЦА ВХОДА ───────────────────────────────────────────────────────── */
 #login-view {
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  min-height: 100vh; min-height: 100dvh;
+  display: flex; align-items: center; justify-content: center;
   padding: 24px;
   padding-bottom: calc(24px + var(--safe-b));
 }
-
 .login-wrap {
-  width: 100%;
-  max-width: 352px;
+  width: 100%; max-width: 352px;
   animation: fade-up .36s cubic-bezier(.22,1,.36,1);
 }
-
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
 }
-
-.login-brand {
-  text-align: center;
-  margin-bottom: 28px;
-}
+.login-brand { text-align: center; margin-bottom: 28px; }
 .login-icon-wrap {
-  width: 50px;
-  height: 50px;
+  width: 50px; height: 50px;
   margin: 0 auto 14px;
-  background: var(--a-bg);
-  border: 1px solid var(--a-ri);
-  border-radius: var(--r3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--a-tx);
+  background: var(--a-bg); border: 1px solid var(--a-ri); border-radius: var(--r3);
+  display: flex; align-items: center; justify-content: center; color: var(--a-tx);
 }
-.login-brand h1 {
-  font-size: 19px;
-  font-weight: 700;
-  letter-spacing: -.4px;
-  color: var(--t1);
-  margin-bottom: 4px;
-}
-.login-brand p { font-size: 13px; color: var(--t2); }
+.login-brand h1 { font-size: 19px; font-weight: 700; letter-spacing: -.4px; margin-bottom: 4px; }
+.login-brand p  { font-size: 13px; color: var(--t2); }
 
 .login-card {
-  background: var(--s1);
-  border: 1px solid var(--bd);
-  border-radius: var(--r4);
+  background: var(--s1); border: 1px solid var(--bd); border-radius: var(--r4);
   padding: 26px;
   box-shadow: 0 20px 56px rgba(0,0,0,.48), 0 1px 0 rgba(255,255,255,.04) inset;
 }
 
 .field { margin-bottom: 16px; }
 .field label {
-  display: block;
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: .05em;
-  text-transform: uppercase;
-  color: var(--t2);
-  margin-bottom: 7px;
+  display: block; font-size: 11.5px; font-weight: 600;
+  letter-spacing: .05em; text-transform: uppercase; color: var(--t2); margin-bottom: 7px;
 }
 .field input {
-  width: 100%;
-  padding: 11px 13px;
-  background: var(--s2);
-  border: 1px solid var(--bd);
-  border-radius: var(--r2);
-  font-size: 16px; /* 16px prevents iOS auto-zoom */
-  color: var(--t1);
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
+  width: 100%; padding: 11px 13px;
+  background: var(--s2); border: 1px solid var(--bd); border-radius: var(--r2);
+  font-size: 16px; color: var(--t1); outline: none;
+  -webkit-appearance: none; appearance: none;
   transition: border-color var(--tf), box-shadow var(--tf), background var(--tf);
 }
 .field input::placeholder { color: var(--t3); }
 .field input:focus {
-  background: rgba(82,113,232,.05);
-  border-color: var(--a);
+  background: rgba(82,113,232,.05); border-color: var(--a);
   box-shadow: 0 0 0 3px var(--a-ri);
 }
+.error-text { font-size: 12.5px; color: var(--rd); min-height: 1.3em; margin-top: 10px; }
 
-.error-text {
-  font-size: 12.5px;
-  color: var(--rd);
-  min-height: 1.3em;
-  margin-top: 10px;
-}
+#login-btn { width: 100%; margin-top: 8px; padding: 12px; font-size: 14px; font-weight: 600; min-height: 46px; }
 
-#login-btn {
-  width: 100%;
-  margin-top: 8px;
-  padding: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  min-height: 46px;
-}
-
-/* ─── HEADER ───────────────────────────────────────────────────────────────── */
+/* ─── ШАПКА ────────────────────────────────────────────────────────────────── */
 .header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  height: 54px;
+  position: sticky; top: 0; z-index: 50; height: 54px;
   background: rgba(7,16,31,.9);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--bd);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between;
   padding: 0 24px;
-  padding-left: calc(24px + var(--safe-l));
+  padding-left:  calc(24px + var(--safe-l));
   padding-right: calc(24px + var(--safe-r));
   gap: 12px;
 }
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  flex-shrink: 0;
-  min-width: 0;
-}
+.logo { display: flex; align-items: center; gap: 9px; flex-shrink: 0; min-width: 0; }
 .logo-mark {
-  width: 30px;
-  height: 30px;
-  background: var(--a-bg);
-  border: 1px solid rgba(82,113,232,.25);
-  border-radius: var(--r2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--a-tx);
-  flex-shrink: 0;
+  width: 30px; height: 30px; flex-shrink: 0;
+  background: var(--a-bg); border: 1px solid rgba(82,113,232,.25); border-radius: var(--r2);
+  display: flex; align-items: center; justify-content: center; color: var(--a-tx);
 }
 .logo-title {
-  font-size: 14.5px;
-  font-weight: 650;
-  color: var(--t1);
-  letter-spacing: -.3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 14.5px; font-weight: 650; color: var(--t1); letter-spacing: -.3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-
 .header-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #3fb87a;
-  padding: 4px 10px;
-  background: var(--gn-bg);
-  border: 1px solid var(--gn-ri);
-  border-radius: 20px;
-  white-space: nowrap;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 500; color: var(--gn-tx);
+  padding: 4px 10px; background: var(--gn-bg); border: 1px solid var(--gn-ri); border-radius: 20px;
   flex-shrink: 0;
 }
 .badge-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--gn);
-  flex-shrink: 0;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--gn); flex-shrink: 0;
   animation: dot-pulse 2.5s ease-in-out infinite;
 }
-@keyframes dot-pulse {
-  0%,100% { opacity: 1; }
-  50%      { opacity: .5; }
-}
+@keyframes dot-pulse { 0%,100% { opacity:1; } 50% { opacity:.5; } }
 
-.header-controls {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
+.header-controls { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 
-/* ─── MAIN ─────────────────────────────────────────────────────────────────── */
+/* ─── ОСНОВНОЙ КОНТЕЙНЕР ───────────────────────────────────────────────────── */
 .main {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: clamp(20px,4vw,36px) clamp(14px,3vw,20px) clamp(56px,8vw,72px);
-  padding-left: max(clamp(14px,3vw,20px), var(--safe-l));
+  max-width: 880px; margin: 0 auto;
+  padding: clamp(20px,4vw,36px) clamp(14px,3vw,20px) clamp(56px,8vw,80px);
+  padding-left:  max(clamp(14px,3vw,20px), var(--safe-l));
   padding-right: max(clamp(14px,3vw,20px), var(--safe-r));
 }
 
-.section-head {
-  margin-bottom: clamp(16px,3vw,22px);
+/* ─── КАРТОЧКИ СТАТИСТИКИ ──────────────────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 28px;
 }
-.section-head h2 {
-  font-size: clamp(17px,3.5vw,20px);
-  font-weight: 700;
-  letter-spacing: -.45px;
-  color: var(--t1);
-  margin-bottom: 4px;
+.stat-card {
+  background: var(--s1); border: 1px solid var(--bd); border-radius: var(--r3);
+  padding: 18px 20px;
+  transition: border-color var(--tm);
 }
-.section-head p { font-size: 13px; color: var(--t2); }
+.stat-card:hover { border-color: var(--bd2); }
 
-/* ─── USER CARDS ───────────────────────────────────────────────────────────── */
+.stat-val {
+  font-size: 26px; font-weight: 700; letter-spacing: -.6px; color: var(--t1);
+  line-height: 1.1; margin-bottom: 6px;
+}
+.stat-val-online {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 16px; font-weight: 600; color: var(--gn);
+  line-height: 1.1; margin-bottom: 6px;
+}
+.stat-online-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--gn); flex-shrink: 0;
+  animation: dot-pulse 2.5s ease-in-out infinite;
+}
+.stat-lbl {
+  font-size: 11px; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--t2);
+}
+
+/* ─── БЛОК СЕКЦИИ (заголовок + кнопка) ────────────────────────────────────── */
+.section-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 14px;
+}
+.section-bar-left {
+  display: flex; align-items: center; gap: 8px; min-width: 0;
+}
+.section-bar-left h2 {
+  font-size: clamp(16px,3.5vw,19px); font-weight: 700; letter-spacing: -.4px;
+  white-space: nowrap;
+}
+.count-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 20px; padding: 0 6px;
+  background: var(--a-bg); border: 1px solid var(--a-ri); border-radius: 10px;
+  font-size: 11px; font-weight: 700; color: var(--a-tx);
+  flex-shrink: 0;
+}
+
+/* ─── КАРТОЧКИ ПОЛЬЗОВАТЕЛЕЙ ───────────────────────────────────────────────── */
 #users-list { display: flex; flex-direction: column; gap: 8px; }
 
 .user-card {
-  background: var(--s1);
-  border: 1px solid var(--bd);
-  border-radius: var(--r3);
+  background: var(--s1); border: 1px solid var(--bd); border-radius: var(--r3);
   overflow: hidden;
   transition: border-color var(--tm), box-shadow var(--tm);
 }
@@ -377,371 +274,180 @@ body {
 }
 
 .user-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  cursor: pointer;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  gap: 10px;
-  min-height: 56px; /* touch target */
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; cursor: pointer; user-select: none;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  gap: 10px; min-height: 56px;
   transition: background var(--tf);
 }
-.user-header:hover { background: rgba(255,255,255,.022); }
+.user-header:hover  { background: rgba(255,255,255,.022); }
 .user-header:active { background: rgba(255,255,255,.035); }
 
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  min-width: 0;
-  flex: 1;
-}
+.user-info { display: flex; align-items: center; gap: 13px; min-width: 0; flex: 1; }
 
 .avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: var(--r2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 15px;
-  flex-shrink: 0;
-  letter-spacing: -.3px;
+  width: 38px; height: 38px; border-radius: var(--r2);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 15px; flex-shrink: 0; letter-spacing: -.3px;
 }
-
 .user-text { min-width: 0; }
 .user-name {
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--t1);
-  letter-spacing: -.15px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-weight: 600; font-size: 14px; color: var(--t1); letter-spacing: -.15px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .user-meta { font-size: 12px; color: var(--t2); margin-top: 2px; }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
+.header-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 
 .chevron {
-  color: var(--t3);
-  flex-shrink: 0;
+  color: var(--t3); flex-shrink: 0;
   transition: transform .26s cubic-bezier(.4,0,.2,1), color var(--tf);
 }
 .chevron.open { transform: rotate(90deg); color: var(--a-tx); }
 
-/* ─── ACCORDION ────────────────────────────────────────────────────────────── */
-.user-body {
-  height: 0;
-  overflow: hidden;
-  transition: height .3s cubic-bezier(.4,0,.2,1);
-}
-.user-body-inner {
-  border-top: 1px solid var(--bd);
-  padding: 14px 18px 18px;
-}
+.user-body { height: 0; overflow: hidden; will-change: height; transition: height .3s cubic-bezier(.4,0,.2,1); }
+.user-body-inner { border-top: 1px solid var(--bd); padding: 14px 18px 18px; }
 
-/* ─── DEVICES ──────────────────────────────────────────────────────────────── */
-.devices-toolbar {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 10px;
-}
-
-.devices-list { display: flex; flex-direction: column; gap: 6px; }
+/* ─── СПИСОК УСТРОЙСТВ ─────────────────────────────────────────────────────── */
+.devices-toolbar { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+.devices-list    { display: flex; flex-direction: column; gap: 6px; }
 
 .device-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
-  background: var(--s2);
-  border: 1px solid var(--bd);
-  border-radius: var(--r2);
-  gap: 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; background: var(--s2); border: 1px solid var(--bd);
+  border-radius: var(--r2); gap: 10px;
   transition: background var(--tf), border-color var(--tf);
 }
-.device-item:hover {
-  background: var(--s3);
-  border-color: var(--bd2);
-}
+.device-item:hover { background: var(--s3); border-color: var(--bd2); }
 
-.device-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  flex: 1;
-}
+.device-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
 .device-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--r1);
-  background: var(--a-bg);
-  border: 1px solid rgba(82,113,232,.18);
-  color: var(--a-tx);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  width: 32px; height: 32px; border-radius: var(--r1);
+  background: var(--a-bg); border: 1px solid rgba(82,113,232,.18);
+  color: var(--a-tx); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .device-name {
-  font-size: 13.5px;
-  font-weight: 500;
-  color: var(--t1);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 13.5px; font-weight: 500; color: var(--t1);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .device-ip {
-  font-size: 11.5px;
-  color: var(--t2);
+  font-size: 11.5px; color: var(--t2);
   font-family: "SF Mono","JetBrains Mono","Cascadia Code",ui-monospace,monospace;
-  margin-top: 2px;
-  letter-spacing: .01em;
+  margin-top: 2px; letter-spacing: .01em;
 }
-.device-actions {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  flex-shrink: 0;
-}
+.device-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
 
-/* ─── EMPTY STATES ─────────────────────────────────────────────────────────── */
-.empty-page {
-  padding: clamp(40px,8vw,64px) 20px;
-  text-align: center;
-}
+/* ─── ПУСТЫЕ СОСТОЯНИЯ ─────────────────────────────────────────────────────── */
+.empty-page { padding: clamp(36px,7vw,56px) 20px; text-align: center; }
 .empty-icon {
-  width: 54px;
-  height: 54px;
-  margin: 0 auto 16px;
-  background: var(--s2);
-  border: 1px solid var(--bd);
-  border-radius: var(--r3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--t3);
+  width: 52px; height: 52px; margin: 0 auto 14px;
+  background: var(--s2); border: 1px solid var(--bd); border-radius: var(--r3);
+  display: flex; align-items: center; justify-content: center; color: var(--t3);
 }
-.empty-page h3 {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--t2);
-  margin-bottom: 6px;
-  letter-spacing: -.2px;
-}
-.empty-page p { font-size: 13px; color: var(--t3); }
+.empty-page h3 { font-size: 15px; font-weight: 600; color: var(--t2); margin-bottom: 5px; }
+.empty-page p  { font-size: 13px; color: var(--t3); }
 .empty-page p strong { color: var(--a-tx); font-weight: 500; }
 
-.empty-devices {
-  text-align: center;
-  padding: 18px 0 6px;
-  font-size: 13px;
-  color: var(--t3);
-}
+.empty-devices { text-align: center; padding: 16px 0 6px; font-size: 13px; color: var(--t3); }
 
-/* ─── LOADING ──────────────────────────────────────────────────────────────── */
+/* ─── ЗАГРУЗКА ─────────────────────────────────────────────────────────────── */
 .loading-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  padding: 24px;
-  font-size: 13px;
-  color: var(--t2);
+  display: flex; align-items: center; justify-content: center;
+  gap: 9px; padding: 24px; font-size: 13px; color: var(--t2);
 }
-
 .spinner {
-  display: inline-block;
-  width: 14px; height: 14px;
-  border: 1.5px solid rgba(255,255,255,.15);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin .6s linear infinite;
-  flex-shrink: 0;
+  display: inline-block; width: 14px; height: 14px;
+  border: 1.5px solid rgba(255,255,255,.15); border-top-color: #fff;
+  border-radius: 50%; animation: spin .6s linear infinite; flex-shrink: 0;
 }
-.spinner-dark {
-  border-color: rgba(82,113,232,.18);
-  border-top-color: var(--a);
-}
+.spinner-dark { border-color: rgba(82,113,232,.18); border-top-color: var(--a); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ─── MODAL ────────────────────────────────────────────────────────────────── */
+/* ─── МОДАЛЬНЫЕ ОКНА ───────────────────────────────────────────────────────── */
 .modal {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
 }
 .modal-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(4,9,20,.75);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  position: absolute; inset: 0; background: rgba(4,9,20,.75);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
 }
 .modal-box {
-  position: relative;
-  background: var(--s4);
-  border: 1px solid var(--bd2);
-  border-radius: var(--r4);
+  position: relative; background: var(--s4);
+  border: 1px solid var(--bd2); border-radius: var(--r4);
   box-shadow: 0 28px 72px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.05) inset;
-  padding: 28px;
-  width: 100%;
-  max-width: 392px;
+  padding: 28px; width: 100%; max-width: 392px;
   animation: modal-in .22s cubic-bezier(.34,1.32,.64,1);
 }
 @keyframes modal-in {
   from { opacity:0; transform: scale(.93) translateY(-10px); }
   to   { opacity:1; transform: scale(1)   translateY(0); }
 }
-
-.modal-box h3 {
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -.4px;
-  margin-bottom: 6px;
-}
-.modal-box .sub {
-  font-size: 13px;
-  color: var(--t2);
-  margin-bottom: 22px;
-}
+.modal-box h3 { font-size: 17px; font-weight: 700; letter-spacing: -.4px; margin-bottom: 6px; }
+.modal-box .sub { font-size: 13px; color: var(--t2); margin-bottom: 22px; }
 .modal-box .sub strong { color: var(--a-tx); font-weight: 500; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 22px; }
 
-.modal-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  margin-top: 22px;
-}
-
-/* ─── TOASTS ───────────────────────────────────────────────────────────────── */
+/* ─── УВЕДОМЛЕНИЯ ──────────────────────────────────────────────────────────── */
 .toast-container {
-  position: fixed;
-  bottom: calc(24px + var(--safe-b));
-  right: 20px;
-  z-index: 200;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  pointer-events: none;
+  position: fixed; bottom: calc(24px + var(--safe-b)); right: 20px;
+  z-index: 200; display: flex; flex-direction: column; gap: 7px; pointer-events: none;
 }
 .toast {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 11px 15px;
-  border-radius: var(--r2);
-  font-size: 13px;
-  font-weight: 500;
-  min-width: 210px;
-  max-width: 320px;
+  display: flex; align-items: center; gap: 9px; padding: 11px 15px;
+  border-radius: var(--r2); font-size: 13px; font-weight: 500;
+  min-width: 210px; max-width: 320px;
   animation: toast-in .2s cubic-bezier(.22,1,.36,1);
-  background: var(--s4);
-  border: 1px solid var(--bd2);
-  color: var(--t1);
+  background: var(--s4); border: 1px solid var(--bd2); color: var(--t1);
   box-shadow: 0 8px 28px rgba(0,0,0,.45);
 }
-.toast.success {
-  background: rgba(31,201,106,.1);
-  border-color: var(--gn-ri);
-  color: #4ece8e;
-}
-.toast.error {
-  background: rgba(229,94,94,.1);
-  border-color: var(--rd-ri);
-  color: #e87c7c;
-}
+.toast.success { background: rgba(31,201,106,.1); border-color: var(--gn-ri); color: #4ece8e; }
+.toast.error   { background: rgba(229,94,94,.1);  border-color: var(--rd-ri); color: #e87c7c; }
 @keyframes toast-in  { from { opacity:0; transform: translateX(14px) scale(.97); } }
 @keyframes toast-out { to   { opacity:0; transform: translateX(14px) scale(.97); } }
 
-/* ─── DOWNLOAD CARD ────────────────────────────────────────────────────────── */
-.download-card {
-  margin-top: 12px;
-  background: var(--s1);
-  border: 1px solid var(--bd);
-  border-radius: var(--r3);
-  padding: 20px 22px;
-  transition: border-color var(--tm);
+/* ─── КЛИЕНТЫ WIREGUARD (ФУТЕР СТРАНИЦЫ) ───────────────────────────────────── */
+.clients-section {
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid var(--bd);
 }
-.download-card:hover { border-color: var(--bd2); }
-
-.download-card-header { margin-bottom: 14px; }
-.download-card-header h3 {
-  font-size: 14px;
-  font-weight: 650;
-  letter-spacing: -.25px;
-  color: var(--t1);
+.clients-head { margin-bottom: 14px; }
+.clients-head h3 {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--t2); margin-bottom: 3px;
 }
-.download-card-header p { font-size: 12.5px; color: var(--t2); margin-top: 3px; }
+.clients-head p { font-size: 12px; color: var(--t3); }
 
-.download-platforms { display: flex; flex-direction: column; gap: 7px; }
-.download-platform {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 13px;
-  background: var(--s2);
-  border: 1px solid var(--bd);
-  border-radius: var(--r2);
+.clients-list { display: flex; flex-direction: column; gap: 6px; }
+
+.client-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 14px; background: var(--s2);
+  border: 1px solid var(--bd); border-radius: var(--r2); gap: 12px;
   transition: background var(--tf), border-color var(--tf);
 }
-.download-platform:hover { background: var(--s3); border-color: var(--bd2); }
+.client-row:hover { background: var(--s3); border-color: var(--bd2); }
 
-.platform-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13.5px;
-  font-weight: 500;
-  color: var(--t1);
+.client-info { display: flex; align-items: center; gap: 10px; }
+.client-os-icon { font-size: 17px; line-height: 1; }
+.client-os      { font-size: 13.5px; font-weight: 500; color: var(--t1); }
+.client-os-sub  { font-size: 11px; color: var(--t3); margin-top: 1px; }
+
+.client-github-row { padding: 6px 1px 0; }
+.github-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12.5px; color: var(--t2); text-decoration: none;
+  transition: color var(--tf); padding: 3px 0;
 }
-.platform-label .p-icon { font-size: 15px; line-height: 1; }
+.github-link:hover { color: var(--a-tx); }
 
-.dl-github-row { padding: 5px 1px 0; }
-.dl-github-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
-  color: var(--t2);
-  text-decoration: none;
-  transition: color var(--tf);
-  padding: 3px 0;
-}
-.dl-github-link:hover { color: var(--a-tx); }
+/* ─── АДАПТИВНОСТЬ ─────────────────────────────────────────────────────────── */
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   RESPONSIVE SYSTEM
-   ─────────────────────────────────────────────────────────────────────────
-   320–480px   mobile (phones)
-   481–768px   large mobile / small tablet
-   769–1024px  tablet
-   1025px+     desktop (base styles)
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ─── MOBILE ≤ 480px ───────────────────────────────────────────────────────── */
+/* Мобильные ≤ 480px */
 @media (max-width: 480px) {
-
-  /* Header */
   .header {
-    height: 50px;
-    padding: 0 14px;
+    height: 50px; padding: 0 14px;
     padding-left: calc(14px + var(--safe-l));
     padding-right: calc(14px + var(--safe-r));
     gap: 8px;
@@ -750,229 +456,136 @@ body {
   .logo-title   { font-size: 13.5px; }
   #logout-btn .logout-label { display: none; }
   #logout-btn { padding: 8px; }
-  #add-user-btn { padding: 7px 12px; font-size: 12.5px; }
 
-  /* Login */
   #login-view {
-    align-items: flex-start;
-    padding: 40px 16px 24px;
+    align-items: flex-start; padding: 40px 16px 24px;
     padding-bottom: calc(24px + var(--safe-b));
   }
-  .login-wrap    { max-width: 100%; }
-  .login-brand   { margin-bottom: 24px; }
+  .login-wrap { max-width: 100%; }
+  .login-brand { margin-bottom: 22px; }
   .login-brand h1 { font-size: 17px; }
-  .login-card    { padding: 22px 18px; border-radius: var(--r3); }
-  #login-btn     { min-height: 48px; font-size: 15px; }
+  .login-card { padding: 22px 18px; border-radius: var(--r3); }
+  #login-btn  { min-height: 48px; font-size: 15px; }
 
-  /* Main */
   .main {
     padding: 20px 14px calc(56px + var(--safe-b));
     padding-left:  max(14px, var(--safe-l));
     padding-right: max(14px, var(--safe-r));
   }
 
-  /* User cards — no hover lift on touch devices */
+  /* Статистика — 2 + 1 на мобайле */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-bottom: 20px;
+  }
+  .stat-card { padding: 14px 14px; }
+  .stat-card:last-child { grid-column: span 2; }
+  .stat-val { font-size: 22px; }
+  .stat-val-online { font-size: 14px; }
+  .stat-lbl { font-size: 10px; }
+
+  /* Секция */
+  .section-bar { flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .section-bar .btn { width: 100%; justify-content: center; min-height: 42px; }
+
+  /* Карточки пользователей */
   .user-card { border-radius: var(--r2); }
-  .user-card:hover {
-    transform: none;
-    box-shadow: none;
-    border-color: var(--bd);
-  }
+  .user-card:hover { transform: none; box-shadow: none; border-color: var(--bd); }
   .user-card:active { border-color: var(--bd2); }
-
-  .user-header {
-    padding: 0 14px;
-    min-height: 58px;
-  }
+  .user-header { padding: 0 14px; min-height: 58px; }
   .user-body-inner { padding: 12px 14px 16px; }
-
   .avatar { width: 34px; height: 34px; font-size: 14px; border-radius: var(--r1); }
   .user-name { font-size: 13.5px; }
-
-  /* Delete user button — larger tap area */
   .header-right .btn-danger { padding: 8px 10px; }
 
-  /* Device items — vertical stack on mobile */
-  .device-item {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-    padding: 12px 14px;
-  }
-  .device-left { gap: 10px; }
+  /* Устройства — вертикальный стек */
+  .device-item { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px 14px; }
   .device-icon { width: 30px; height: 30px; }
-
   .device-actions {
-    display: flex;
-    gap: 7px;
-    padding-top: 2px;
-    border-top: 1px solid var(--bd);
-    margin-top: 2px;
+    display: flex; gap: 7px; padding-top: 2px;
+    border-top: 1px solid var(--bd); margin-top: 2px;
   }
-  /* Config button takes remaining width */
-  .device-actions .btn-secondary {
-    flex: 1;
-    min-height: 38px;
-    font-size: 13px;
-  }
-  /* Delete button stays compact */
-  .device-actions .btn-danger {
-    flex: 0 0 38px;
-    min-height: 38px;
-    padding: 8px;
-  }
+  .device-actions .btn-secondary { flex: 1; min-height: 38px; font-size: 13px; }
+  .device-actions .btn-danger    { flex: 0 0 38px; min-height: 38px; padding: 8px; }
+  .devices-toolbar .btn { width: 100%; min-height: 40px; font-size: 13px; }
 
-  /* Add Device button — full width */
-  .devices-toolbar .btn {
-    width: 100%;
-    min-height: 40px;
-    font-size: 13px;
-  }
-  .devices-toolbar { margin-bottom: 10px; }
-
-  /* Modal → bottom sheet */
-  .modal {
-    align-items: flex-end;
-    padding: 0;
-  }
+  /* Модальное окно → нижний шторка */
+  .modal { align-items: flex-end; padding: 0; }
   .modal-backdrop { background: rgba(4,9,20,.8); }
   .modal-box {
-    width: 100%;
-    max-width: 100%;
+    width: 100%; max-width: 100%;
     border-radius: var(--r4) var(--r4) 0 0;
-    border-left: none;
-    border-right: none;
-    border-bottom: none;
+    border-left: none; border-right: none; border-bottom: none;
     padding: 24px 20px calc(24px + var(--safe-b));
     animation: sheet-up .28s cubic-bezier(.22,1,.36,1);
     box-shadow: 0 -8px 48px rgba(0,0,0,.55);
   }
   @keyframes sheet-up {
-    from { opacity: 0; transform: translateY(100%); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity:0; transform: translateY(100%); }
+    to   { opacity:1; transform: translateY(0); }
   }
-  /* Sheet drag handle hint */
   .modal-box::before {
-    content: '';
-    display: block;
-    width: 36px;
-    height: 4px;
-    background: rgba(255,255,255,.15);
-    border-radius: 2px;
-    margin: 0 auto 20px;
+    content: ''; display: block; width: 36px; height: 4px;
+    background: rgba(255,255,255,.15); border-radius: 2px; margin: 0 auto 20px;
   }
   .modal-box h3  { font-size: 16px; }
   .modal-box .sub { margin-bottom: 18px; }
-  /* Stacked buttons — cancel below, confirm on top */
-  .modal-actions {
-    flex-direction: column-reverse;
-    gap: 8px;
-    margin-top: 20px;
-  }
-  .modal-actions .btn {
-    width: 100%;
-    min-height: 46px;
-    font-size: 14.5px;
-    justify-content: center;
-    border-radius: var(--r2);
-  }
+  .modal-actions { flex-direction: column-reverse; gap: 8px; margin-top: 20px; }
+  .modal-actions .btn { width: 100%; min-height: 46px; font-size: 14.5px; justify-content: center; }
 
-  /* Toasts — full width bottom bar */
-  .toast-container {
-    right: 12px;
-    left: 12px;
-    bottom: calc(16px + var(--safe-b));
-  }
+  /* Уведомления — полная ширина */
+  .toast-container { right: 12px; left: 12px; bottom: calc(16px + var(--safe-b)); }
   .toast { min-width: 0; max-width: 100%; width: 100%; }
 
-  /* Download platforms — stack */
-  .download-platform {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-  .download-platform .btn {
-    width: 100%;
-    min-height: 42px;
-    justify-content: center;
-  }
-  .download-card { padding: 16px 16px 18px; border-radius: var(--r2); }
+  /* Клиенты — кнопки на полную ширину */
+  .client-row { flex-direction: column; align-items: stretch; gap: 10px; }
+  .client-row .btn { width: 100%; min-height: 42px; justify-content: center; }
+  .clients-section { margin-top: 28px; padding-top: 24px; }
 }
 
-/* ─── SMALL MOBILE ≤ 360px ─────────────────────────────────────────────────── */
+/* Маленький телефон ≤ 360px */
 @media (max-width: 360px) {
   .logo-title { display: none; }
   .header { gap: 6px; padding: 0 12px; }
   .main { padding-left: 12px; padding-right: 12px; }
   .user-header { padding-left: 12px; padding-right: 12px; }
   .user-body-inner { padding-left: 12px; padding-right: 12px; }
-  .section-head h2 { font-size: 16px; }
 }
 
-/* ─── LARGE MOBILE / SMALL TABLET  481px–768px ─────────────────────────────── */
+/* Планшет / большой телефон 481–768px */
 @media (min-width: 481px) and (max-width: 768px) {
   .header { padding: 0 20px; }
   .header-badge { display: none; }
-
   .main { padding: 28px 18px 64px; }
-
-  .user-header { min-height: 54px; }
-  .device-item { padding: 10px 14px; }
-
-  /* Slightly larger touch targets on large phones */
-  .user-header, .device-item {
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  /* Modal: slightly narrower than full screen */
+  .stats-grid { gap: 8px; }
+  .stat-card { padding: 16px 16px; }
+  .stat-val { font-size: 24px; }
   .modal { align-items: flex-end; padding: 0; }
   .modal-box {
-    width: 100%;
-    max-width: 100%;
+    width: 100%; max-width: 100%;
     border-radius: var(--r4) var(--r4) 0 0;
-    border-left: none;
-    border-right: none;
-    border-bottom: none;
+    border-left: none; border-right: none; border-bottom: none;
     padding: 28px 24px calc(28px + var(--safe-b));
     animation: sheet-up .28s cubic-bezier(.22,1,.36,1);
   }
   .modal-box::before {
-    content: '';
-    display: block;
-    width: 36px;
-    height: 4px;
-    background: rgba(255,255,255,.15);
-    border-radius: 2px;
-    margin: 0 auto 20px;
+    content:''; display:block; width:36px; height:4px;
+    background:rgba(255,255,255,.15); border-radius:2px; margin:0 auto 20px;
   }
-  .modal-actions {
-    flex-direction: column-reverse;
-    gap: 8px;
-    margin-top: 20px;
-  }
-  .modal-actions .btn {
-    width: 100%;
-    min-height: 46px;
-    justify-content: center;
-    font-size: 14px;
-  }
-
+  .modal-actions { flex-direction: column-reverse; gap: 8px; margin-top: 20px; }
+  .modal-actions .btn { width: 100%; min-height: 46px; justify-content: center; font-size: 14px; }
   .toast-container { right: 16px; left: 16px; }
   .toast { min-width: 0; max-width: 100%; }
 }
 
-/* ─── TABLET  769px–1024px ────────────────────────────────────────────────── */
+/* Планшет 769–1024px */
 @media (min-width: 769px) and (max-width: 1024px) {
   .main { padding: 30px 20px 68px; }
-  .header-badge { display: flex; }
-  .user-header { padding: 13px 18px; }
-  .user-body-inner { padding: 13px 18px 17px; }
 }
 
-/* ─── DESKTOP  1025px+ ─────────────────────────────────────────────────────── */
+/* Десктоп 1025px+ */
 @media (min-width: 1025px) {
   .header-badge { display: flex; }
-  /* Restore hover lift on desktop only */
   .user-card:hover {
     transform: translateY(-1px);
     box-shadow: 0 0 0 1px rgba(82,113,232,.12), 0 4px 20px rgba(0,0,0,.22);
@@ -983,10 +596,10 @@ body {
 </head>
 <body>
 
-<!-- Toast container -->
+<!-- Уведомления -->
 <div class="toast-container" id="toasts"></div>
 
-<!-- ─── LOGIN ──────────────────────────────────────────────────────────────── -->
+<!-- ─── СТРАНИЦА ВХОДА ─────────────────────────────────────────────────────── -->
 <div id="login-view">
   <div class="login-wrap">
     <div class="login-brand">
@@ -996,21 +609,21 @@ body {
           <polyline points="9 12 11 14 15 10"/>
         </svg>
       </div>
-      <h1>VPN Control Panel</h1>
-      <p>WireGuard administration</p>
+      <h1>VPN Панель управления</h1>
+      <p>Управление WireGuard</p>
     </div>
     <div class="login-card">
       <div class="field">
-        <label for="pw-input">Password</label>
-        <input type="password" id="pw-input" placeholder="Admin password" autocomplete="current-password">
+        <label for="pw-input">Пароль</label>
+        <input type="password" id="pw-input" placeholder="Пароль администратора" autocomplete="current-password">
       </div>
       <div class="error-text" id="login-error"></div>
-      <button class="btn btn-primary" id="login-btn">Sign in</button>
+      <button class="btn btn-primary" id="login-btn">Войти</button>
     </div>
   </div>
 </div>
 
-<!-- ─── DASHBOARD ──────────────────────────────────────────────────────────── -->
+<!-- ─── ДАШБОРД ────────────────────────────────────────────────────────────── -->
 <div id="dashboard-view" class="hidden">
   <header class="header">
     <div class="logo">
@@ -1020,7 +633,7 @@ body {
           <polyline points="9 12 11 14 15 10"/>
         </svg>
       </div>
-      <span class="logo-title">VPN Control Panel</span>
+      <span class="logo-title">VPN Панель</span>
     </div>
 
     <div class="header-badge">
@@ -1029,96 +642,129 @@ body {
     </div>
 
     <div class="header-controls">
-      <button class="btn btn-primary btn-sm" id="add-user-btn">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8">
-          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-        Add User
-      </button>
-      <button class="btn btn-ghost btn-sm" id="logout-btn" title="Sign out">
+      <button class="btn btn-ghost btn-sm" id="logout-btn" title="Выйти">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
           <polyline points="16 17 21 12 16 7"/>
           <line x1="21" y1="12" x2="9" y2="12"/>
         </svg>
-        <span class="logout-label">Sign out</span>
+        <span class="logout-label">Выйти</span>
       </button>
     </div>
   </header>
 
   <main class="main">
-    <div class="section-head">
-      <h2>Users</h2>
-      <p>Manage VPN users and their device configurations</p>
+
+    <!-- Карточки статистики -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-val" id="stat-users-val">—</div>
+        <div class="stat-lbl">Пользователи</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-devices-val">—</div>
+        <div class="stat-lbl">Устройства</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val-online">
+          <div class="stat-online-dot"></div>
+          Online
+        </div>
+        <div class="stat-lbl">Сервер</div>
+      </div>
+    </div>
+
+    <!-- Блок пользователей -->
+    <div class="section-bar">
+      <div class="section-bar-left">
+        <h2>Пользователи</h2>
+        <span class="count-badge" id="section-users-count">0</span>
+      </div>
+      <button class="btn btn-primary btn-sm" id="add-user-btn">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Добавить пользователя
+      </button>
     </div>
 
     <div id="users-list"></div>
 
-    <div id="download-section" class="download-card hidden">
-      <div class="download-card-header">
-        <h3>Download Amnesia VPN Client</h3>
-        <p>Install the client, then import your .conf file to connect</p>
+    <!-- Клиенты WireGuard (футер страницы) -->
+    <div id="download-section" class="clients-section hidden">
+      <div class="clients-head">
+        <h3>Клиенты WireGuard</h3>
+        <p>Установите приложение и импортируйте .conf файл для подключения</p>
       </div>
-      <div class="download-platforms">
-        <div class="download-platform" id="dl-android">
-          <div class="platform-label">
-            <span class="p-icon">📱</span> Android
+      <div class="clients-list">
+        <div class="client-row" id="dl-android">
+          <div class="client-info">
+            <span class="client-os-icon">📱</span>
+            <div>
+              <div class="client-os">Android</div>
+              <div class="client-os-sub">Google Play или APK</div>
+            </div>
           </div>
           <a id="dl-android-btn" class="btn btn-primary btn-sm" target="_blank" rel="noopener noreferrer">
-            Download for Android
+            Скачать
           </a>
         </div>
-        <div class="download-platform" id="dl-windows">
-          <div class="platform-label">
-            <span class="p-icon">🪟</span> Windows
+        <div class="client-row" id="dl-windows">
+          <div class="client-info">
+            <span class="client-os-icon">🪟</span>
+            <div>
+              <div class="client-os">Windows</div>
+              <div class="client-os-sub">Установщик 64-bit</div>
+            </div>
           </div>
           <a id="dl-windows-btn" class="btn btn-windows btn-sm" target="_blank" rel="noopener noreferrer">
-            Download for Windows (.exe)
+            Скачать .exe
           </a>
         </div>
-        <div class="dl-github-row" id="dl-github">
-          <a id="dl-github-link" class="dl-github-link" target="_blank" rel="noopener noreferrer">
+        <div class="client-github-row" id="dl-github">
+          <a id="dl-github-link" class="github-link" target="_blank" rel="noopener noreferrer">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/>
             </svg>
-            View all releases on GitHub →
+            Все релизы на GitHub →
           </a>
         </div>
       </div>
     </div>
+
   </main>
 </div>
 
-<!-- ─── ADD USER MODAL ─────────────────────────────────────────────────────── -->
+<!-- ─── МОДАЛ: НОВЫЙ ПОЛЬЗОВАТЕЛЬ ──────────────────────────────────────────── -->
 <div id="user-modal" class="modal hidden">
   <div class="modal-backdrop" id="user-modal-bg"></div>
   <div class="modal-box">
-    <h3>New User</h3>
-    <p class="sub">Creates a VPN user with no devices attached.</p>
+    <h3>Новый пользователь</h3>
+    <p class="sub">Будет создан пользователь без устройств.</p>
     <div class="field">
-      <label for="user-name-input">Username</label>
-      <input type="text" id="user-name-input" placeholder="e.g. alice" autocomplete="off" spellcheck="false">
+      <label for="user-name-input">Имя пользователя</label>
+      <input type="text" id="user-name-input" placeholder="например, ivan" autocomplete="off" spellcheck="false">
     </div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="user-cancel-btn">Cancel</button>
-      <button class="btn btn-primary" id="user-confirm-btn">Create User</button>
+      <button class="btn btn-ghost" id="user-cancel-btn">Отмена</button>
+      <button class="btn btn-primary" id="user-confirm-btn">Создать</button>
     </div>
   </div>
 </div>
 
-<!-- ─── ADD DEVICE MODAL ───────────────────────────────────────────────────── -->
+<!-- ─── МОДАЛ: НОВОЕ УСТРОЙСТВО ────────────────────────────────────────────── -->
 <div id="device-modal" class="modal hidden">
   <div class="modal-backdrop" id="device-modal-bg"></div>
   <div class="modal-box">
-    <h3>Add Device</h3>
-    <p class="sub">User: <strong id="device-modal-user"></strong></p>
+    <h3>Добавить устройство</h3>
+    <p class="sub">Пользователь: <strong id="device-modal-user"></strong></p>
     <div class="field">
-      <label for="device-name-input">Device name</label>
-      <input type="text" id="device-name-input" placeholder="e.g. macbook, iphone, pc" autocomplete="off" spellcheck="false">
+      <label for="device-name-input">Название устройства</label>
+      <input type="text" id="device-name-input" placeholder="например, телефон, ноутбук" autocomplete="off" spellcheck="false">
     </div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="device-cancel-btn">Cancel</button>
-      <button class="btn btn-primary" id="device-confirm-btn">Add Device</button>
+      <button class="btn btn-ghost" id="device-cancel-btn">Отмена</button>
+      <button class="btn btn-primary" id="device-confirm-btn">Добавить</button>
     </div>
   </div>
 </div>
@@ -1131,7 +777,8 @@ let _token = localStorage.getItem("vpn_token");
 const _open = new Set();
 let _pendingUser = null;
 
-const _AVATAR_PALETTE = [
+/* Палитра аватаров — детерминировано по коду первой буквы */
+const _PALETTE = [
   { bg:"rgba(82,113,232,.15)",  bd:"rgba(82,113,232,.30)",  tx:"#7b9af4" },
   { bg:"rgba(34,197,94,.12)",   bd:"rgba(34,197,94,.28)",   tx:"#4ade80" },
   { bg:"rgba(245,158,11,.12)",  bd:"rgba(245,158,11,.28)",  tx:"#fbbf24" },
@@ -1139,10 +786,26 @@ const _AVATAR_PALETTE = [
   { bg:"rgba(20,184,166,.12)",  bd:"rgba(20,184,166,.28)",  tx:"#2dd4bf" },
   { bg:"rgba(244,63,94,.12)",   bd:"rgba(244,63,94,.28)",   tx:"#fb7185" },
 ];
-function _avatarStyle(name) {
-  return _AVATAR_PALETTE[name.charCodeAt(0) % _AVATAR_PALETTE.length];
+function _av(name) { return _PALETTE[name.charCodeAt(0) % _PALETTE.length]; }
+
+/* Русское склонение "устройство" */
+function _nDev(n) {
+  const r10 = n % 10, r100 = n % 100;
+  if (r10 === 1 && r100 !== 11) return `${n} устройство`;
+  if (r10 >= 2 && r10 <= 4 && (r100 < 10 || r100 >= 20)) return `${n} устройства`;
+  return `${n} устройств`;
 }
 
+/* Обновление счётчиков статистики */
+function _updateStats(users) {
+  const total = users.reduce((s, u) => s + (u.device_count || 0), 0);
+  const eU = $("stat-users-val"),  eD = $("stat-devices-val"), eB = $("section-users-count");
+  if (eU) eU.textContent = users.length;
+  if (eD) eD.textContent = total;
+  if (eB) eB.textContent = users.length;
+}
+
+/* ── Запросы ──────────────────────────────────────────────────────────────── */
 async function req(method, path, body = null) {
   const opts = {
     method,
@@ -1153,15 +816,14 @@ async function req(method, path, body = null) {
   };
   if (body !== null) opts.body = JSON.stringify(body);
   const res = await fetch(API + path, opts);
-  if (res.status === 401) { _logout(); throw new Error("Session expired"); }
+  if (res.status === 401) { _logout(); throw new Error("Сессия истекла"); }
   if (!res.ok) {
-    let msg = "Request failed";
+    let msg = "Ошибка запроса";
     try { const j = await res.json(); msg = j.error || j.detail || msg; } catch {}
     throw new Error(msg);
   }
   return res;
 }
-
 async function rj(method, path, body = null) {
   const res  = await req(method, path, body);
   if (res.status === 204) return null;
@@ -1169,13 +831,14 @@ async function rj(method, path, body = null) {
   return json.data !== undefined ? json.data : json;
 }
 
+/* ── Авторизация ──────────────────────────────────────────────────────────── */
 async function _login() {
   const pw  = $("pw-input").value;
   const btn = $("login-btn");
   const err = $("login-error");
   err.textContent = "";
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Signing in…';
+  btn.innerHTML = '<span class="spinner"></span> Вход…';
   try {
     const data = await rj("POST", "/auth/login", { password: pw });
     _token = data.token;
@@ -1183,10 +846,10 @@ async function _login() {
     _showDashboard();
   } catch (e) {
     err.textContent = e.message.toLowerCase().includes("invalid") || e.message.includes("401")
-      ? "Incorrect password" : e.message;
+      ? "Неверный пароль" : e.message;
   } finally {
     btn.disabled = false;
-    btn.textContent = "Sign in";
+    btn.textContent = "Войти";
   }
 }
 
@@ -1194,18 +857,18 @@ function _logout() {
   _token = null;
   localStorage.removeItem("vpn_token");
   _open.clear();
-  show("login-view");
-  hide("dashboard-view");
+  show("login-view"); hide("dashboard-view");
   $("pw-input").value = "";
   $("login-error").textContent = "";
 }
 
+/* ── Экраны ───────────────────────────────────────────────────────────────── */
 async function _showDashboard() {
-  hide("login-view");
-  show("dashboard-view");
+  hide("login-view"); show("dashboard-view");
   await Promise.all([_loadUsers(), _loadDownloads()]);
 }
 
+/* ── Загрузка клиентов ────────────────────────────────────────────────────── */
 async function _loadDownloads() {
   const section = $("download-section");
   ["dl-android","dl-windows","dl-github"].forEach(id => {
@@ -1214,22 +877,20 @@ async function _loadDownloads() {
   section.classList.add("hidden");
   try {
     const data = await rj("GET", "/downloads");
-    const androidUrl = (data.android_play_store || data.android_apk || "").trim();
-    const windowsUrl = (data.windows_exe  || "").trim();
-    const githubUrl  = (data.github_repo  || "").trim();
-    if (androidUrl) $("dl-android-btn").href = androidUrl;
-    else $("dl-android").classList.add("hidden");
-    if (windowsUrl) $("dl-windows-btn").href = windowsUrl;
-    else $("dl-windows").classList.add("hidden");
-    if (githubUrl)  $("dl-github-link").href = githubUrl;
-    else $("dl-github").classList.add("hidden");
-    if (androidUrl || windowsUrl || githubUrl) section.classList.remove("hidden");
-  } catch { /* optional */ }
+    const aUrl = (data.android_play_store || data.android_apk || "").trim();
+    const wUrl = (data.windows_exe  || "").trim();
+    const gUrl = (data.github_repo  || "").trim();
+    if (aUrl) $("dl-android-btn").href = aUrl; else $("dl-android").classList.add("hidden");
+    if (wUrl) $("dl-windows-btn").href = wUrl; else $("dl-windows").classList.add("hidden");
+    if (gUrl) $("dl-github-link").href = gUrl; else $("dl-github").classList.add("hidden");
+    if (aUrl || wUrl || gUrl) section.classList.remove("hidden");
+  } catch { /* опционально */ }
 }
 
+/* ── Список пользователей ─────────────────────────────────────────────────── */
 async function _loadUsers() {
   const list = $("users-list");
-  list.innerHTML = '<div class="loading-row"><span class="spinner spinner-dark"></span> Loading…</div>';
+  list.innerHTML = '<div class="loading-row"><span class="spinner spinner-dark"></span> Загрузка…</div>';
   try {
     const users = await rj("GET", "/users");
     _renderUsers(users);
@@ -1239,6 +900,7 @@ async function _loadUsers() {
 }
 
 function _renderUsers(users) {
+  _updateStats(users);
   const list = $("users-list");
   if (!users.length) {
     list.innerHTML = `
@@ -1250,8 +912,8 @@ function _renderUsers(users) {
             <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
           </svg>
         </div>
-        <h3>No users yet</h3>
-        <p>Tap <strong>Add User</strong> to get started.</p>
+        <h3>Нет пользователей</h3>
+        <p>Нажмите <strong>Добавить пользователя</strong> чтобы начать.</p>
       </div>`;
     return;
   }
@@ -1264,19 +926,19 @@ function _userCard(u) {
   card.className = "user-card";
   card.dataset.user = u.name;
   const isOpen = _open.has(u.name);
-  const av = _avatarStyle(u.name);
+  const av = _av(u.name);
   card.innerHTML = `
     <div class="user-header" data-action="toggle" data-user="${esc(u.name)}">
       <div class="user-info">
         <div class="avatar" style="background:${av.bg};border:1px solid ${av.bd};color:${av.tx};">${esc(u.name[0].toUpperCase())}</div>
         <div class="user-text">
           <div class="user-name">${esc(u.name)}</div>
-          <div class="user-meta" id="meta-${esc(u.name)}">${u.device_count} device${u.device_count !== 1 ? "s" : ""}</div>
+          <div class="user-meta" id="meta-${esc(u.name)}">${_nDev(u.device_count)}</div>
         </div>
       </div>
       <div class="header-right">
         <button class="btn btn-xs btn-danger" data-action="del-user" data-user="${esc(u.name)}"
-          style="padding:7px 9px;" title="Delete user">
+          style="padding:7px 9px;" title="Удалить пользователя">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3 6 5 6 21 6"/>
             <path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/>
@@ -1297,6 +959,7 @@ function _userCard(u) {
   return card;
 }
 
+/* ── Аккордеон ────────────────────────────────────────────────────────────── */
 async function _toggle(name) {
   const body    = document.getElementById("body-" + name);
   const card    = document.querySelector(`[data-user="${name}"].user-card`) || body?.closest(".user-card");
@@ -1314,7 +977,6 @@ async function _toggle(name) {
     _expandBody(body, name);
   }
 }
-
 function _expandBody(body, name) {
   body.style.height = body.scrollHeight + "px";
   body.addEventListener("transitionend", () => {
@@ -1322,6 +984,7 @@ function _expandBody(body, name) {
   }, { once: true });
 }
 
+/* ── Устройства ───────────────────────────────────────────────────────────── */
 async function _loadDevices(name) {
   const inner = document.getElementById("inner-" + name);
   if (!inner) return;
@@ -1357,17 +1020,17 @@ function _renderDevices(userName, devices, container) {
             <button class="btn btn-xs btn-secondary"
               data-action="download" data-id="${esc(d.id)}"
               data-filename="${esc(userName)}-${esc(d.name)}.conf"
-              title="Download WireGuard config">
+              title="Скачать конфигурацию">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              Config
+              Конфиг
             </button>
             <button class="btn btn-xs btn-danger"
               data-action="del-device" data-user="${esc(userName)}" data-id="${esc(d.id)}"
-              title="Delete device" style="padding:6px 8px;">
+              title="Удалить устройство" style="padding:6px 8px;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="3 6 5 6 21 6"/>
                 <path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6"/>
@@ -1375,7 +1038,7 @@ function _renderDevices(userName, devices, container) {
             </button>
           </div>
         </div>`).join("")
-    : '<div class="empty-devices">No devices yet.</div>';
+    : '<div class="empty-devices">Нет устройств.</div>';
 
   container.innerHTML = `
     <div class="devices-toolbar">
@@ -1383,12 +1046,13 @@ function _renderDevices(userName, devices, container) {
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8">
           <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
-        Add Device
+        Добавить устройство
       </button>
     </div>
     <div class="devices-list">${rows}</div>`;
 }
 
+/* ── Скачивание конфига ───────────────────────────────────────────────────── */
 async function _download(deviceId, filename) {
   try {
     const res  = await req("GET", `/devices/${encodeURIComponent(deviceId)}/config`);
@@ -1398,17 +1062,18 @@ async function _download(deviceId, filename) {
     a.href = url; a.download = filename;
     document.body.appendChild(a); a.click();
     document.body.removeChild(a); URL.revokeObjectURL(url);
-    toast("Config downloaded", "success");
+    toast("Конфиг скачан", "success");
   } catch (e) { toast(e.message, "error"); }
 }
 
+/* ── Удаление устройства ──────────────────────────────────────────────────── */
 async function _delDevice(userName, deviceId, btn = null) {
-  if (!confirm("Delete this device? This cannot be undone.")) return;
+  if (!confirm("Удалить это устройство? Действие нельзя отменить.")) return;
   const orig = btn?.innerHTML;
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner spinner-dark"></span>'; }
   try {
     await req("DELETE", `/users/${encodeURIComponent(userName)}/devices/${encodeURIComponent(deviceId)}`);
-    toast("Device deleted", "success");
+    toast("Устройство удалено", "success");
     await _loadDevices(userName);
     await _refreshMeta(userName);
   } catch (e) {
@@ -1417,14 +1082,15 @@ async function _delDevice(userName, deviceId, btn = null) {
   }
 }
 
+/* ── Удаление пользователя ────────────────────────────────────────────────── */
 async function _delUser(name, btn = null) {
-  if (!confirm(`Delete user "${name}" and all their devices? This cannot be undone.`)) return;
+  if (!confirm(`Удалить пользователя «${name}» и все его устройства? Действие нельзя отменить.`)) return;
   const orig = btn?.innerHTML;
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner spinner-dark"></span>'; }
   try {
     await req("DELETE", `/users/${encodeURIComponent(name)}`);
     _open.delete(name);
-    toast(`User "${name}" deleted`, "success");
+    toast(`Пользователь «${name}» удалён`, "success");
     await _loadUsers();
   } catch (e) {
     toast(e.message, "error");
@@ -1435,40 +1101,37 @@ async function _delUser(name, btn = null) {
 async function _refreshMeta(name) {
   try {
     const users = await rj("GET", "/users");
+    _updateStats(users);
     const u = users.find(x => x.name === name);
     if (u) {
       const el = document.getElementById("meta-" + name);
-      if (el) el.textContent = `${u.device_count} device${u.device_count !== 1 ? "s" : ""}`;
+      if (el) el.textContent = _nDev(u.device_count);
     }
   } catch {}
 }
 
-function _openUserModal() {
-  $("user-name-input").value = "";
-  show("user-modal");
-  setTimeout(() => $("user-name-input").focus(), 60);
-}
+/* ── Модал: новый пользователь ────────────────────────────────────────────── */
+function _openUserModal()  { $("user-name-input").value = ""; show("user-modal"); setTimeout(() => $("user-name-input").focus(), 60); }
 function _closeUserModal() { hide("user-modal"); }
 
 async function _submitUser() {
   const name = $("user-name-input").value.trim();
   if (!name) return;
   const btn = $("user-confirm-btn");
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
   try {
     await rj("POST", "/users", { name });
     _closeUserModal();
-    toast(`User "${name}" created`, "success");
+    toast(`Пользователь «${name}» создан`, "success");
     await _loadUsers();
   } catch (e) {
     toast(e.message, "error");
   } finally {
-    btn.disabled = false;
-    btn.textContent = "Create User";
+    btn.disabled = false; btn.textContent = "Создать";
   }
 }
 
+/* ── Модал: новое устройство ──────────────────────────────────────────────── */
 function _openDeviceModal(userName) {
   _pendingUser = userName;
   $("device-modal-user").textContent = userName;
@@ -1481,28 +1144,26 @@ function _closeDeviceModal() { hide("device-modal"); _pendingUser = null; }
 async function _submitDevice() {
   const name = $("device-name-input").value.trim();
   if (!name || !_pendingUser) return;
-  const btn  = $("device-confirm-btn");
-  const user = _pendingUser;
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Adding…';
+  const btn = $("device-confirm-btn"), user = _pendingUser;
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Добавление…';
   try {
     await rj("POST", `/users/${encodeURIComponent(user)}/devices`, { name });
     _closeDeviceModal();
-    toast("Device added", "success");
+    toast("Устройство добавлено", "success");
     await _loadDevices(user);
     await _refreshMeta(user);
   } catch (e) {
     toast(e.message, "error");
   } finally {
-    btn.disabled = false;
-    btn.textContent = "Add Device";
+    btn.disabled = false; btn.textContent = "Добавить";
   }
 }
 
+/* ── Уведомления ──────────────────────────────────────────────────────────── */
 function toast(msg, type = "info") {
   const icon = {
-    success: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
-    error:   `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+    success:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+    error:  `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
   };
   const el = document.createElement("div");
   el.className = `toast ${type}`;
@@ -1514,6 +1175,7 @@ function toast(msg, type = "info") {
   }, 3500);
 }
 
+/* ── Делегирование событий ────────────────────────────────────────────────── */
 document.addEventListener("click", e => {
   const t = e.target;
   const delUser = t.closest("[data-action='del-user']");
@@ -1528,6 +1190,7 @@ document.addEventListener("click", e => {
   if (delDev) { _delDevice(delDev.dataset.user, delDev.dataset.id, delDev); return; }
 });
 
+/* ── Утилиты ──────────────────────────────────────────────────────────────── */
 function $(id) { return document.getElementById(id); }
 function show(id) { $(id).classList.remove("hidden"); }
 function hide(id) { $(id).classList.add("hidden"); }
@@ -1536,22 +1199,24 @@ function esc(s) {
     .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
+/* ── Привязка событий ─────────────────────────────────────────────────────── */
 $("login-btn").addEventListener("click", _login);
-$("pw-input").addEventListener("keydown", e => { if (e.key === "Enter") _login(); });
+$("pw-input").addEventListener("keydown",  e => { if (e.key === "Enter") _login(); });
 $("logout-btn").addEventListener("click", _logout);
 $("add-user-btn").addEventListener("click", _openUserModal);
-$("user-cancel-btn").addEventListener("click",  _closeUserModal);
-$("user-confirm-btn").addEventListener("click", _submitUser);
+$("user-cancel-btn").addEventListener("click",   _closeUserModal);
+$("user-confirm-btn").addEventListener("click",  _submitUser);
 $("user-name-input").addEventListener("keydown", e => { if (e.key === "Enter") _submitUser(); });
 $("user-modal-bg").addEventListener("click", _closeUserModal);
-$("device-cancel-btn").addEventListener("click",  _closeDeviceModal);
-$("device-confirm-btn").addEventListener("click", _submitDevice);
+$("device-cancel-btn").addEventListener("click",   _closeDeviceModal);
+$("device-confirm-btn").addEventListener("click",  _submitDevice);
 $("device-name-input").addEventListener("keydown", e => { if (e.key === "Enter") _submitDevice(); });
 $("device-modal-bg").addEventListener("click", _closeDeviceModal);
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") { _closeUserModal(); _closeDeviceModal(); }
 });
 
+/* ── Старт ────────────────────────────────────────────────────────────────── */
 if (_token) _showDashboard().catch(() => _logout());
 </script>
 </body>
