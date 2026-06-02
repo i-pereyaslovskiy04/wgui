@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import secrets
 import threading
 import time
 from pathlib import Path
@@ -87,6 +88,13 @@ def _migrate(data: dict) -> bool:
             udata["subscription"] = dict(_EMPTY_SUBSCRIPTION)
             dirty = True
             log.info(f"Migration: added subscription to user '{uname}'")
+
+    # v6: add user_token to every user that lacks one
+    for uname, udata in data.get("users", {}).items():
+        if not udata.get("user_token"):
+            udata["user_token"] = secrets.token_urlsafe(24)
+            dirty = True
+            log.info(f"Migration: added user_token to user '{uname}'")
 
     return dirty
 
@@ -183,15 +191,44 @@ def find_device(device_id: str) -> tuple[str, dict] | None:
 
 # ── User operations ───────────────────────────────────────────────────────────
 
-def create_user_atomic(name: str) -> None:
-    """Raises ValueError if the user already exists."""
+def create_user_atomic(name: str) -> str:
+    """Create user with a fresh token. Raises ValueError if already exists. Returns user_token."""
     with _lock:
         data = _read()
         if name in data["users"]:
             raise ValueError(f"User '{name}' already exists")
-        data["users"][name] = {"subscription": dict(_EMPTY_SUBSCRIPTION), "devices": []}
+        token = secrets.token_urlsafe(24)
+        data["users"][name] = {
+            "user_token":   token,
+            "subscription": dict(_EMPTY_SUBSCRIPTION),
+            "devices":      [],
+        }
         _write_safe(data)
         log.info(f"User created: {name}")
+        return token
+
+
+def find_user_by_token(token: str) -> tuple[str, dict] | None:
+    """Return (username, udata) for the matching token, or None."""
+    with _lock:
+        data = _read()
+        for uname, udata in data["users"].items():
+            if udata.get("user_token") == token:
+                return uname, udata
+    return None
+
+
+def regenerate_user_token(username: str) -> str:
+    """Replace user_token with a fresh one. Returns new token. Raises KeyError if not found."""
+    with _lock:
+        data = _read()
+        if username not in data["users"]:
+            raise KeyError(f"User '{username}' not found")
+        new_token = secrets.token_urlsafe(24)
+        data["users"][username]["user_token"] = new_token
+        _write_safe(data)
+        log.info(f"user_token regenerated: {username}")
+        return new_token
 
 
 def delete_user_atomic(name: str) -> list[dict]:

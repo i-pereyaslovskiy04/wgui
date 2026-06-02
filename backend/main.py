@@ -46,9 +46,11 @@ from routes.downloads    import router as downloads_router
 from routes.subscription import router as subscription_router
 from routes.wg_status    import router as wg_status_router
 from routes.system       import router as system_router
+from routes.public       import router as public_router
 
-FRONTEND    = Path(__file__).parent.parent / "frontend" / "index.html"
-FAVICON     = Path(__file__).parent.parent / "frontend" / "favicon.svg"
+FRONTEND   = Path(__file__).parent.parent / "frontend" / "index.html"
+USER_PAGE  = Path(__file__).parent.parent / "frontend" / "user.html"
+FAVICON    = Path(__file__).parent.parent / "frontend" / "favicon.svg"
 PUBLIC_PATHS = {"/api/auth/login", "/health", "/", "/favicon.svg"}
 
 
@@ -107,7 +109,9 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
-    if request.url.path in PUBLIC_PATHS or not request.url.path.startswith("/api"):
+    if (request.url.path in PUBLIC_PATHS
+            or not request.url.path.startswith("/api")
+            or request.url.path.startswith("/api/public/")):
         return await call_next(request)
     token = request.headers.get("X-API-TOKEN", "")
     if not token or not verify_token(token):
@@ -127,6 +131,7 @@ app.include_router(subscription_router, prefix="/api/users",      tags=["subscri
 app.include_router(downloads_router,    prefix="/api/downloads",  tags=["downloads"])
 app.include_router(wg_status_router,    prefix="/api/wireguard",  tags=["wireguard"])
 app.include_router(system_router,       prefix="/api/system",     tags=["system"])
+app.include_router(public_router,       prefix="/api/public",     tags=["public"])
 
 
 # ── Static / health ───────────────────────────────────────────────────────────
@@ -136,6 +141,13 @@ async def serve_frontend():
     if not FRONTEND.exists():
         return JSONResponse({"ok": False, "error": "Frontend not found"}, status_code=404)
     return FileResponse(FRONTEND)
+
+
+@app.get("/u/{token}")
+async def serve_user_page(token: str):
+    if not USER_PAGE.exists():
+        return JSONResponse({"ok": False, "error": "User page not found"}, status_code=404)
+    return FileResponse(USER_PAGE)
 
 
 @app.get("/favicon.svg")

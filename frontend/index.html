@@ -490,6 +490,20 @@ body{
 .traffic-val{font-size:12.5px;font-weight:500;color:var(--t1);font-family:"SF Mono","JetBrains Mono",ui-monospace,monospace}
 .traffic-total{color:var(--t2)}
 
+/* ─── ЛИЧНАЯ ССЫЛКА ─────────────────────────────────────────────────────────── */
+.link-box{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 13px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);
+  margin-bottom:18px;
+}
+.link-box input{
+  flex:1;background:none;border:none;outline:none;font-size:12.5px;
+  font-family:"SF Mono","JetBrains Mono",ui-monospace,monospace;
+  color:var(--t1);min-width:0;
+}
+.link-reset-warn{font-size:11.5px;color:var(--t2);margin-bottom:14px}
+.link-reset-warn strong{color:var(--rd)}
+
 /* ─── СИСТЕМНЫЙ МОНИТОРИНГ ─────────────────────────────────────────────────── */
 .sys-dashboard{
   display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px;
@@ -1038,6 +1052,29 @@ body{
   </main>
 </div>
 
+<!-- ─── МОДАЛ: ЛИЧНАЯ ССЫЛКА ────────────────────────────────────────────────── -->
+<div id="link-modal" class="modal hidden">
+  <div class="modal-backdrop" id="link-modal-bg"></div>
+  <div class="modal-box">
+    <h3>Личная ссылка</h3>
+    <p class="sub">Пользователь: <strong id="link-modal-user"></strong></p>
+    <div class="link-box">
+      <input type="text" id="link-url-input" readonly>
+      <button class="btn btn-ghost btn-xs" id="link-copy-btn" title="Скопировать">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+        </svg>
+      </button>
+    </div>
+    <p class="link-reset-warn">Кнопка «Сбросить» сгенерирует новую ссылку — <strong>старая перестанет работать.</strong></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" id="link-reset-btn">Сбросить ссылку</button>
+      <button class="btn btn-secondary btn-sm" id="link-open-btn">Открыть</button>
+      <button class="btn btn-primary btn-sm" id="link-close-btn">Готово</button>
+    </div>
+  </div>
+</div>
+
 <!-- ─── МОДАЛ: НОВЫЙ ПОЛЬЗОВАТЕЛЬ ──────────────────────────────────────────── -->
 <div id="user-modal" class="modal hidden">
   <div class="modal-backdrop" id="user-modal-bg"></div>
@@ -1278,7 +1315,11 @@ async function _loadUsers() {
 function _renderUsers(users) {
   _updateStats(users);
   for(const u of users){
-    _userCache.set(u.name, {subscription: u.subscription||{type:"unlimited",expires_at:0,active:true}});
+    _userCache.set(u.name, {
+      subscription: u.subscription||{type:"unlimited",expires_at:0,active:true},
+      stats:        u.stats||{},
+      user_token:   u.user_token||"",
+    });
   }
   const list=$("#users-list");
   if(!users.length){
@@ -1323,6 +1364,13 @@ function _userCard(u) {
       </div>
       <div class="header-right">
         <span class="sub-badge ${hCls} sub-badge-static" id="user-sub-badge-${esc(u.name)}" title="Статус подписки">${esc(hLabel)}</span>
+        <button class="btn btn-xs btn-secondary" data-action="user-link" data-user="${esc(u.name)}"
+          style="padding:7px 9px;" title="Личная ссылка пользователя">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+          </svg>
+        </button>
         <button class="btn btn-xs btn-danger" data-action="del-user" data-user="${esc(u.name)}"
           style="padding:7px 9px;" title="Удалить пользователя">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
@@ -1793,6 +1841,53 @@ async function _calPickDate(ts){
   }catch(e){ toast(e.message,"error"); }
 }
 
+/* ── Личная ссылка ────────────────────────────────────────────────────────── */
+let _linkUser = null;
+
+function _linkUrl(token){ return token ? `${location.origin}/u/${token}` : ""; }
+
+function _openLinkModal(userName){
+  _linkUser = userName;
+  const cached = _userCache.get(userName);
+  const token  = cached?.user_token || "";
+  document.getElementById("link-modal-user").textContent = userName;
+  document.getElementById("link-url-input").value = _linkUrl(token);
+  show("link-modal");
+}
+
+function _closeLinkModal(){ hide("link-modal"); _linkUser = null; }
+
+document.getElementById("link-copy-btn").addEventListener("click", async () => {
+  const val = document.getElementById("link-url-input").value;
+  if(!val) return;
+  try { await navigator.clipboard.writeText(val); }
+  catch { document.getElementById("link-url-input").select(); document.execCommand("copy"); }
+  toast("Ссылка скопирована","success");
+});
+
+document.getElementById("link-open-btn").addEventListener("click", () => {
+  const val = document.getElementById("link-url-input").value;
+  if(val) window.open(val, "_blank", "noopener");
+});
+
+document.getElementById("link-close-btn").addEventListener("click", _closeLinkModal);
+document.getElementById("link-modal-bg").addEventListener("click", _closeLinkModal);
+
+document.getElementById("link-reset-btn").addEventListener("click", async () => {
+  if(!_linkUser) return;
+  if(!confirm("Сгенерировать новую ссылку? Старая ссылка перестанет работать.")) return;
+  const btn = document.getElementById("link-reset-btn");
+  btn.disabled = true;
+  try{
+    const data = await rj("POST", `/users/${encodeURIComponent(_linkUser)}/token`);
+    const cached = _userCache.get(_linkUser);
+    if(cached) cached.user_token = data.user_token;
+    document.getElementById("link-url-input").value = _linkUrl(data.user_token);
+    toast("Ссылка обновлена","success");
+  }catch(e){ toast(e.message,"error"); }
+  finally{ btn.disabled = false; }
+});
+
 /* ── Системный мониторинг ─────────────────────────────────────────────────── */
 let _sysTimer = null;
 
@@ -1881,6 +1976,7 @@ function _stopSysPolling(){
 /* ── Делегирование событий ────────────────────────────────────────────────── */
 document.addEventListener("click",e=>{
   const t=e.target;
+  const uL=t.closest("[data-action='user-link']");   if(uL){ e.stopPropagation(); _openLinkModal(uL.dataset.user); return; }
   const dU=t.closest("[data-action='del-user']");    if(dU){ e.stopPropagation(); _delUser(dU.dataset.user,dU); return; }
   const sC=t.closest("[data-action='sub-calendar']"); if(sC){ e.stopPropagation(); _openCalendar(sC.dataset.user,sC); return; }
   const sU=t.closest("[data-action='sub-unlimited']");if(sU){ e.stopPropagation(); _setSubUnlimited(sU.dataset.user); return; }
@@ -1914,7 +2010,7 @@ $("#device-cancel-btn").addEventListener("click",_closeDeviceModal);
 $("#device-confirm-btn").addEventListener("click",_submitDevice);
 $("#device-name-input").addEventListener("keydown",e=>{ if(e.key==="Enter") _submitDevice(); });
 $("#device-modal-bg").addEventListener("click",_closeDeviceModal);
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ _closeUserModal(); _closeDeviceModal(); _closeCalendar(); } });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ _closeUserModal(); _closeDeviceModal(); _closeCalendar(); _closeLinkModal(); } });
 
 /* ── Аккордеон "Скачать Amnezia VPN" ─────────────────────────────────────── */
 (function(){

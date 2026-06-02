@@ -13,6 +13,7 @@ from storage import (
     delete_device_atomic,
     delete_user_atomic,
     get_data,
+    regenerate_user_token,
     release_ip,
     reserve_ip,
 )
@@ -73,6 +74,7 @@ def list_users():
             "device_count": len(u.get("devices", [])),
             "subscription": u.get("subscription", _EMPTY_SUB),
             "stats":        _agg_stats(u),
+            "user_token":   u.get("user_token", ""),
         }
         for n, u in data["users"].items()
     ]
@@ -100,7 +102,13 @@ def get_user(user: str):
         {"id": d["id"], "name": d["name"], "ip": d["ip"]}
         for d in udata.get("devices", [])
     ]
-    return _ok({"name": user, "subscription": subscription, "devices": devices, "stats": _agg_stats(udata)})
+    return _ok({
+        "name":         user,
+        "subscription": subscription,
+        "devices":      devices,
+        "stats":        _agg_stats(udata),
+        "user_token":   udata.get("user_token", ""),
+    })
 
 
 @router.delete("/{user}")
@@ -130,6 +138,16 @@ def delete_user(user: str):
 
     log.info(f"User deleted: {user}")
     return _ok({"deleted": True})
+
+
+@router.post("/{user}/token", status_code=200)
+def reset_user_token(user: str):
+    """Generate a fresh user_token for the personal link. Old link immediately stops working."""
+    try:
+        new_token = regenerate_user_token(user)
+    except KeyError:
+        raise HTTPException(404, "User not found")
+    return _ok({"user_token": new_token})
 
 
 # ── Devices ────────────────────────────────────────────────────────────────────
