@@ -490,6 +490,50 @@ body{
 .traffic-val{font-size:12.5px;font-weight:500;color:var(--t1);font-family:"SF Mono","JetBrains Mono",ui-monospace,monospace}
 .traffic-total{color:var(--t2)}
 
+/* ─── СИСТЕМНЫЙ МОНИТОРИНГ ─────────────────────────────────────────────────── */
+.sys-dashboard{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px;
+}
+.sys-card{
+  background:var(--s1);border:1px solid var(--bd);border-radius:var(--r3);
+  padding:15px 16px;display:flex;flex-direction:column;gap:9px;
+  transition:border-color var(--tm);
+}
+.sys-card:hover{border-color:var(--bd2)}
+.sys-card-cpu,.sys-card-ram,.sys-card-disk{grid-column:span 2}
+.sys-card-uptime,.sys-card-wg,.sys-card-net{grid-column:span 2}
+.sys-card-head{display:flex;align-items:center;gap:7px}
+.sys-card-icon{color:var(--t2);flex-shrink:0;display:flex;align-items:center}
+.sys-card-title{
+  font-size:10.5px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--t2);flex:1;
+}
+.sys-card-pct{font-size:21px;font-weight:700;letter-spacing:-.5px;color:var(--t1);line-height:1}
+.sys-bar-wrap{height:4px;background:var(--s3);border-radius:2px;overflow:hidden}
+.sys-bar{height:100%;border-radius:2px;background:var(--a);transition:width .5s ease,background .3s}
+.sys-bar.bar-warn{background:var(--am)}
+.sys-bar.bar-crit{background:var(--rd)}
+.sys-card-sub{font-size:11.5px;color:var(--t2);line-height:1.3}
+.sys-uptime-val{font-size:18px;font-weight:700;letter-spacing:-.4px;color:var(--t1)}
+.sys-wg-val{font-size:21px;font-weight:700;letter-spacing:-.5px;color:var(--t1);line-height:1}
+.sys-wg-row{display:flex;align-items:center;gap:6px}
+.sys-wg-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sys-net-grid{display:flex;gap:16px;flex-wrap:wrap}
+.sys-net-item{display:flex;flex-direction:column;gap:2px}
+.sys-net-lbl{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--t2)}
+.sys-net-val{font-size:14px;font-weight:600;color:var(--t1);font-family:"SF Mono","JetBrains Mono",ui-monospace,monospace;letter-spacing:-.2px}
+.sys-err{opacity:.4;pointer-events:none}
+@media(max-width:480px){
+  .sys-dashboard{grid-template-columns:repeat(2,1fr)}
+  .sys-card-cpu,.sys-card-ram,.sys-card-disk,
+  .sys-card-uptime,.sys-card-wg,.sys-card-net{grid-column:span 1}
+}
+@media(max-width:360px){
+  .sys-dashboard{grid-template-columns:1fr}
+  .sys-card-cpu,.sys-card-ram,.sys-card-disk,
+  .sys-card-uptime,.sys-card-wg,.sys-card-net{grid-column:span 1}
+}
+
 /* ─── ПОДПИСКА: календарь-поповер ───────────────────────────────────────────── */
 .cal-popover{
   position:fixed;z-index:300;
@@ -713,6 +757,114 @@ body{
   </header>
 
   <main class="main">
+
+    <!-- Системный мониторинг -->
+    <div class="sys-dashboard" id="sys-dashboard">
+
+      <!-- CPU -->
+      <div class="sys-card sys-card-cpu">
+        <div class="sys-card-head">
+          <span class="sys-card-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="4" width="16" height="16" rx="2"/>
+              <rect x="9" y="9" width="6" height="6"/>
+              <line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/>
+              <line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/>
+              <line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/>
+              <line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>
+            </svg>
+          </span>
+          <span class="sys-card-title">CPU</span>
+          <span class="sys-card-pct" id="sys-cpu-pct">—</span>
+        </div>
+        <div class="sys-bar-wrap"><div class="sys-bar" id="sys-cpu-bar" style="width:0%"></div></div>
+      </div>
+
+      <!-- RAM -->
+      <div class="sys-card sys-card-ram">
+        <div class="sys-card-head">
+          <span class="sys-card-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 19V5h12v14"/><path d="M3 19h18"/><path d="M9 8h6"/><path d="M9 12h6"/>
+            </svg>
+          </span>
+          <span class="sys-card-title">Память</span>
+          <span class="sys-card-pct" id="sys-ram-pct">—</span>
+        </div>
+        <div class="sys-bar-wrap"><div class="sys-bar" id="sys-ram-bar" style="width:0%"></div></div>
+        <div class="sys-card-sub" id="sys-ram-sub"></div>
+      </div>
+
+      <!-- Disk -->
+      <div class="sys-card sys-card-disk">
+        <div class="sys-card-head">
+          <span class="sys-card-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/>
+              <path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/>
+            </svg>
+          </span>
+          <span class="sys-card-title">Диск</span>
+          <span class="sys-card-pct" id="sys-disk-pct">—</span>
+        </div>
+        <div class="sys-bar-wrap"><div class="sys-bar" id="sys-disk-bar" style="width:0%"></div></div>
+        <div class="sys-card-sub" id="sys-disk-sub"></div>
+      </div>
+
+      <!-- Uptime -->
+      <div class="sys-card sys-card-uptime">
+        <div class="sys-card-head">
+          <span class="sys-card-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </span>
+          <span class="sys-card-title">Аптайм</span>
+        </div>
+        <div class="sys-uptime-val" id="sys-uptime-val">—</div>
+      </div>
+
+      <!-- WireGuard -->
+      <div class="sys-card sys-card-wg">
+        <div class="sys-card-head">
+          <span class="sys-card-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </span>
+          <span class="sys-card-title">WireGuard</span>
+          <span class="sys-wg-val" id="sys-wg-val">—</span>
+        </div>
+        <div class="sys-wg-row">
+          <div class="sys-wg-dot" id="sys-wg-dot" style="background:var(--t3)"></div>
+          <div class="sys-card-sub" id="sys-wg-sub">—</div>
+        </div>
+      </div>
+
+      <!-- Network -->
+      <div class="sys-card sys-card-net">
+        <div class="sys-card-head">
+          <span class="sys-card-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="8 17 12 21 16 17"/><line x1="12" y1="21" x2="12" y2="12"/>
+              <polyline points="16 7 12 3 8 7"/><line x1="12" y1="3" x2="12" y2="12"/>
+            </svg>
+          </span>
+          <span class="sys-card-title">Сеть (<span id="sys-net-ifc">wg0</span>)</span>
+        </div>
+        <div class="sys-net-grid">
+          <div class="sys-net-item">
+            <span class="sys-net-lbl">↓ RX</span>
+            <span class="sys-net-val" id="sys-net-rx">—</span>
+          </div>
+          <div class="sys-net-item">
+            <span class="sys-net-lbl">↑ TX</span>
+            <span class="sys-net-val" id="sys-net-tx">—</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
 
     <!-- Статистика -->
     <div class="stats-grid">
@@ -1008,6 +1160,7 @@ async function _login() {
 
 function _logout() {
   if(_wgTimer){ clearInterval(_wgTimer); _wgTimer=null; }
+  _stopSysPolling();
   _lastWgStatus=null; _userCache.clear(); _closeCalendar();
   _token=null; localStorage.removeItem("vpn_token"); _open.clear();
   show("login-view"); hide("dashboard-view");
@@ -1021,6 +1174,7 @@ async function _showDashboard() {
   _loadWgStatus();
   if(_wgTimer) clearInterval(_wgTimer);
   _wgTimer = setInterval(_loadWgStatus, 30000);
+  _startSysPolling();
 }
 
 /* ── WireGuard статус ─────────────────────────────────────────────────────── */
@@ -1637,6 +1791,91 @@ async function _calPickDate(ts){
     _applySubUpdate(username,sub);
     toast("Подписка обновлена","success");
   }catch(e){ toast(e.message,"error"); }
+}
+
+/* ── Системный мониторинг ─────────────────────────────────────────────────── */
+let _sysTimer = null;
+
+function _fmtUptime(s){
+  if(!s||s<=0) return "—";
+  const d=Math.floor(s/86400), h=Math.floor((s%86400)/3600), m=Math.floor((s%3600)/60);
+  if(d>0) return d+"д "+h+"ч "+m+"м";
+  if(h>0) return h+"ч "+m+"м";
+  return m+"м";
+}
+
+function _setBar(barId, pct){
+  const el=document.getElementById(barId);
+  if(!el) return;
+  el.style.width=Math.min(100,Math.max(0,pct))+"%";
+  el.className="sys-bar"+(pct>=90?" bar-crit":pct>=70?" bar-warn":"");
+}
+
+function _applySysStatus(d){
+  const dash=document.getElementById("sys-dashboard");
+  if(dash) dash.querySelectorAll(".sys-card").forEach(c=>c.classList.remove("sys-err"));
+
+  if(d.cpu){
+    const el=document.getElementById("sys-cpu-pct");
+    if(el) el.textContent=d.cpu.percent.toFixed(1)+"%";
+    _setBar("sys-cpu-bar",d.cpu.percent);
+  }
+  if(d.memory){
+    const {used,total,percent}=d.memory;
+    const el=document.getElementById("sys-ram-pct");
+    if(el) el.textContent=percent.toFixed(1)+"%";
+    _setBar("sys-ram-bar",percent);
+    const sub=document.getElementById("sys-ram-sub");
+    if(sub) sub.textContent=_fmtBytes(used)+" / "+_fmtBytes(total);
+  }
+  if(d.disk){
+    const {used,total,percent}=d.disk;
+    const el=document.getElementById("sys-disk-pct");
+    if(el) el.textContent=percent.toFixed(1)+"%";
+    _setBar("sys-disk-bar",percent);
+    const sub=document.getElementById("sys-disk-sub");
+    if(sub) sub.textContent=_fmtBytes(used)+" / "+_fmtBytes(total);
+  }
+  const uEl=document.getElementById("sys-uptime-val");
+  if(uEl) uEl.textContent=_fmtUptime(d.uptime_seconds);
+  if(d.wireguard){
+    const {online_peers,total_peers,interface:ifc}=d.wireguard;
+    const vEl=document.getElementById("sys-wg-val");
+    if(vEl) vEl.textContent=online_peers+"/"+total_peers;
+    const sEl=document.getElementById("sys-wg-sub");
+    if(sEl) sEl.textContent=online_peers+" онлайн из "+total_peers;
+    const dot=document.getElementById("sys-wg-dot");
+    if(dot) dot.style.background=online_peers>0?"var(--gn)":"var(--t3)";
+    const ifcEl=document.getElementById("sys-net-ifc");
+    if(ifcEl&&ifc) ifcEl.textContent=ifc;
+  }
+  if(d.network){
+    const rx=document.getElementById("sys-net-rx");
+    const tx=document.getElementById("sys-net-tx");
+    if(rx) rx.textContent=_fmtBytes(d.network.rx_bytes);
+    if(tx) tx.textContent=_fmtBytes(d.network.tx_bytes);
+  }
+}
+
+async function _loadSysStatus(){
+  try{
+    const r=await fetch(API+"/system/status",{headers:{"X-API-TOKEN":_token||""}});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const j=await r.json();
+    if(j.ok&&j.data) _applySysStatus(j.data);
+  }catch{
+    const dash=document.getElementById("sys-dashboard");
+    if(dash) dash.querySelectorAll(".sys-card").forEach(c=>c.classList.add("sys-err"));
+  }
+}
+
+function _startSysPolling(){
+  _loadSysStatus();
+  _sysTimer=setInterval(_loadSysStatus,60000);
+}
+
+function _stopSysPolling(){
+  if(_sysTimer){ clearInterval(_sysTimer); _sysTimer=null; }
 }
 
 /* ── Делегирование событий ────────────────────────────────────────────────── */

@@ -37,6 +37,7 @@ from fastapi.responses import FileResponse, JSONResponse
 
 from auth import verify_token
 from stats_worker import StatsWorker
+from system_monitor import SystemMonitorWorker
 from storage import init_storage
 from routes.auth         import router as auth_router
 from routes.users        import router as users_router
@@ -44,6 +45,7 @@ from routes.devices      import router as devices_router
 from routes.downloads    import router as downloads_router
 from routes.subscription import router as subscription_router
 from routes.wg_status    import router as wg_status_router
+from routes.system       import router as system_router
 
 FRONTEND    = Path(__file__).parent.parent / "frontend" / "index.html"
 FAVICON     = Path(__file__).parent.parent / "frontend" / "favicon.svg"
@@ -52,16 +54,19 @@ PUBLIC_PATHS = {"/api/auth/login", "/health", "/", "/favicon.svg"}
 
 # ── Lifespan ──────────────────────────────────────────────────────────────────
 
-_stats_worker = StatsWorker()
+_stats_worker  = StatsWorker()
+_system_worker = SystemMonitorWorker()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_storage()
     _stats_worker.start()
+    _system_worker.start()
     log.info("VPN Control Panel started")
     yield
     _stats_worker.stop()
+    _system_worker.stop()
     log.info("VPN Control Panel shutting down")
 
 
@@ -121,6 +126,7 @@ app.include_router(devices_router,      prefix="/api/devices",    tags=["devices
 app.include_router(subscription_router, prefix="/api/users",      tags=["subscription"])
 app.include_router(downloads_router,    prefix="/api/downloads",  tags=["downloads"])
 app.include_router(wg_status_router,    prefix="/api/wireguard",  tags=["wireguard"])
+app.include_router(system_router,       prefix="/api/system",     tags=["system"])
 
 
 # ── Static / health ───────────────────────────────────────────────────────────
