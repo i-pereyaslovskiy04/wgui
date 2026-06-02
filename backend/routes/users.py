@@ -58,6 +58,12 @@ class CreateDeviceBody(BaseModel):
 _EMPTY_SUB = {"type": "unlimited", "expires_at": 0, "active": True}
 
 
+def _agg_stats(udata: dict) -> dict:
+    rx = sum(d.get("stats", {}).get("total_rx", 0) for d in udata.get("devices", []))
+    tx = sum(d.get("stats", {}).get("total_tx", 0) for d in udata.get("devices", []))
+    return {"total_rx": rx, "total_tx": tx, "total": rx + tx}
+
+
 @router.get("")
 def list_users():
     data = get_data()
@@ -66,6 +72,7 @@ def list_users():
             "name":         n,
             "device_count": len(u.get("devices", [])),
             "subscription": u.get("subscription", _EMPTY_SUB),
+            "stats":        _agg_stats(u),
         }
         for n, u in data["users"].items()
     ]
@@ -93,7 +100,7 @@ def get_user(user: str):
         {"id": d["id"], "name": d["name"], "ip": d["ip"]}
         for d in udata.get("devices", [])
     ]
-    return _ok({"name": user, "subscription": subscription, "devices": devices})
+    return _ok({"name": user, "subscription": subscription, "devices": devices, "stats": _agg_stats(udata)})
 
 
 @router.delete("/{user}")

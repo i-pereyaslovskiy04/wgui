@@ -291,9 +291,7 @@ body{
   margin-top:2px;font-size:11.5px;color:var(--t2);
 }
 .device-ip{font-family:"SF Mono","JetBrains Mono",ui-monospace,monospace;letter-spacing:.01em}
-.device-activity:not(:empty)::before,
-.device-traffic:not(:empty)::before{content:' · ';color:var(--t3)}
-.device-traffic{font-family:"SF Mono","JetBrains Mono",ui-monospace,monospace;white-space:nowrap}
+.device-activity:not(:empty)::before{content:' · ';color:var(--t3)}
 
 .device-actions{display:flex;align-items:center;gap:5px;flex-shrink:0}
 
@@ -480,6 +478,17 @@ body{
 .sub-module-foot.sf-unl{background:var(--a-bg);color:var(--a-tx)}
 .sub-module-foot.sf-bad{background:var(--rd-bg);color:var(--rd)}
 .sub-module-foot.sf-exp{background:rgba(255,255,255,.04);color:var(--t2)}
+
+/* ─── ТРАФИК ПОЛЬЗОВАТЕЛЯ ──────────────────────────────────────────────────── */
+.traffic-module{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;margin-bottom:14px;
+  background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);
+}
+.traffic-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t2);margin-bottom:3px}
+.traffic-vals{display:flex;gap:12px;flex-wrap:wrap}
+.traffic-val{font-size:12.5px;font-weight:500;color:var(--t1);font-family:"SF Mono","JetBrains Mono",ui-monospace,monospace}
+.traffic-total{color:var(--t2)}
 
 /* ─── ПОДПИСКА: календарь-поповер ───────────────────────────────────────────── */
 .cal-popover{
@@ -1031,8 +1040,9 @@ function _applyWgStatus(data) {
   /* Список онлайн */
   _renderOnlineList(data.online_list || []);
 
-  /* Обновить каждое устройство и собрать подписки по пользователям */
+  /* Обновить каждое устройство и собрать данные по пользователям */
   const userSubUpdates = new Map(); // username → subscription
+  const userTrafficMap = new Map(); // username → {rx, tx}
   for(const p of (data.peers||[])){
     const dot = document.getElementById("dot-"+p.id);
     if(dot){ dot.className="dev-dot "+(p.status||"offline"); }
@@ -1040,11 +1050,10 @@ function _applyWgStatus(data) {
     const act = document.getElementById("act-"+p.id);
     if(act){ act.textContent = p.last_handshake_seconds!=null ? _fmtAge(p.last_handshake_seconds) : ""; }
 
-    const trf = document.getElementById("trf-"+p.id);
-    if(trf){
-      const rx=(p.stats&&p.stats.total_rx)||0, tx=(p.stats&&p.stats.total_tx)||0;
-      trf.textContent = (rx||tx) ? `↓ ${_fmtBytes(rx)} ↑ ${_fmtBytes(tx)}` : "";
-    }
+    /* Агрегировать трафик на уровне пользователя */
+    const rx=(p.stats&&p.stats.total_rx)||0, tx=(p.stats&&p.stats.total_tx)||0;
+    const prev=userTrafficMap.get(p.user)||{rx:0,tx:0};
+    userTrafficMap.set(p.user,{rx:prev.rx+rx, tx:prev.tx+tx});
 
     /* Собрать user-level подписку (одна на пользователя) */
     if(p.subscription && !userSubUpdates.has(p.user)){
@@ -1058,6 +1067,11 @@ function _applyWgStatus(data) {
     if(cached) cached.subscription = sub;
     _updateSubBadge(username, sub);
     _updateSubPanel(username, sub);
+  }
+
+  /* Обновить блоки трафика */
+  for(const [username, {rx,tx}] of userTrafficMap){
+    _updateUserTraffic(username, rx, tx);
   }
 }
 
@@ -1206,8 +1220,9 @@ async function _loadDevices(name) {
   try{
     const user=await rj("GET",`/users/${encodeURIComponent(name)}`);
     const sub=user.subscription||{type:"unlimited",expires_at:0,active:true};
-    _userCache.set(name,{subscription:sub});
-    _renderDevices(name,sub,user.devices,inner);
+    const stats=user.stats||{total_rx:0,total_tx:0,total:0};
+    _userCache.set(name,{subscription:sub,stats});
+    _renderDevices(name,sub,user.devices,inner,stats);
     if(_lastWgStatus) _applyWgStatus(_lastWgStatus);  // применить кешированный статус сразу
     const body=document.getElementById("body-"+name);
     if(body&&_open.has(name)&&body.style.height!=="auto")
@@ -1217,7 +1232,7 @@ async function _loadDevices(name) {
   }
 }
 
-function _renderDevices(userName, userSub, devices, container){
+function _renderDevices(userName, userSub, devices, container, userStats){
   const rows=devices.length
     ?devices.map(d=>`
         <div class="device-item">
@@ -1231,7 +1246,7 @@ function _renderDevices(userName, userSub, devices, container){
             </div>
             <div class="device-info">
               <div class="device-name">${esc(d.name)}</div>
-              <div class="device-sub"><span class="device-ip">${esc(d.ip)}</span><span class="device-activity" id="act-${esc(d.id)}"></span><span class="device-traffic" id="trf-${esc(d.id)}"></span></div>
+              <div class="device-sub"><span class="device-ip">${esc(d.ip)}</span><span class="device-activity" id="act-${esc(d.id)}"></span></div>
             </div>
           </div>
           <div class="device-actions">
@@ -1259,6 +1274,7 @@ function _renderDevices(userName, userSub, devices, container){
 
   container.innerHTML=`
     ${_subPanelHTML(userName, userSub)}
+    ${_trafficBlockHTML(userName, userStats)}
     <div class="devices-toolbar">
       <span class="device-hint">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
@@ -1440,6 +1456,34 @@ function _subPanelHTML(userName, sub){
       <span>${esc(footText)}</span>
     </div>
   </div>`;
+}
+
+/* Блок трафика в теле карточки пользователя */
+function _trafficBlockHTML(userName, stats){
+  const rx=(stats&&stats.total_rx)||0, tx=(stats&&stats.total_tx)||0, total=rx+tx;
+  return `<div class="traffic-module" id="user-trf-${esc(userName)}">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--t2);flex-shrink:0">
+      <polyline points="8 17 12 21 16 17"/><line x1="12" y1="21" x2="12" y2="12"/>
+      <polyline points="16 7 12 3 8 7"/><line x1="12" y1="3" x2="12" y2="12"/>
+    </svg>
+    <div>
+      <div class="traffic-label">Трафик</div>
+      <div class="traffic-vals">
+        <span class="traffic-val">↓ ${esc(_fmtBytes(rx))}</span>
+        <span class="traffic-val">↑ ${esc(_fmtBytes(tx))}</span>
+        <span class="traffic-val traffic-total">Всего: ${esc(_fmtBytes(total))}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function _updateUserTraffic(username, rx, tx){
+  const el=document.getElementById("user-trf-"+username);
+  if(!el) return;
+  const vals=el.querySelector(".traffic-vals");
+  if(!vals) return;
+  const total=rx+tx;
+  vals.innerHTML=`<span class="traffic-val">↓ ${esc(_fmtBytes(rx))}</span><span class="traffic-val">↑ ${esc(_fmtBytes(tx))}</span><span class="traffic-val traffic-total">Всего: ${esc(_fmtBytes(total))}</span>`;
 }
 
 /* Обновить бейдж в шапке карточки пользователя */
