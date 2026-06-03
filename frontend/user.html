@@ -284,8 +284,8 @@ body{
   .main{padding:20px 14px 72px}
   .sub-card{padding:16px}
   .device-item{flex-direction:column;align-items:stretch;gap:10px;padding:12px 14px}
-  .device-actions{display:flex;gap:7px;padding-top:2px;border-top:1px solid var(--bd);margin-top:2px}
-  .device-actions .btn-secondary{flex:1;min-height:38px;font-size:13px}
+  .device-actions{display:flex;flex-wrap:wrap;gap:7px;padding-top:2px;border-top:1px solid var(--bd);margin-top:2px}
+  .device-actions .btn-secondary{flex:1;min-width:100px;min-height:38px;font-size:13px}
   .device-actions .btn-danger{flex:0 0 38px;min-height:38px;padding:8px}
   .client-row{flex-direction:column;align-items:stretch;gap:10px}
   .client-row .btn{width:100%;min-height:42px;justify-content:center}
@@ -493,8 +493,9 @@ body{
                 <div>
                   <div class="step-title">Импортируйте конфигурацию</div>
                   <div class="step-desc">
-                    Откройте приложение и выберите <strong>«Файл с настройками подключения»</strong>.<br>
-                    Выберите файл <code>.conf</code>, скачанный на этой странице.
+                    Нажмите <strong>«Скопировать ключ»</strong>, затем откройте Amnezia VPN, выберите добавление подключения через ключ/текст и вставьте скопированный конфиг.<br>
+                    Если приложение предложит включить обфускацию WireGuard — можно включить.<br>
+                    Запасной вариант: скачайте <code>.conf</code>-файл и выберите <strong>«Файл с настройками подключения»</strong>.
                   </div>
                 </div>
               </div>
@@ -702,6 +703,11 @@ function _renderDevices(devices){
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Конфиг</button>`
       :"";
+    const copyBtn=allowed
+      ?`<button class="btn btn-xs btn-secondary" data-act="copy" data-id="${esc(d.id)}" data-name="${esc(d.name)}" title="Скопировать конфиг в буфер">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Скопировать ключ</button>`
+      :"";
     return `<div class="device-item">
       <div class="device-left">
         <div class="dev-dot ${d.status||"offline"}"></div>
@@ -718,6 +724,7 @@ function _renderDevices(devices){
       </div>
       <div class="device-actions">
         ${dlBtn}
+        ${copyBtn}
         <button class="btn btn-xs btn-danger" data-act="del" data-id="${esc(d.id)}" data-name="${esc(d.name)}" style="padding:6px 8px" title="Удалить устройство">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
         </button>
@@ -759,6 +766,20 @@ async function _download(deviceId, deviceName){
   }catch(e){ toast(e.message,"error"); }
 }
 
+
+/* ── Скопировать ключ ────────────────────────────────────────────────────────── */
+async function _copyConfig(deviceId, deviceName){
+  try{
+    const r=await apiFetch("GET",`/devices/${encodeURIComponent(deviceId)}/config`);
+    const text=await r.text();
+    if(navigator.clipboard?.writeText){
+      await navigator.clipboard.writeText(text);
+      toast("Ключ скопирован. Вставьте его в Amnezia VPN при добавлении подключения.","success");
+    }else{
+      prompt("Скопируйте текст вручную и вставьте в Amnezia VPN:",text);
+    }
+  }catch(e){ toast(e.message||"Не удалось скопировать","error"); }
+}
 
 /* ── Удалить устройство ──────────────────────────────────────────────────────── */
 async function _deleteDevice(deviceId, deviceName, btn){
@@ -803,7 +824,8 @@ async function _submitDevice(){
 
 /* ── Делегирование событий ───────────────────────────────────────────────────── */
 document.getElementById("devices-list").addEventListener("click",e=>{
-  const dl=e.target.closest("[data-act='dl']");   if(dl){ _download(dl.dataset.id,dl.dataset.name); return; }
+  const dl=e.target.closest("[data-act='dl']");    if(dl){ _download(dl.dataset.id,dl.dataset.name); return; }
+  const cp=e.target.closest("[data-act='copy']");  if(cp){ _copyConfig(cp.dataset.id,cp.dataset.name); return; }
   const del=e.target.closest("[data-act='del']");  if(del){ _deleteDevice(del.dataset.id,del.dataset.name,del); return; }
 });
 
