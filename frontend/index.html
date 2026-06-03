@@ -1423,7 +1423,7 @@ async function _loadDevices(name) {
     const user=await rj("GET",`/users/${encodeURIComponent(name)}`);
     const sub=user.subscription||{type:"unlimited",expires_at:0,active:true};
     const stats=user.stats||{total_rx:0,total_tx:0,total:0};
-    _userCache.set(name,{subscription:sub,stats});
+    _userCache.set(name,{subscription:sub,stats,user_token:user.user_token||""});
     _renderDevices(name,sub,user.devices,inner,stats);
     if(_lastWgStatus) _applyWgStatus(_lastWgStatus);  // применить кешированный статус сразу
     const body=document.getElementById("body-"+name);
