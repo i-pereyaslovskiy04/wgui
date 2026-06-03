@@ -96,9 +96,6 @@ def _build_amnezia_vpn_url(wg_config: str, description: str = "WireGuard") -> st
     """
     meta = _parse_wg_meta(wg_config)
 
-    # last_config is a JSON string that itself contains {"config": "<wg conf>"}
-    inner_json = json.dumps({"config": wg_config}, ensure_ascii=False)
-
     profile = {
         "defaultContainer": "amnezia-wireguard",
         "description":      description,
@@ -110,7 +107,7 @@ def _build_amnezia_vpn_url(wg_config: str, description: str = "WireGuard") -> st
             {
                 "container": "amnezia-wireguard",
                 "wireguard": {
-                    "last_config":       inner_json,
+                    "last_config":        wg_config,
                     "isThirdPartyConfig": True,
                 },
             }
@@ -118,6 +115,7 @@ def _build_amnezia_vpn_url(wg_config: str, description: str = "WireGuard") -> st
     }
 
     json_bytes  = json.dumps(profile, ensure_ascii=False).encode("utf-8")
+    log.debug("QR JSON preview: %s", json_bytes[:150].decode("utf-8", errors="replace"))
     compressed  = zlib.compress(json_bytes, level=8)
     # Qt qCompress format: 4-byte big-endian uncompressed size + zlib stream
     qcompress   = struct.pack(">I", len(json_bytes)) + compressed
