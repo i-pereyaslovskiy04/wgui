@@ -218,9 +218,10 @@ body{
   .header{padding:0 16px}
   .main{padding:20px 14px 72px}
   .sub-card{padding:16px}
-  .device-item{padding:12px 14px}
-  .device-actions{flex-direction:column;gap:4px}
-  .device-actions .btn{width:100%;justify-content:center}
+  .device-item{flex-direction:column;align-items:stretch;gap:10px;padding:12px 14px}
+  .device-actions{display:flex;gap:7px;padding-top:2px;border-top:1px solid var(--bd);margin-top:2px}
+  .device-actions .btn-secondary{flex:1;min-height:38px;font-size:13px}
+  .device-actions .btn-danger{flex:0 0 38px;min-height:38px;padding:8px}
   .modal{align-items:flex-end;padding:0}
   .modal-box{width:100%;max-width:100%;border-radius:var(--r4) var(--r4) 0 0;border:none;border-top:1px solid var(--bd2);padding:24px 20px calc(24px + var(--safe-b));animation:sheet-up .28s cubic-bezier(.22,1,.36,1)}
   @keyframes sheet-up{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
