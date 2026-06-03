@@ -601,8 +601,6 @@ async function _submitDevice(){
     toast(`Устройство "${d.name}" создано`,"success");
     _closeAddForm();
     await _loadUser();
-    // Автоматически предложить скачать конфиг нового устройства
-    await _download(d.id, d.name);
   }catch(e){ toast(e.message,"error"); }
   finally{ btn.disabled=false; btn.innerHTML=orig; }
 }
