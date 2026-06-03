@@ -782,6 +782,7 @@ body{
           <span class="sys-card-pct" id="sys-cpu-pct">—</span>
         </div>
         <div class="sys-bar-wrap"><div class="sys-bar" id="sys-cpu-bar" style="width:0%"></div></div>
+        <div class="sys-card-sub" id="sys-cpu-sub"></div>
       </div>
 
       <!-- RAM -->
@@ -1088,11 +1089,12 @@ function _fmtAge(s) {
 
 /* Форматирование байт */
 function _fmtBytes(b) {
-  if(!b||b<=0)       return "0 Б";
-  if(b<1024)         return `${b} Б`;
-  if(b<1048576)      return `${(b/1024).toFixed(1)} КБ`;
-  if(b<1073741824)   return `${(b/1048576).toFixed(1)} МБ`;
-  return `${(b/1073741824).toFixed(2)} ГБ`;
+  if(!b||b<=0)              return "0 Б";
+  if(b<1024)                return `${b} Б`;
+  if(b<1048576)             return `${(b/1024).toFixed(1)} КБ`;
+  if(b<1073741824)          return `${(b/1048576).toFixed(1)} МБ`;
+  if(b<1099511627776)       return `${(b/1073741824).toFixed(2)} ГБ`;
+  return `${(b/1099511627776).toFixed(2)} ТБ`;
 }
 
 /* ── Запросы ──────────────────────────────────────────────────────────────── */
@@ -1851,6 +1853,8 @@ function _applySysStatus(d){
     const el=document.getElementById("sys-cpu-pct");
     if(el) el.textContent=d.cpu.percent.toFixed(1)+"%";
     _setBar("sys-cpu-bar",d.cpu.percent);
+    const sub=document.getElementById("sys-cpu-sub");
+    if(sub) sub.textContent=d.cpu.count?d.cpu.count+" vCPU":"";
   }
   if(d.memory){
     const {used,total,percent}=d.memory;

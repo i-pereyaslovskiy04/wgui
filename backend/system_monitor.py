@@ -32,8 +32,11 @@ def get_snapshot() -> Optional[dict]:
 
 def _collect_cpu() -> dict:
     if not _PSUTIL_OK:
-        return {"percent": 0.0}
-    return {"percent": round(_psutil.cpu_percent(interval=None), 1)}
+        return {"percent": 0.0, "count": 0}
+    return {
+        "percent": round(_psutil.cpu_percent(interval=None), 1),
+        "count":   _psutil.cpu_count(logical=True) or 0,
+    }
 
 
 def _collect_memory() -> dict:
