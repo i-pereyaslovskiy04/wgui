@@ -189,27 +189,6 @@ body{
 .add-device-form input::placeholder{color:var(--t3)}
 .add-device-form input:focus{border-color:var(--a);box-shadow:0 0 0 3px var(--a-ri)}
 
-/* ─── QR МОДАЛ ───────────────────────────────────────────────────────────────── */
-.modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal-backdrop{position:absolute;inset:0;background:rgba(4,9,20,.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.modal-box{
-  position:relative;background:var(--s4);
-  border:1px solid var(--bd2);border-radius:var(--r4);
-  box-shadow:0 28px 72px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.05) inset;
-  padding:28px;width:100%;max-width:340px;
-  animation:modal-in .22s cubic-bezier(.34,1.32,.64,1);
-}
-@keyframes modal-in{from{opacity:0;transform:scale(.93) translateY(-10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.modal-box h3{font-size:16px;font-weight:700;letter-spacing:-.3px;margin-bottom:4px}
-.modal-box .sub{font-size:13px;color:var(--t2);margin-bottom:18px}
-.qr-wrap{
-  background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);
-  padding:16px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;
-  min-height:200px;
-}
-.qr-wrap svg{max-width:220px;height:auto}
-.qr-loading{font-size:13px;color:var(--t2)}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end}
 
 /* ─── УВЕДОМЛЕНИЯ ────────────────────────────────────────────────────────────── */
 .toast-container{position:fixed;bottom:calc(20px + var(--safe-b));right:16px;z-index:200;display:flex;flex-direction:column;gap:7px;pointer-events:none}
@@ -360,21 +339,6 @@ body{
   </main>
 </div>
 
-<!-- ─── МОДАЛ: QR-КОД ─────────────────────────────────────────────────────────── -->
-<div id="qr-modal" class="modal hidden">
-  <div class="modal-backdrop" id="qr-backdrop"></div>
-  <div class="modal-box">
-    <h3>QR-код</h3>
-    <p class="sub" id="qr-device-name"></p>
-    <div class="qr-wrap" id="qr-wrap">
-      <span class="qr-loading">Загрузка…</span>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost btn-sm" id="qr-download-btn">Скачать конфиг</button>
-      <button class="btn btn-primary btn-sm" id="qr-close-btn">Закрыть</button>
-    </div>
-  </div>
-</div>
 
 <script>
 "use strict";
@@ -440,8 +404,6 @@ async function apiJson(method, path, body=null){
 /* ── Состояние ───────────────────────────────────────────────────────────────── */
 let _userData    = null;
 let _subStatus   = "unlimited";
-let _qrDeviceId  = null;
-let _qrFilename  = null;
 
 /* ── Подписка ────────────────────────────────────────────────────────────────── */
 function _renderSub(data){
@@ -544,11 +506,6 @@ function _renderDevices(devices){
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Конфиг</button>`
       :"";
-    const qrBtn=allowed
-      ?`<button class="btn btn-xs btn-secondary" data-act="qr" data-id="${esc(d.id)}" data-name="${esc(d.name)}" title="QR-код">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="4" height="4"/></svg>
-          QR</button>`
-      :"";
     return `<div class="device-item">
       <div class="device-left">
         <div class="dev-dot ${d.status||"offline"}"></div>
@@ -564,7 +521,7 @@ function _renderDevices(devices){
         </div>
       </div>
       <div class="device-actions">
-        ${dlBtn}${qrBtn}
+        ${dlBtn}
         <button class="btn btn-xs btn-danger" data-act="del" data-id="${esc(d.id)}" data-name="${esc(d.name)}" style="padding:6px 8px" title="Удалить устройство">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
         </button>
@@ -606,24 +563,6 @@ async function _download(deviceId, deviceName){
   }catch(e){ toast(e.message,"error"); }
 }
 
-/* ── QR-код ──────────────────────────────────────────────────────────────────── */
-async function _showQr(deviceId, deviceName){
-  _qrDeviceId = deviceId; _qrFilename = deviceName;
-  $("qr-device-name").textContent=deviceName;
-  $("qr-wrap").innerHTML='<span class="qr-loading">Загрузка…</span>';
-  $("qr-download-btn").onclick = ()=>_download(deviceId,deviceName);
-  show("qr-modal");
-  try{
-    const r=await apiFetch("GET",`/devices/${encodeURIComponent(deviceId)}/qr`);
-    const svg=await r.text();
-    $("qr-wrap").innerHTML=svg;
-    $("qr-wrap").querySelector("svg")?.setAttribute("style","max-width:220px;height:auto");
-  }catch(e){
-    $("qr-wrap").innerHTML=`<span class="qr-loading" style="color:var(--rd)">${esc(e.message)}</span>`;
-  }
-}
-
-function _closeQr(){ hide("qr-modal"); _qrDeviceId=null; }
 
 /* ── Удалить устройство ──────────────────────────────────────────────────────── */
 async function _deleteDevice(deviceId, deviceName, btn){
@@ -658,7 +597,7 @@ async function _submitDevice(){
   const orig=btn.innerHTML;
   btn.innerHTML='<span class="spinner" style="width:12px;height:12px;border-width:1.5px"></span>';
   try{
-    const d=await apiJson("POST","", {name});
+    const d=await apiJson("POST","/devices", {name});
     toast(`Устройство "${d.name}" создано`,"success");
     _closeAddForm();
     await _loadUser();
@@ -671,7 +610,6 @@ async function _submitDevice(){
 /* ── Делегирование событий ───────────────────────────────────────────────────── */
 document.getElementById("devices-list").addEventListener("click",e=>{
   const dl=e.target.closest("[data-act='dl']");   if(dl){ _download(dl.dataset.id,dl.dataset.name); return; }
-  const qr=e.target.closest("[data-act='qr']");   if(qr){ _showQr(qr.dataset.id,qr.dataset.name); return; }
   const del=e.target.closest("[data-act='del']");  if(del){ _deleteDevice(del.dataset.id,del.dataset.name,del); return; }
 });
 
@@ -679,9 +617,7 @@ $("add-device-btn").addEventListener("click", _openAddForm);
 $("add-device-cancel").addEventListener("click", _closeAddForm);
 $("add-device-confirm").addEventListener("click", _submitDevice);
 $("new-device-name").addEventListener("keydown",e=>{ if(e.key==="Enter") _submitDevice(); if(e.key==="Escape") _closeAddForm(); });
-$("qr-close-btn").addEventListener("click", _closeQr);
-$("qr-backdrop").addEventListener("click", _closeQr);
-document.addEventListener("keydown",e=>{ if(e.key==="Escape") _closeQr(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") _closeAddForm(); });
 
 /* ── Старт ───────────────────────────────────────────────────────────────────── */
 if(!_token){ hide("loading-view"); show("error-view"); }

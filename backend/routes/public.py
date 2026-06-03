@@ -15,11 +15,10 @@ import os
 import re
 import time
 import uuid
-from io import BytesIO
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from storage import (
@@ -245,34 +244,6 @@ def download_config(token: str, device_id: str):
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
-
-@router.get("/{token}/devices/{device_id}/qr")
-def get_device_qr(token: str, device_id: str):
-    username, udata = _lookup(token)
-
-    if not _sub_ok(udata):
-        raise HTTPException(403, "Subscription inactive")
-
-    device = next((d for d in udata.get("devices", []) if d.get("id") == device_id), None)
-    if not device:
-        raise HTTPException(404, "Device not found")
-
-    config_path = _safe_config_path(device)
-    if not config_path.exists():
-        raise HTTPException(404, "Config file not found on disk")
-
-    config_content = config_path.read_text(encoding="utf-8")
-
-    try:
-        import qrcode
-        import qrcode.image.svg
-
-        img    = qrcode.make(config_content, image_factory=qrcode.image.svg.SvgImage)
-        stream = BytesIO()
-        img.save(stream)
-        return Response(content=stream.getvalue(), media_type="image/svg+xml")
-    except ImportError:
-        raise HTTPException(501, "QR generation unavailable — install qrcode package")
 
 
 @router.delete("/{token}/devices/{device_id}", status_code=200)
