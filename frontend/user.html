@@ -197,6 +197,71 @@ body{
 .toast.error  {background:rgba(229,94,94,.1); border-color:var(--rd-ri);color:#e87c7c}
 @keyframes toast-in{from{opacity:0;transform:translateX(14px) scale(.97)}}
 
+/* ─── КЛИЕНТЫ ─────────────────────────────────────────────────────────────── */
+.clients-section{margin-top:40px;padding-top:32px;border-top:1px solid var(--bd)}
+.clients-list{display:flex;flex-direction:column;gap:6px}
+.client-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);gap:12px;transition:background var(--tf),border-color var(--tf)}
+.client-row:hover{background:var(--s3);border-color:var(--bd2)}
+.client-info{display:flex;align-items:center;gap:10px}
+.client-os-icon{display:flex;align-items:center;justify-content:center;width:30px;height:30px;color:var(--t2);flex-shrink:0}
+.dl-btn{min-width:210px;justify-content:center;white-space:nowrap}
+.client-os{font-size:13.5px;font-weight:500;color:var(--t1)}
+.client-os-sub{font-size:11px;color:var(--t3);margin-top:1px}
+.client-github-row{padding:6px 1px 0}
+.github-link{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--t2);text-decoration:none;transition:color var(--tf);padding:3px 0}
+.github-link:hover{color:var(--a-tx)}
+
+/* ─── ИНСТРУКЦИЯ ПОДКЛЮЧЕНИЯ ────────────────────────────────────────────── */
+.connect-guide{margin-top:20px;padding-top:20px;border-top:1px solid var(--bd)}
+.connect-guide-header{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;padding:2px 0;min-height:32px;
+}
+.connect-guide-header-title{
+  font-size:13.5px;font-weight:700;color:var(--t1);letter-spacing:-.15px;
+  transition:color var(--tf);
+}
+.connect-guide-header:hover .connect-guide-header-title{color:var(--a-tx)}
+.connect-guide-chevron{
+  color:var(--t2);flex-shrink:0;
+  transition:transform .26s cubic-bezier(.4,0,.2,1),color var(--tf);
+}
+.connect-guide-chevron.open{transform:rotate(180deg);color:var(--a-tx)}
+.connect-body{height:0;overflow:hidden;transition:height .28s cubic-bezier(.4,0,.2,1)}
+.connect-body-inner{padding-top:14px}
+.connect-steps{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+.connect-step{display:flex;gap:12px;align-items:flex-start}
+.step-num{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;margin-top:1px;
+  background:var(--a-bg);border:1px solid var(--a-ri);color:var(--a-tx);
+  font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;
+}
+.step-title{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px}
+.step-desc{font-size:12.5px;color:var(--t2);line-height:1.55}
+.step-desc strong{color:var(--t1);font-weight:600}
+.step-desc code{
+  font-family:"SF Mono","JetBrains Mono",ui-monospace,monospace;font-size:11.5px;
+  background:var(--s3);padding:1px 5px;border-radius:4px;color:var(--t1);
+}
+.connect-warn{
+  background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.30);
+  border-radius:var(--r2);padding:13px 15px;
+}
+.connect-warn-title{
+  display:flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;color:#f59e0b;margin-bottom:9px;
+}
+.connect-warn-body{font-size:12.5px;color:var(--t2);line-height:1.55}
+.connect-warn-body strong{color:var(--t1);font-weight:600}
+.obfuscation-label{
+  display:inline-flex;align-items:center;gap:6px;margin-top:9px;
+  padding:6px 12px;background:rgba(245,158,11,.13);
+  border:1px solid rgba(245,158,11,.30);border-radius:var(--r1);
+  font-size:13px;font-weight:700;color:#fbbf24;letter-spacing:.01em;
+}
+.warn-hint{margin-top:8px;font-size:12.5px;color:var(--t2);line-height:1.55}
+
 /* ─── ФУТЕР ──────────────────────────────────────────────────────────────────── */
 .support-section{
   margin-top:40px;padding:20px;
@@ -222,6 +287,9 @@ body{
   .device-actions{display:flex;gap:7px;padding-top:2px;border-top:1px solid var(--bd);margin-top:2px}
   .device-actions .btn-secondary{flex:1;min-height:38px;font-size:13px}
   .device-actions .btn-danger{flex:0 0 38px;min-height:38px;padding:8px}
+  .client-row{flex-direction:column;align-items:stretch;gap:10px}
+  .client-row .btn{width:100%;min-height:42px;justify-content:center}
+  .clients-section{margin-top:28px;padding-top:24px}
   .modal{align-items:flex-end;padding:0}
   .modal-box{width:100%;max-width:100%;border-radius:var(--r4) var(--r4) 0 0;border:none;border-top:1px solid var(--bd2);padding:24px 20px calc(24px + var(--safe-b));animation:sheet-up .28s cubic-bezier(.22,1,.36,1)}
   @keyframes sheet-up{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
@@ -328,6 +396,132 @@ body{
         <input type="text" id="new-device-name" placeholder="например, телефон" autocomplete="off" spellcheck="false" maxlength="32">
         <button class="btn btn-primary btn-sm" id="add-device-confirm">Создать</button>
         <button class="btn btn-ghost btn-sm" id="add-device-cancel">✕</button>
+      </div>
+    </div>
+
+    <!-- Скачать Amnezia VPN -->
+    <div id="download-section" class="clients-section hidden">
+
+      <div class="connect-guide-header" id="dl-toggle">
+        <span class="connect-guide-header-title">Скачать Amnezia VPN</span>
+        <svg class="connect-guide-chevron" width="16" height="16" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+
+      <div class="connect-body" id="dl-body">
+        <div class="connect-body-inner">
+          <div class="clients-list">
+            <div class="client-row" id="dl-android">
+              <div class="client-info">
+                <span class="client-os-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="5" y="2" width="14" height="20" rx="3"/>
+                    <circle cx="12" cy="18.5" r=".5" fill="currentColor"/>
+                  </svg>
+                </span>
+                <div><div class="client-os">Android</div><div class="client-os-sub">Google Play или APK</div></div>
+              </div>
+              <a id="dl-android-btn" class="btn btn-primary btn-sm dl-btn" target="_blank" rel="noopener noreferrer">
+                Скачать Amnezia VPN Android
+              </a>
+            </div>
+            <div class="client-row" id="dl-ios">
+              <div class="client-info">
+                <span class="client-os-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="5" y="2" width="14" height="20" rx="3"/>
+                    <path d="M9.5 5.5h5"/>
+                  </svg>
+                </span>
+                <div><div class="client-os">iOS</div><div class="client-os-sub">App Store</div></div>
+              </div>
+              <a id="dl-ios-btn" class="btn btn-primary btn-sm dl-btn" target="_blank" rel="noopener noreferrer">
+                Скачать Amnezia VPN iOS
+              </a>
+            </div>
+            <div class="client-row" id="dl-windows">
+              <div class="client-info">
+                <span class="client-os-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="13" rx="2"/>
+                    <path d="M8 21h8M12 17v4"/>
+                  </svg>
+                </span>
+                <div><div class="client-os">Windows</div><div class="client-os-sub">Установщик 64-bit (.exe)</div></div>
+              </div>
+              <a id="dl-windows-btn" class="btn btn-primary btn-sm dl-btn" target="_blank" rel="noopener noreferrer">
+                Скачать Amnezia VPN Windows
+              </a>
+            </div>
+            <div class="client-github-row" id="dl-github">
+              <a id="dl-github-link" class="github-link" target="_blank" rel="noopener noreferrer">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/>
+                </svg>
+                Все версии на GitHub →
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Инструкция подключения -->
+      <div class="connect-guide">
+        <div class="connect-guide-header" id="connect-guide-toggle">
+          <span class="connect-guide-header-title">Как подключиться</span>
+          <svg class="connect-guide-chevron" width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+
+        <div class="connect-body" id="connect-body">
+          <div class="connect-body-inner">
+
+            <div class="connect-steps">
+              <div class="connect-step">
+                <div class="step-num">1</div>
+                <div>
+                  <div class="step-title">Установите приложение</div>
+                  <div class="step-desc">Скачайте и установите <strong>Amnezia VPN</strong> для вашей платформы, используя ссылки выше.</div>
+                </div>
+              </div>
+              <div class="connect-step">
+                <div class="step-num">2</div>
+                <div>
+                  <div class="step-title">Импортируйте конфигурацию</div>
+                  <div class="step-desc">
+                    Откройте приложение и выберите <strong>«Файл с настройками подключения»</strong>.<br>
+                    Выберите файл <code>.conf</code>, скачанный на этой странице.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="connect-warn">
+              <div class="connect-warn-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                Если подключение не работает
+              </div>
+              <div class="connect-warn-body">
+                Некоторые сети и провайдеры могут блокировать WireGuard.
+                При импорте конфигурации <strong>обязательно включите</strong> опцию:
+                <div class="obfuscation-label">
+                  ☑&nbsp; Включить аутфускацию WireGuard
+                </div>
+                <div class="warn-hint">
+                  Это галочка в интерфейсе Amnezia VPN, которую нужно активировать прямо во время импорта файла конфигурации.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
       </div>
     </div>
 
@@ -619,9 +813,72 @@ $("add-device-confirm").addEventListener("click", _submitDevice);
 $("new-device-name").addEventListener("keydown",e=>{ if(e.key==="Enter") _submitDevice(); if(e.key==="Escape") _closeAddForm(); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") _closeAddForm(); });
 
+/* ── Скачать клиент ──────────────────────────────────────────────────────────── */
+async function _loadDownloads(){
+  const sec=$("download-section");
+  ["dl-android","dl-ios","dl-windows","dl-github"].forEach(id=>{ const el=$(id); if(el) el.classList.remove("hidden"); });
+  sec.classList.add("hidden");
+  try{
+    const r=await fetch("/api/downloads");
+    if(!r.ok) return;
+    const j=await r.json();
+    const d=j.data||{};
+    const aU=(d.android_play_store||d.android_apk||"").trim();
+    const iU=(d.ios_app_store||"").trim();
+    const wU=(d.windows_exe||"").trim(), gU=(d.github_repo||"").trim();
+    if(aU) $("dl-android-btn").href=aU; else $("dl-android").classList.add("hidden");
+    if(iU) $("dl-ios-btn").href=iU; else $("dl-ios").classList.add("hidden");
+    if(wU) $("dl-windows-btn").href=wU; else $("dl-windows").classList.add("hidden");
+    if(gU) $("dl-github-link").href=gU; else $("dl-github").classList.add("hidden");
+    if(aU||iU||wU||gU) sec.classList.remove("hidden");
+  }catch{}
+}
+
+/* ── Аккордеон "Скачать Amnezia VPN" ─────────────────────────────────────── */
+(function(){
+  const toggle=document.getElementById("dl-toggle");
+  const body  =document.getElementById("dl-body");
+  if(!toggle||!body) return;
+  let open=false;
+  toggle.addEventListener("click",()=>{
+    const chevron=toggle.querySelector(".connect-guide-chevron");
+    if(open){
+      body.style.height=body.scrollHeight+"px";
+      requestAnimationFrame(()=>{ body.style.height="0"; });
+      chevron&&chevron.classList.remove("open");
+    }else{
+      body.style.height=body.scrollHeight+"px";
+      body.addEventListener("transitionend",()=>{ if(open) body.style.height="auto"; },{once:true});
+      chevron&&chevron.classList.add("open");
+    }
+    open=!open;
+  });
+})();
+
+/* ── Аккордеон "Как подключиться" ────────────────────────────────────────── */
+(function(){
+  const toggle=document.getElementById("connect-guide-toggle");
+  const body  =document.getElementById("connect-body");
+  if(!toggle||!body) return;
+  let open=false;
+  toggle.addEventListener("click",()=>{
+    const chevron=toggle.querySelector(".connect-guide-chevron");
+    if(open){
+      body.style.height=body.scrollHeight+"px";
+      requestAnimationFrame(()=>{ body.style.height="0"; });
+      chevron&&chevron.classList.remove("open");
+    }else{
+      body.style.height=body.scrollHeight+"px";
+      body.addEventListener("transitionend",()=>{ if(open) body.style.height="auto"; },{once:true});
+      chevron&&chevron.classList.add("open");
+    }
+    open=!open;
+  });
+})();
+
 /* ── Старт ───────────────────────────────────────────────────────────────────── */
 if(!_token){ hide("loading-view"); show("error-view"); }
-else _loadUser();
+else { _loadUser(); _loadDownloads(); }
 </script>
 </body>
 </html>

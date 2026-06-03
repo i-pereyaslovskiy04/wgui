@@ -51,7 +51,7 @@ from routes.public       import router as public_router
 FRONTEND   = Path(__file__).parent.parent / "frontend" / "index.html"
 USER_PAGE  = Path(__file__).parent.parent / "frontend" / "user.html"
 FAVICON    = Path(__file__).parent.parent / "frontend" / "favicon.svg"
-PUBLIC_PATHS = {"/api/auth/login", "/health", "/", "/favicon.svg"}
+PUBLIC_PATHS = {"/api/auth/login", "/api/downloads", "/health", "/", "/favicon.svg"}
 
 
 # ── Lifespan ──────────────────────────────────────────────────────────────────
