@@ -504,6 +504,13 @@ body{
 .link-reset-warn{font-size:11.5px;color:var(--t2);margin-bottom:14px}
 .link-reset-warn strong{color:var(--rd)}
 
+/* ─── QR-КОД ─────────────────────────────────────────────────────────────────── */
+.qr-wrap{display:flex;align-items:center;justify-content:center;min-height:180px;margin:16px auto}
+.qr-img{display:block;max-width:260px;width:100%;background:#fff;border-radius:var(--r2);padding:10px;box-shadow:0 2px 20px rgba(0,0,0,.3)}
+.qr-spinner-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--t2);font-size:13px}
+.qr-load-err{color:var(--rd);font-size:13px;text-align:center}
+.qr-hint{font-size:12px;color:var(--t2);line-height:1.55;margin-top:14px;padding-top:14px;border-top:1px solid var(--bd)}
+
 /* ─── СИСТЕМНЫЙ МОНИТОРИНГ ─────────────────────────────────────────────────── */
 .sys-dashboard{
   display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px;
@@ -663,6 +670,11 @@ body{
   .client-row{flex-direction:column;align-items:stretch;gap:10px}
   .client-row .btn{width:100%;min-height:42px;justify-content:center}
   .clients-section{margin-top:28px;padding-top:24px}
+
+  #qr-modal{align-items:center;padding:16px}
+  #qr-modal .modal-box{border-radius:var(--r3);width:100%;max-width:100%}
+  #qr-modal .modal-box::before{display:none}
+  .qr-img{max-width:min(72vw,260px)}
 }
 
 /* Маленький телефон ≤ 360px */
@@ -1009,6 +1021,27 @@ body{
       <button class="btn btn-ghost btn-sm" id="link-reset-btn">Сбросить ссылку</button>
       <button class="btn btn-secondary btn-sm" id="link-open-btn">Открыть</button>
       <button class="btn btn-primary btn-sm" id="link-close-btn">Готово</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── МОДАЛ: QR-КОД УСТРОЙСТВА ───────────────────────────────────────────── -->
+<div id="qr-modal" class="modal hidden">
+  <div class="modal-backdrop" id="qr-modal-bg"></div>
+  <div class="modal-box">
+    <h3>QR-код</h3>
+    <p class="sub">Устройство: <strong id="qr-device-name"></strong></p>
+    <div class="qr-wrap" id="qr-wrap">
+      <img id="qr-img" class="qr-img hidden" src="" alt="QR-код">
+      <div id="qr-spinner" class="qr-spinner-wrap">
+        <span class="spinner"></span>
+        <span>Загрузка…</span>
+      </div>
+      <div id="qr-err" class="qr-load-err hidden">Не удалось загрузить QR-код</div>
+    </div>
+    <p class="qr-hint">Сканируйте QR-код в Amnezia VPN или WireGuard. Если QR-код не распознаётся, скачайте конфигурационный файл и импортируйте его вручную.</p>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-sm" id="qr-close-btn">Закрыть</button>
     </div>
   </div>
 </div>
@@ -1401,6 +1434,18 @@ function _renderDevices(userName, userSub, devices, container, userStats){
               </svg>
               Конфиг
             </button>
+            <button class="btn btn-xs btn-secondary"
+              data-action="qr" data-id="${esc(d.id)}" data-name="${esc(d.name)}"
+              title="Показать QR-код">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/>
+                <rect x="14" y="14" width="3" height="3"/>
+                <rect x="18" y="14" width="3" height="3"/><rect x="14" y="18" width="3" height="3"/>
+                <rect x="18" y="18" width="3" height="3"/>
+              </svg>
+              QR
+            </button>
             <button class="btn btn-xs btn-danger"
               data-action="del-device" data-user="${esc(userName)}" data-id="${esc(d.id)}"
               title="Удалить устройство" style="padding:6px 8px;">
@@ -1442,6 +1487,30 @@ async function _download(deviceId,filename){
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     toast("Конфиг скачан","success");
   }catch(e){ toast(e.message,"error"); }
+}
+
+/* ── QR-код ───────────────────────────────────────────────────────────────── */
+function _openQrModal(deviceId, deviceName) {
+  document.getElementById("qr-device-name").textContent = deviceName;
+  const img  = document.getElementById("qr-img");
+  const spin = document.getElementById("qr-spinner");
+  const err  = document.getElementById("qr-err");
+  img.classList.add("hidden"); err.classList.add("hidden"); spin.classList.remove("hidden");
+  img.src = "";
+  img.onload = () => { spin.classList.add("hidden"); img.classList.remove("hidden"); };
+  img.onerror = () => { spin.classList.add("hidden"); err.classList.remove("hidden"); };
+  // req() sends X-API-TOKEN; for img.src we use fetch + blob URL
+  req("GET", `/devices/${encodeURIComponent(deviceId)}/qr`)
+    .then(r => r.blob())
+    .then(blob => { img.src = URL.createObjectURL(blob); })
+    .catch(e => { spin.classList.add("hidden"); err.classList.remove("hidden"); err.textContent = e.message || "Ошибка загрузки QR"; });
+  show("qr-modal");
+}
+function _closeQrModal() {
+  hide("qr-modal");
+  const img = document.getElementById("qr-img");
+  if (img.src.startsWith("blob:")) URL.revokeObjectURL(img.src);
+  img.src = "";
 }
 
 /* ── Удаление ─────────────────────────────────────────────────────────────── */
@@ -1910,6 +1979,7 @@ document.addEventListener("click",e=>{
   const tg=t.closest("[data-action='toggle']");      if(tg){ _toggle(tg.dataset.user); return; }
   const aD=t.closest("[data-action='add-device']");  if(aD){ _openDeviceModal(aD.dataset.user); return; }
   const dl=t.closest("[data-action='download']");    if(dl){ _download(dl.dataset.id,dl.dataset.filename); return; }
+  const qr=t.closest("[data-action='qr']");          if(qr){ _openQrModal(qr.dataset.id,qr.dataset.name); return; }
   const dD=t.closest("[data-action='del-device']");  if(dD){ _delDevice(dD.dataset.user,dD.dataset.id,dD); return; }
   const cP=t.closest("[data-action='cal-prev']");    if(cP){ const p=document.getElementById("cal-popover"); if(p){_calMonth.month--;if(_calMonth.month<0){_calMonth.month=11;_calMonth.year--;}_renderCalendar(p);} return; }
   const cN=t.closest("[data-action='cal-next']");    if(cN){ const p=document.getElementById("cal-popover"); if(p){_calMonth.month++;if(_calMonth.month>11){_calMonth.month=0;_calMonth.year++;}_renderCalendar(p);} return; }
@@ -1936,7 +2006,9 @@ $("#device-cancel-btn").addEventListener("click",_closeDeviceModal);
 $("#device-confirm-btn").addEventListener("click",_submitDevice);
 $("#device-name-input").addEventListener("keydown",e=>{ if(e.key==="Enter") _submitDevice(); });
 $("#device-modal-bg").addEventListener("click",_closeDeviceModal);
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ _closeUserModal(); _closeDeviceModal(); _closeCalendar(); _closeLinkModal(); } });
+document.getElementById("qr-modal-bg").addEventListener("click",_closeQrModal);
+document.getElementById("qr-close-btn").addEventListener("click",_closeQrModal);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ _closeUserModal(); _closeDeviceModal(); _closeCalendar(); _closeLinkModal(); _closeQrModal(); } });
 
 /* ── Аккордеон "Скачать Amnezia VPN" ─────────────────────────────────────── */
 (function(){
