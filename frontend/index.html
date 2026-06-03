@@ -293,7 +293,13 @@ body{
 .device-ip{font-family:"SF Mono","JetBrains Mono",ui-monospace,monospace;letter-spacing:.01em}
 .device-activity:not(:empty)::before{content:' · ';color:var(--t3)}
 
-.device-actions{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.device-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.device-actions:has(.device-primary-action){min-width:150px}
+.device-primary-action .btn{width:100%;justify-content:center;min-height:38px;font-size:13px;background:var(--a-bg);border-color:var(--a-ri);color:var(--a-tx)}
+.device-primary-action .btn:hover:not(:disabled){background:rgba(82,113,232,.18)}
+.device-secondary-actions{display:flex;gap:6px}
+.device-secondary-actions .btn{flex:1;justify-content:center;min-height:34px}
+.device-secondary-actions .btn-danger{flex:0 0 auto}
 
 /* ─── ПУСТЫЕ СОСТОЯНИЯ ─────────────────────────────────────────────────────── */
 .empty-page{padding:clamp(36px,7vw,56px) 20px;text-align:center}
@@ -634,9 +640,10 @@ body{
 
   .device-item{flex-direction:column;align-items:stretch;gap:10px;padding:12px 14px}
   .device-icon{width:30px;height:30px}
-  .device-actions{display:flex;gap:7px;padding-top:2px;border-top:1px solid var(--bd);margin-top:2px}
-  .device-actions .btn-secondary{flex:1;min-height:38px;font-size:13px}
-  .device-actions .btn-danger{flex:0 0 38px;min-height:38px;padding:8px}
+  .device-actions{min-width:0;padding-top:8px;border-top:1px solid var(--bd);margin-top:4px}
+  .device-primary-action .btn{min-height:48px;font-size:14px}
+  .device-secondary-actions .btn{min-height:44px;font-size:13px}
+  .device-secondary-actions .btn-danger{flex:0 0 auto;padding:10px 14px}
   .device-hint{display:none}
   .sub-module-controls{grid-template-columns:1fr 1fr;grid-template-rows:auto auto}
   .sub-date-btn{grid-column:span 2}
@@ -1392,32 +1399,36 @@ function _renderDevices(userName, userSub, devices, container, userStats){
             </div>
           </div>
           <div class="device-actions">
-            <button class="btn btn-xs btn-secondary"
-              data-action="download" data-id="${esc(d.id)}"
-              data-filename="${esc(userName)}-${esc(d.name)}.conf"
-              title="Скачать конфигурацию">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              Конфиг
-            </button>
-            <button class="btn btn-xs btn-secondary"
-              data-action="copy-config" data-id="${esc(d.id)}"
-              title="Скопировать конфиг в буфер">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-              </svg>
-              Скопировать ключ
-            </button>
-            <button class="btn btn-xs btn-danger"
-              data-action="del-device" data-user="${esc(userName)}" data-id="${esc(d.id)}"
-              title="Удалить устройство" style="padding:6px 8px;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"/>
-                <path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6"/>
-              </svg>
-            </button>
+            <div class="device-primary-action">
+              <button class="btn"
+                data-action="copy-config" data-id="${esc(d.id)}"
+                title="Скопировать конфиг в буфер">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                </svg>
+                Скопировать ключ
+              </button>
+            </div>
+            <div class="device-secondary-actions">
+              <button class="btn btn-xs btn-secondary"
+                data-action="download" data-id="${esc(d.id)}"
+                data-filename="${esc(userName)}-${esc(d.name)}.conf"
+                title="Скачать конфигурацию">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Скачать
+              </button>
+              <button class="btn btn-xs btn-danger"
+                data-action="del-device" data-user="${esc(userName)}" data-id="${esc(d.id)}"
+                title="Удалить устройство">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6"/>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>`).join("")
     :'<div class="empty-devices">Нет устройств.</div>';
