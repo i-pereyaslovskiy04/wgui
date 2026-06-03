@@ -7,6 +7,14 @@ from typing import Optional
 
 log = logging.getLogger(__name__)
 
+try:
+    import psutil as _psutil
+    _PSUTIL_OK = True
+except ImportError:
+    _psutil = None
+    _PSUTIL_OK = False
+    log.error("psutil not installed — system metrics unavailable. Run: pip install psutil>=5.9.0")
+
 _INTERVAL   = 60   # seconds between collections
 _ONLINE_SEC = 180  # WG handshake age threshold for "online"
 _WG_IFACE   = os.getenv("WG_INTERFACE", "wg0")
@@ -23,28 +31,32 @@ def get_snapshot() -> Optional[dict]:
 # ── Collectors ────────────────────────────────────────────────────────────────
 
 def _collect_cpu() -> dict:
-    import psutil
-    return {"percent": round(psutil.cpu_percent(interval=1), 1)}
+    if not _PSUTIL_OK:
+        return {"percent": 0.0}
+    return {"percent": round(_psutil.cpu_percent(interval=1), 1)}
 
 
 def _collect_memory() -> dict:
-    import psutil
-    m = psutil.virtual_memory()
+    if not _PSUTIL_OK:
+        return {"used": 0, "total": 0, "percent": 0.0}
+    m = _psutil.virtual_memory()
     return {"used": m.used, "total": m.total, "percent": round(m.percent, 1)}
 
 
 def _collect_disk() -> dict:
-    import psutil
+    if not _PSUTIL_OK:
+        return {"used": 0, "total": 0, "percent": 0.0}
     try:
-        d = psutil.disk_usage("/")
+        d = _psutil.disk_usage("/")
         return {"used": d.used, "total": d.total, "percent": round(d.percent, 1)}
     except Exception:
         return {"used": 0, "total": 0, "percent": 0.0}
 
 
 def _collect_uptime() -> int:
-    import psutil
-    return int(time.time() - psutil.boot_time())
+    if not _PSUTIL_OK:
+        return 0
+    return int(time.time() - _psutil.boot_time())
 
 
 def _collect_wg() -> dict:
@@ -78,8 +90,9 @@ def _collect_wg() -> dict:
 
 def _collect_net() -> dict:
     try:
-        import psutil
-        counters = psutil.net_io_counters(pernic=True)
+        if not _PSUTIL_OK:
+            return {"rx_bytes": 0, "tx_bytes": 0}
+        counters = _psutil.net_io_counters(pernic=True)
         ifc = counters.get(_WG_IFACE)
         if ifc is None:
             return {"rx_bytes": 0, "tx_bytes": 0}
