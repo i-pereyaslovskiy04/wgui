@@ -1039,7 +1039,7 @@ body{
       </div>
       <div id="qr-err" class="qr-load-err hidden">Не удалось загрузить QR-код</div>
     </div>
-    <p class="qr-hint">Сканируйте QR-код в Amnezia VPN или WireGuard. Если QR-код не распознаётся, скачайте конфигурационный файл и импортируйте его вручную.</p>
+    <p class="qr-hint">Сканируйте QR-код в WireGuard или Amnezia VPN. Если Amnezia VPN не реагирует на QR-код, скачайте конфигурационный файл и импортируйте его вручную. Если приложение предложит включить обфускацию WireGuard — можно включить.</p>
     <div class="modal-actions">
       <button class="btn btn-primary btn-sm" id="qr-close-btn">Закрыть</button>
     </div>
@@ -1495,15 +1495,35 @@ function _openQrModal(deviceId, deviceName) {
   const img  = document.getElementById("qr-img");
   const spin = document.getElementById("qr-spinner");
   const err  = document.getElementById("qr-err");
-  img.classList.add("hidden"); err.classList.add("hidden"); spin.classList.remove("hidden");
+  // Reset state before each open
   img.src = "";
-  img.onload = () => { spin.classList.add("hidden"); img.classList.remove("hidden"); };
-  img.onerror = () => { spin.classList.add("hidden"); err.classList.remove("hidden"); };
-  // req() sends X-API-TOKEN; for img.src we use fetch + blob URL
+  img.classList.add("hidden");
+  err.classList.add("hidden");
+  err.textContent = "Не удалось загрузить QR-код";
+  spin.classList.remove("hidden");
+  // img.onload fires when blob URL is decoded — clear error, show image
+  img.onload = () => {
+    spin.classList.add("hidden");
+    err.classList.add("hidden");
+    img.classList.remove("hidden");
+  };
+  // img.onerror fires only if the browser can't decode the image blob
+  img.onerror = () => {
+    spin.classList.add("hidden");
+    img.classList.add("hidden");
+    err.textContent = "Не удалось загрузить QR-код";
+    err.classList.remove("hidden");
+  };
+  // req() sends X-API-TOKEN; use fetch + blob URL so <img> gets auth
   req("GET", `/devices/${encodeURIComponent(deviceId)}/qr`)
     .then(r => r.blob())
     .then(blob => { img.src = URL.createObjectURL(blob); })
-    .catch(e => { spin.classList.add("hidden"); err.classList.remove("hidden"); err.textContent = e.message || "Ошибка загрузки QR"; });
+    .catch(e => {
+      spin.classList.add("hidden");
+      img.classList.add("hidden");
+      err.textContent = e.message || "Ошибка загрузки QR";
+      err.classList.remove("hidden");
+    });
   show("qr-modal");
 }
 function _closeQrModal() {

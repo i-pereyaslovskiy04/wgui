@@ -1,5 +1,6 @@
 import io
 import logging
+import re
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse, StreamingResponse
@@ -8,6 +9,28 @@ from storage import CONFIGS_DIR, find_device
 
 log = logging.getLogger(__name__)
 router = APIRouter()
+
+_EMPTY_VALUE_RE = re.compile(r"^[A-Za-z0-9]+\s*=\s*$")
+_SENSITIVE_KEY_RE = re.compile(r"(?i)^(PrivateKey|PresharedKey)\s*=")
+
+
+def _normalize_wg_config(text: str) -> str:
+    """Normalize WireGuard config text for QR encoding without touching the file on disk.
+
+    - Strip BOM
+    - Normalize CRLF/CR → LF
+    - Strip trailing whitespace from each line
+    - Drop lines with empty values  (e.g. "DNS =" or "DNS=")
+    """
+    text = text.lstrip("﻿")
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+    lines = []
+    for line in text.split("\n"):
+        line = line.rstrip()
+        if _EMPTY_VALUE_RE.match(line):
+            continue
+        lines.append(line)
+    return "\n".join(lines).strip() + "\n"
 
 try:
     import qrcode as _qrcode
@@ -49,7 +72,14 @@ def device_qr(device_id: str):
         raise HTTPException(503, "QR generation unavailable — qrcode[pil] not installed")
 
     _, _, config_file = _resolve_config(device_id)
-    content = config_file.read_text(encoding="utf-8")
+    raw     = config_file.read_text(encoding="utf-8")
+    content = _normalize_wg_config(raw)
+
+    if log.isEnabledFor(logging.DEBUG):
+        preview = []
+        for ln in content.splitlines()[:6]:
+            preview.append(ln.split("=")[0] + "= [redacted]" if _SENSITIVE_KEY_RE.match(ln) else ln)
+        log.debug("QR: raw=%d chars, normalized=%d chars\n%s", len(raw), len(content), "\n".join(preview))
 
     img = _qrcode.make(content)
     buf = io.BytesIO()
