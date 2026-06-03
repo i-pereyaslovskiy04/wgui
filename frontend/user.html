@@ -355,10 +355,11 @@ function hide(id){ $(id).classList.add("hidden"); }
 
 function _fmtBytes(b){
   if(!b||b<=0) return "0 Б";
-  if(b<1024)       return b+" Б";
-  if(b<1048576)    return (b/1024).toFixed(1)+" КБ";
-  if(b<1073741824) return (b/1048576).toFixed(1)+" МБ";
-  return (b/1073741824).toFixed(2)+" ГБ";
+  if(b<1024)             return b+" Б";
+  if(b<1048576)          return (b/1024).toFixed(1)+" КБ";
+  if(b<1073741824)       return (b/1048576).toFixed(1)+" МБ";
+  if(b<1099511627776)    return (b/1073741824).toFixed(2)+" ГБ";
+  return (b/1099511627776).toFixed(2)+" ТБ";
 }
 
 function _fmtAge(s){

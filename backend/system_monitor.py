@@ -1,6 +1,4 @@
 import logging
-import os
-import subprocess
 import threading
 import time
 from typing import Optional
@@ -15,9 +13,7 @@ except ImportError:
     _PSUTIL_OK = False
     log.error("psutil not installed — system metrics unavailable. Run: pip install psutil>=5.9.0")
 
-_INTERVAL   = 60   # seconds between collections
-_ONLINE_SEC = 180  # WG handshake age threshold for "online"
-_WG_IFACE   = os.getenv("WG_INTERFACE", "wg0")
+_INTERVAL = 60  # seconds between collections
 
 _lock: threading.Lock = threading.Lock()
 _snapshot: Optional[dict] = None
@@ -62,57 +58,12 @@ def _collect_uptime() -> int:
     return int(time.time() - _psutil.boot_time())
 
 
-def _collect_wg() -> dict:
-    base = {"interface": _WG_IFACE, "online_peers": 0, "total_peers": 0}
-    try:
-        r = subprocess.run(
-            ["wg", "show", _WG_IFACE, "dump"],
-            capture_output=True, text=True, timeout=5,
-        )
-        if r.returncode != 0:
-            return base
-        lines = [ln for ln in r.stdout.splitlines() if ln.strip()]
-        peer_lines = lines[1:]  # first line = interface info
-        now    = int(time.time())
-        total  = len(peer_lines)
-        online = 0
-        for line in peer_lines:
-            parts = line.split("\t")
-            if len(parts) >= 5:
-                try:
-                    lh = int(parts[4])
-                    if lh and (now - lh) < _ONLINE_SEC:
-                        online += 1
-                except (ValueError, IndexError):
-                    pass
-        return {"interface": _WG_IFACE, "online_peers": online, "total_peers": total}
-    except Exception as e:
-        log.debug("SystemMonitor: wg collect: %s", e)
-        return base
-
-
-def _collect_net() -> dict:
-    try:
-        if not _PSUTIL_OK:
-            return {"rx_bytes": 0, "tx_bytes": 0}
-        counters = _psutil.net_io_counters(pernic=True)
-        ifc = counters.get(_WG_IFACE)
-        if ifc is None:
-            return {"rx_bytes": 0, "tx_bytes": 0}
-        return {"rx_bytes": ifc.bytes_recv, "tx_bytes": ifc.bytes_sent}
-    except Exception as e:
-        log.debug("SystemMonitor: net collect: %s", e)
-        return {"rx_bytes": 0, "tx_bytes": 0}
-
-
 def _collect() -> dict:
     return {
         "cpu":            _collect_cpu(),
         "memory":         _collect_memory(),
         "disk":           _collect_disk(),
         "uptime_seconds": _collect_uptime(),
-        "wireguard":      _collect_wg(),
-        "network":        _collect_net(),
         "updated_at":     int(time.time()),
     }
 
