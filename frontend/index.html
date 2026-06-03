@@ -1879,21 +1879,15 @@ async function _loadSysStatus(){
     const r=await fetch(API+"/system/status",{headers:{"X-API-TOKEN":_token||""}});
     if(!r.ok) throw new Error("HTTP "+r.status);
     const j=await r.json();
-    if(j.ok&&j.data){ _applySysStatus(j.data); return true; }
+    if(j.ok&&j.data) _applySysStatus(j.data);
   }catch{
     const dash=document.getElementById("sys-dashboard");
     if(dash) dash.querySelectorAll(".sys-card").forEach(c=>c.classList.add("sys-err"));
   }
-  return false;
 }
 
 function _startSysPolling(){
-  let _retries=6;
-  async function _poll(){
-    const ok=await _loadSysStatus();
-    if(!ok&&_retries-->0) setTimeout(_poll,3000);
-  }
-  _poll();
+  _loadSysStatus();
   _sysTimer=setInterval(_loadSysStatus,60000);
 }
 

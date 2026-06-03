@@ -33,7 +33,7 @@ def get_snapshot() -> Optional[dict]:
 def _collect_cpu() -> dict:
     if not _PSUTIL_OK:
         return {"percent": 0.0}
-    return {"percent": round(_psutil.cpu_percent(interval=1), 1)}
+    return {"percent": round(_psutil.cpu_percent(interval=None), 1)}
 
 
 def _collect_memory() -> dict:
@@ -135,6 +135,9 @@ class SystemMonitorWorker:
         log.info("SystemMonitorWorker stopped")
 
     def _run(self) -> None:
+        if _PSUTIL_OK:
+            _psutil.cpu_percent(interval=None)  # prime the counter
+        time.sleep(1)                            # wait for a meaningful 1s window
         self._tick()
         while not self._stop.wait(_INTERVAL):
             self._tick()
